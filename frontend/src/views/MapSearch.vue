@@ -1,6 +1,7 @@
 <template lang="">
    <div class="container">
       <div class="detail-compo floating">
+         <map-detail></map-detail>
          <!-- 좌측 사이드 메뉴 위치 -->
          <!-- 내부에 컴포넌트 생성 후 배치 -->
       </div>
@@ -18,9 +19,10 @@
 
 <script>
 import VueDaumMap from 'vue-daum-map';
+import MapDetail from '@/components/MapDetail.vue';
 
 export default {
-   components: { VueDaumMap },
+   components: { VueDaumMap, MapDetail },
    data: () => ({
       appKey: 'b20bb90eb97f8724820808bd2047982e', //restAPI key
       center: { lat: '', lng: '' },

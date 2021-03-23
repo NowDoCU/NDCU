@@ -1,5 +1,6 @@
 <template>
    <div id="app">
+      <!-- 추후 라우터뷰로 변환 -->
       <map-search></map-search>
    </div>
 </template>
