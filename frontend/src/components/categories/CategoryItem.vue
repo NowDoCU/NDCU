@@ -28,16 +28,20 @@ export default {
 <style scoped lang="scss">
 .bt-wrapper {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
   .img-wrapper {
-    width: 50px;
-    height: 50px;
+    width: 40px;
+    height: 40px;
     img {
       width: 100%;
       height: 100%;
     }
   }
   .cate-text {
-    font-size: 8pt;
+    font-size: 6pt;
   }
 
 }

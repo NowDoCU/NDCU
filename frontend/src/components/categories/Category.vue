@@ -50,9 +50,18 @@ export default {
   align-self: center;
   flex-wrap: wrap;
   .button-wrapper {
-    width: 20%;
+    width: 65px;
+    height: 65px;
+    background-color: rgba(204, 203, 203, 0.782);
     display: flex;
     justify-content: center;
+    margin: 5px;
+    padding: 5px;
+    border-radius: 10px;
+  }
+  .button-wrapper:hover {
+    background-color: rgba(181, 181, 181, 0.782);
+    cursor: pointer;
   }
 }
 </style>

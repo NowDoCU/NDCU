@@ -1,50 +1,66 @@
 <template>
   <div class="oi-container">
-    <div class="top-wrapper">
-      <span>업종</span>
-      <category @category-select="onCateSelect"></category>
-    </div>
-    <div class="middle-wrapper">
-      <span>지역</span>
-        {{ selectedDs }}
-        <div 
-          class="search"
-          @keyup.right="selectValue('right')"
-          @keyup.left="selectValue('left')"
-        >
-          <input
-            id="districtInput" 
-            class="ds-input" 
-            type="text" 
-            @input="filter($event.target.value)"
-            @keypress.enter="addDistrct($event.target.value)"
-            @click="getAllDs"
-            autocomplete="off"
+      <div class="top-wrapper">
+        <span>업종</span>
+        <category class="category" @category-select="onCateSelect"></category>
+      </div>
+      <div class="middle-wrapper">
+        <span class="md-subtitle">지역</span>
+          <div 
+            :class="{ 'selected-ds' : selectedDs.length }"
+            v-if="showDsList"
           >
-          <ul
-            tabindex="0"
-            class="ds-list"
-            v-if="filterList.length"
-            @mouseover="removeValue"
-          >
-            <li
-              tabindex="-1"
-              v-for="(district, idx) in filterList"
+            <div 
+              class="ds-item"
+              v-for="(ds, idx) in selectedDs"
               :key="idx"
-              @click="changeValue(district)"
-              @keyup.enter="selectValue('enter', district)"
             >
-              <span>{{ district }}</span>
-            </li>
-          </ul>
-        </div>
-    </div>
-    <div class="bottom-wrapper">
-      <span>추가정보</span>
-    </div>
-    <div class="footer">
+              <span class="ds-text">{{ ds }}</span>
+              <span @click="deleteDs(idx)" class="del">x</span>
+            </div>
+          </div>
+          <div 
+            class="search"
+            @blur="focusOut"
+            @keyup.right="selectValue('right')"
+            @keyup.left="selectValue('left')"
+          >
+            <input
+              id="districtInput" 
+              class="ds-input" 
+              type="text" 
+              @input="filter($event.target.value)"
+              @keypress.enter="addDistrct($event.target.value)"
+              @click="getAllDs"
+              autocomplete="off"
+            >
+            <ul
+              tabindex="0"
+              class="ds-list"
+              v-if="filterList.length"
+              @mouseover="removeValue"
+            >
+              <li
+                tabindex="-1"
+                v-for="(district, idx) in filterList"
+                :key="idx"
+                @click="changeValue(district)"
+                @keyup.enter="selectValue('enter', district)"
+              >
+                <span>{{ district }}</span>
+              </li>
+            </ul>
+          </div>
+      </div>
+      <div class="bottom-wrapper">
+        <span>추가정보</span>
+        <div class="option-wrapper">
 
-    </div>
+        </div>
+      </div>
+      <div class="footer">
+        <button class="com-bt">완료</button>
+      </div>
   </div>
 </template>
 <script>
@@ -58,6 +74,7 @@ export default {
   data: function () {
     return {
       selectedCate: '',
+      showDsList: false,
       isActive: false,
       query: '',
       selectedDs: [],
@@ -119,6 +136,9 @@ export default {
         }
       }
     },
+    deleteDs: function (idx) {
+      this.selectedDs.splice(idx, 1)
+    },
     removeValue: function () {
       if (document.querySelector('.ds-list').classList.contains('key')) {
         document.querySelector('.ds-list').classList.remove('key')
@@ -163,7 +183,11 @@ export default {
       }
     },
     getAllDs: function () {
+      this.showDsList = true
       this.filterList = this.districts
+    },
+    focusOut: function () {
+      this.showDsList = false
     },
     filter: function (q) {
       const reg = /[^가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9|\s]/.test(q)
@@ -182,26 +206,147 @@ export default {
 </script>
 <style scoped lang="scss">
 .oi-container {
-  height: 100%;
-  padding: 50px 10px 10px;
+  height: 87%;
+  padding: 50px 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  .top-wrapper {
+    height: 30%;
+    width: 100%;
+    span {
+      font-size: 15pt;
+      font-weight: 900;
+      margin: 0 10px;
+    }
+    .category {
+      margin-top: 15px;
+    }
+  }
   .middle-wrapper {
+    height: 20%;
+    width: 100%;
+    .md-subtitle {
+      font-size: 15pt;
+      font-weight: 900;
+      margin: 0 10px;
+    }
+    .selected-ds {
+      margin: 15px 0;
+      display: flex;
+      animation: 0.5s ease-out 0s 1 collapse;
+      @keyframes collapse {
+        0% {
+          height: 0;
+          display: none;
+        }
+        100% {
+          height: 40px;
+        }
+      }
+      .ds-item {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        background-color: rgb(66, 66, 132);
+        margin: 0 5px;
+        width: 60px;
+        height: 15px;
+        padding: 10px;
+        border-radius: 20px;
+        color: white;
+        text-align: center;
+        .ds-text {
+          font-size: 9pt;
+          font-weight: 100;
+        }
+        .del {
+          font-size: 6pt
+        }
+        .del:hover {
+          cursor: pointer;
+        }
+        animation: 1s ease-out 0s 1 opacity-control;
+        @keyframes opacity-control {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+        
+      }
+        
+      }
+    }
     .search {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       .ds-input {
-        width: 100%;
+        padding: 5px;
+        z-index: 100;
+        width: 380px;
+        height: 35px;
+        border-radius: 20px;
+        background-color: rgba(255, 255, 255, 0.68);
+      }
+      .ds-input:focus {
+        outline: none;
       }
       .ds-list {
-        width: 100%;
-        background-color: violet;
-        padding: 10px;
+        z-index: 50;
+        float: inherit;
+        margin-top: -42px;
+        border-radius: 20px;
+        width: 368px;
+        background-color: white;
+        box-shadow: 0px 9px 20px 0px #56565629;
+        padding: 50px 10px 10px 10px;
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
         li {
+          font-size: 10pt;
           margin: 3px;
-          background-color: aquamarine;
-          width: 65px;
+          padding: 5px;
+          text-align: center;
+          border-radius: 20px;
+          color: white;
+          background-color: rgb(80, 101, 176);
+          width: 54px;
+        }
+        li:hover {
+          cursor: pointer;
+          background-color: rgb(57, 72, 128);
         }
       }
+    }
+  }
+  .bottom-wrapper {
+    z-index: -10;
+    height: 30%;
+    width: 100%;
+    span {
+      font-size: 15pt;
+    }
+    .option-wrapper {
+      background-color: burlywood;
+      width: 100%;
+      height: 100%;
+    }
+  }
+  .footer {
+    position: absolute;
+    bottom: 40px;
+    right: 30px;
+    .com-bt {
+      color: white;
+      padding: 5px;
+      border-radius: 10px;
+      background-color: rgb(48, 48, 122);
     }
   }
 }

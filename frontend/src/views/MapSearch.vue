@@ -71,9 +71,9 @@ export default {
       border-radius: 0px 30px 30px 0px;
    }
   .menu-expand-compo {
-    background-color: rgb(255, 230, 230);
+    background-color: rgb(243, 242, 223);
 
-    width: 400px;
+    width: 445px;
     height: 100%;
     left: 0px;
 
