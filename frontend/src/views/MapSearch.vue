@@ -10,9 +10,9 @@
          <!-- 내부에 컴포넌트 생성 후 배치 -->
       </div>
       <div class="sidemenu-compo floating">
-         <!-- 좌측 사이드 메뉴 위치 -->
-         <!-- 내부에 컴포넌트 생성 후 배치 -->
+         <side-menu></side-menu>
       </div>
+
       <vue-daum-map id="map" :appKey="appKey" :center.sync="center" :level.sync="level" :mapTypeId="mapTypeId" :libraries="libraries" @load="onLoad"> </vue-daum-map>
    </div>
 </template>
@@ -20,9 +20,10 @@
 <script>
 import VueDaumMap from 'vue-daum-map';
 import MapDetail from '@/components/MapDetail.vue';
+import SideMenu from '@/components/SideMenu.vue';
 
 export default {
-   components: { VueDaumMap, MapDetail },
+   components: { VueDaumMap, MapDetail, SideMenu },
    data: () => ({
       appKey: 'b20bb90eb97f8724820808bd2047982e', //restAPI key
       center: { lat: '', lng: '' },
