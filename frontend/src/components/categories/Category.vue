@@ -22,7 +22,7 @@ export default {
     return {
       selectedCate: '',
       categories: [
-        { name: '한식음식점', sel: false},
+        { name: '한식음식점', sel: false}, // sel >> 선택된 업종 스타일링 적용 위해
         { name: '중식음식점', sel: false},
         { name: '일식음식점', sel: false},
         { name: '양식음식점', sel: false},

@@ -58,10 +58,10 @@ export default {
    data: function() {
       return {
          selectedCate: '',
-         showDsList: false,
-         isActive: false,
-         query: '',
-         selectedDs: [],
+         showDsList: false, // 선택된 지역 목록
+         isActive: false, // 지역 input 자동완성
+         query: '', // 지역 검색어
+         selectedDs: [], // 선택된 지역
          districts: [
             '종로구',
             '중구',
@@ -89,36 +89,38 @@ export default {
             '송파구',
             '강동구',
          ],
-         filterList: [],
+         filterList: [], // 자동완성으로 걸러진 결과
       };
    },
    methods: {
+      // expeneded compo 닫기
       closeCompo: function () {
          this.$emit('close-expended')
       },
+      // 업종 선택 완료햇을 때
       onCateSelect: function(category) {
-         console.log(category.cate, this.selectedCate);
          if (category.cate !== this.selectedCate) {
-            if (this.selectedCate === '') {
-               this.selectedCate = category.cate;
+            if (this.selectedCate === '') { // 현재 선택된 업종 없으면
+               this.selectedCate = category.cate; // 업종 선택 처리
             }
-         } else if (category.cate === this.selectedCate) {
-            this.selectedCate = '';
+         } else if (category.cate === this.selectedCate) { // 선택된 업종과 원래 선택 되어 있던 업종이 같으면
+            this.selectedCate = '' // 선택 취소
          }
       },
+      // 자동완성 결과에서 하나 선택 했을 때
       changeValue(district) {
-         this.addDistrct(district);
+         this.addDistrct(district); // 선택된 지역 목록에 추가
          this.filterList = [];
          document.querySelector('.ds-input').value = null;
       },
       addDistrct: function(district) {
          const isSel = this.selectedDs.indexOf(district);
-         if (isSel >= 0) {
+         if (isSel >= 0) { // 이미 선택된 지역이면
             alert('이미 선택된 지역입니다.');
          } else {
-            if (this.districts.indexOf(district) != -1) {
-               if (this.selectedDs.length < 3) {
-                  this.selectedDs.push(district);
+            if (this.districts.indexOf(district) != -1) { // 입력된 값이 유효한 지역구 이름이면(검색창에서 지역이름 아닌 것 입력한 경우나 오타났을 경우 차단)
+               if (this.selectedDs.length < 3) { // 선택된 지역목록이 최대목록이 아니면
+                  this.selectedDs.push(district); // 추가
                   this.filterList = [];
                   document.querySelector('.ds-input').value = null;
                } else {
@@ -129,9 +131,11 @@ export default {
             }
          }
       },
+      // 선택한 지역 제거
       deleteDs: function(idx) {
          this.selectedDs.splice(idx, 1);
       },
+      // 검색 결과에서 마우스 작동일 때
       removeValue: function() {
          if (document.querySelector('.ds-list').classList.contains('key')) {
             document.querySelector('.ds-list').classList.remove('key');
@@ -177,10 +181,12 @@ export default {
             }
          }
       },
+      // 검색결과 창에 모든 지역 보여주기
       getAllDs: function() {
          this.showDsList = true;
          this.filterList = this.districts;
       },
+      // 자동완성 위한 필터
       filter: function(q) {
          const reg = /[^가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9|\s]/.test(q);
          if (reg === false) {
@@ -192,6 +198,7 @@ export default {
             this.isActive = false;
          }
       },
+      // 조건 입력 완료했을 때
       getRecommended: function() {
          const options = {
             category: this.selectedCate,
@@ -342,6 +349,9 @@ export default {
                }
                .unsel:hover {
                   cursor: pointer;
+                  background-color: rgb(45, 83, 186);
+               }
+               .sel {
                   background-color: rgb(45, 83, 186);
                }
                .sele {
