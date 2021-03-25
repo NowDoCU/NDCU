@@ -20,7 +20,7 @@
 
 <script>
 import VueDaumMap from 'vue-daum-map';
-import MapDetail from '@/components/MapDetail.vue';
+import MapDetail from '@/components/MapDetail/MapDetail.vue';
 import OptionInput from '@/components/OptionInput.vue'
 import SideMenu from '@/components/SideMenu.vue';
 
@@ -87,7 +87,7 @@ export default {
   }
 
    .detail-compo {
-      display: none; // 임시
+      // display: none; // 임시
       top: 2%;
       right: 1%;
       background-color: white;
