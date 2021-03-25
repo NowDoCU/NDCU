@@ -19,7 +19,7 @@
 
 <script>
 import VueDaumMap from 'vue-daum-map';
-import MapDetail from '@/components/MapDetail.vue';
+import MapDetail from '@/components/MapDetail/MapDetail.vue';
 
 export default {
    components: { VueDaumMap, MapDetail },
