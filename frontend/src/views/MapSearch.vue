@@ -5,14 +5,15 @@
          <!-- 좌측 사이드 메뉴 위치 -->
          <!-- 내부에 컴포넌트 생성 후 배치 -->
       </div>
-      <div class="menu-expand-compo floating">
+      <div v-if="optionCompo||bookMarkCompo" class="menu-expand-compo floating">
+        <option-input v-if="optionCompo"></option-input>
          <!-- 좌측 사이드 메뉴 위치 -->
          <!-- 내부에 컴포넌트 생성 후 배치 -->
       </div>
       <div class="sidemenu-compo floating">
-         <!-- 좌측 사이드 메뉴 위치 -->
-         <!-- 내부에 컴포넌트 생성 후 배치 -->
+         <side-menu></side-menu>
       </div>
+
       <vue-daum-map id="map" :appKey="appKey" :center.sync="center" :level.sync="level" :mapTypeId="mapTypeId" :libraries="libraries" @load="onLoad"> </vue-daum-map>
    </div>
 </template>
@@ -20,9 +21,11 @@
 <script>
 import VueDaumMap from 'vue-daum-map';
 import MapDetail from '@/components/MapDetail/MapDetail.vue';
+import OptionInput from '@/components/OptionInput.vue'
+import SideMenu from '@/components/SideMenu.vue';
 
 export default {
-   components: { VueDaumMap, MapDetail },
+   components: { VueDaumMap, MapDetail, OptionInput, SideMenu },
    data: () => ({
       appKey: 'b20bb90eb97f8724820808bd2047982e', //restAPI key
       center: { lat: '', lng: '' },
@@ -30,6 +33,8 @@ export default {
       mapTypeId: VueDaumMap.MapTypeId.NORMAL,
       libraries: [],
       map: null,
+      optionCompo: true,
+      bookMarkCompo: false,
    }),
    created() {
       this.initCenter();
@@ -37,7 +42,7 @@ export default {
    methods: {
       // 지도가 로드 완료되면 load 이벤트 발생
       onLoad(map) {
-         console.log(map);
+         // console.log(map);
          this.map = map;
       },
       initCenter() {
@@ -68,8 +73,21 @@ export default {
 
       border-radius: 0px 30px 30px 0px;
    }
+  .menu-expand-compo {
+    background-color: white;
+
+    width: 445px;
+    height: 100%;
+    left: 0px;
+
+    padding-left: 100px;
+    z-index: 8;
+
+    border-radius: 0px 30px 30px 0px;
+  }
 
    .detail-compo {
+      // display: none; // 임시
       top: 2%;
       right: 1%;
       background-color: white;

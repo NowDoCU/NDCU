@@ -32,5 +32,5 @@
 │       ├── components
 │       ├── css
 │       └── views
-└── recommand
+└── recommend
 ```
