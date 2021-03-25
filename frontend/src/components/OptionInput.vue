@@ -21,7 +21,6 @@
           </div>
           <div 
             class="search"
-            @blur="focusOut"
             @keyup.right="selectValue('right')"
             @keyup.left="selectValue('left')"
           >
@@ -41,8 +40,10 @@
               @mouseover="removeValue"
             >
               <li
+                class="ds-items"
                 tabindex="-1"
                 v-for="(district, idx) in filterList"
+                :class="[{'unsel': selectedDs.indexOf(district) === -1}, {'sele':selectedDs.indexOf(district) !== -1}]"
                 :key="idx"
                 @click="changeValue(district)"
                 @keyup.enter="selectValue('enter', district)"
@@ -59,7 +60,7 @@
         </div>
       </div>
       <div class="footer">
-        <button class="com-bt">완료</button>
+        <button @click="getRecommended" class="com-bt">완료</button>
       </div>
   </div>
 </template>
@@ -110,7 +111,14 @@ export default {
   },
   methods: {
     onCateSelect: function (category) {
-      this.selectedCate = category
+      console.log(category.cate, this.selectedCate)
+      if (category.cate !== this.selectedCate) {
+        if (this.selectedCate === '') {
+          this.selectedCate = category.cate
+        } 
+      } else if (category.cate === this.selectedCate) {
+        this.selectedCate = ''
+      }
     },
     changeValue(district) {
       this.addDistrct(district)
@@ -132,7 +140,7 @@ export default {
             alert('지역은 최대 3개까지 선택가능합니다.')
           }
         } else {
-          alert('지역명을 입력해주세요.')
+          alert('올바른 지역명이 아닙니다.')
         }
       }
     },
@@ -186,9 +194,6 @@ export default {
       this.showDsList = true
       this.filterList = this.districts
     },
-    focusOut: function () {
-      this.showDsList = false
-    },
     filter: function (q) {
       const reg = /[^가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9|\s]/.test(q)
       if (reg === false) {
@@ -200,6 +205,13 @@ export default {
         this.isActive = false
       }
     },
+    getRecommended: function () {
+      const options = {
+        category: this.selectedCate,
+        districts: this.selectedDs
+      }
+      this.$emit('input-complete', options)
+    }
   },
   
 }
@@ -207,10 +219,10 @@ export default {
 <style scoped lang="scss">
 .oi-container {
   height: 87%;
-  padding: 50px 10px;
+  padding: 30px 10px;
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: space-evenly;
   align-items: center;
   .top-wrapper {
     height: 30%;
@@ -225,16 +237,20 @@ export default {
     }
   }
   .middle-wrapper {
-    height: 20%;
+    height: 15%;
     width: 100%;
+    // display: flex;
+    // flex-direction: column;
+    // justify-content: center;
     .md-subtitle {
       font-size: 15pt;
       font-weight: 900;
       margin: 0 10px;
     }
     .selected-ds {
-      margin: 15px 0;
+      margin: 5px;
       display: flex;
+      justify-content: center;
       animation: 0.5s ease-out 0s 1 collapse;
       @keyframes collapse {
         0% {
@@ -242,17 +258,17 @@ export default {
           display: none;
         }
         100% {
-          height: 40px;
+          height: 30px;
         }
       }
       .ds-item {
         display: flex;
         justify-content: space-around;
         align-items: center;
-        background-color: rgb(66, 66, 132);
+        background-color: rgb(80, 101, 176);
         margin: 0 5px;
-        width: 60px;
-        height: 15px;
+        width: 58px;
+        height: 10px;
         padding: 10px;
         border-radius: 20px;
         color: white;
@@ -290,6 +306,7 @@ export default {
         z-index: 100;
         width: 380px;
         height: 35px;
+        border-color: lightgray;
         border-radius: 20px;
         background-color: rgba(255, 255, 255, 0.68);
       }
@@ -301,38 +318,55 @@ export default {
         float: inherit;
         margin-top: -42px;
         border-radius: 20px;
-        width: 368px;
+        width: 375px;
         background-color: white;
         box-shadow: 0px 9px 20px 0px #56565629;
         padding: 50px 10px 10px 10px;
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
-        li {
+        .ds-items {
           font-size: 10pt;
           margin: 3px;
-          padding: 5px;
+          padding: 10px 5px;
           text-align: center;
           border-radius: 20px;
           color: white;
-          background-color: rgb(80, 101, 176);
-          width: 54px;
+          width: 58px;
+          height: 10px;
         }
-        li:hover {
+        .ds-items:focus {
+          outline: none;
+        }
+        .unsel { 
+          background-color: rgb(80, 101, 176);
+        }
+        .unsel:hover {
           cursor: pointer;
           background-color: rgb(57, 72, 128);
         }
+        .sele {
+          background-color: gray;
+        }
+        
+      }
+      .ds-list:focus {
+        outline: none;
       }
     }
   }
   .bottom-wrapper {
+    margin-top: -10px;
     z-index: -10;
     height: 30%;
     width: 100%;
     span {
       font-size: 15pt;
+      font-weight: 900;
+      margin: 0 10px;
     }
     .option-wrapper {
+      margin-top: 20px;
       background-color: burlywood;
       width: 100%;
       height: 100%;
@@ -340,13 +374,24 @@ export default {
   }
   .footer {
     position: absolute;
-    bottom: 40px;
+    bottom: 30px;
     right: 30px;
     .com-bt {
       color: white;
       padding: 5px;
-      border-radius: 10px;
-      background-color: rgb(48, 48, 122);
+      width: 70px;
+      height: 40px;
+      border-radius: 20px;
+      border: none;
+      background-color: rgb(80, 101, 176);
+      
+    }
+    .com-bt:hover {
+      cursor: pointer;
+      background-color: rgb(57, 72, 128);
+    }
+    .com-bt:focus {
+      outline:none;
     }
   }
 }

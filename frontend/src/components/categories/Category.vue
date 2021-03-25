@@ -4,8 +4,9 @@
       v-for="(category, idx) in categories"
       :key="idx"
       class="button-wrapper"
+      :class="[{ 'unsel' : !category.sel }, { 'sel' : category.sel }]"
     >
-      <categoryItem @category-select="onCateSelect" :category="category" :idx="idx"></categoryItem>
+      <categoryItem @category-select="onCateSelect" :category="category.name" :idx="idx"></categoryItem>
     </div>
   </div>
 </template>
@@ -19,23 +20,36 @@ export default {
   },
   data: function () {
     return {
+      selectedCate: '',
       categories: [
-        '한식음식점',
-        '중식음식점',
-        '일식음식점',
-        '양식음식점',
-        '분식전문점',
-        '패스트푸드점',
-        '치킨전문점',
-        '호프-간이주점',
-        '커피-음료',
-        '제과점'
+        { name: '한식음식점', sel: false},
+        { name: '중식음식점', sel: false},
+        { name: '일식음식점', sel: false},
+        { name: '양식음식점', sel: false},
+        { name: '분식전문점', sel: false},
+        { name: '패스트푸드점', sel: false},
+        { name: '치킨전문점', sel: false},
+        { name: '호프-간이주점', sel: false},
+        { name: '커피-음료', sel: false},
+        { name: '제과점', sel: false},
       ]
     }
   },
   methods: {
     onCateSelect: function (category) {
-      this.$emit('category-select', category)
+      if (this.selectedCate !== category.cate) {
+        if(this.selectedCate === '') {
+          this.selectedCate = category.cate
+          this.categories[category.idx].sel = true
+          this.$emit('category-select', category)
+        } else {
+          alert('업종은 한 개만 선택할 수 있습니다.')
+        } 
+      } else {
+        this.selectedCate = ''
+        this.categories[category.idx].sel = false
+        this.$emit('category-select', category)
+      }
     }
   }
 
@@ -52,15 +66,23 @@ export default {
   .button-wrapper {
     width: 65px;
     height: 65px;
-    background-color: rgba(204, 203, 203, 0.782);
     display: flex;
     justify-content: center;
     margin: 5px;
     padding: 5px;
     border-radius: 10px;
   }
-  .button-wrapper:hover {
-    background-color: rgba(181, 181, 181, 0.782);
+  .unsel {
+    background-color: rgba(204, 203, 203, 0.782);
+  }
+  .unsel:hover {
+    background-color: rgba(147, 146, 146, 0.782);
+    cursor: pointer;
+  }
+  .sel {
+    background-color: rgba(147, 146, 146, 0.782);
+  }
+  .sel:hover {
     cursor: pointer;
   }
 }

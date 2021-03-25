@@ -13,9 +13,20 @@ export default {
     category: String,
     idx: Number
   },
+  data: function () {
+    return {
+      isSelected: false
+    }
+  },
   methods: {
     cateSelect: function () {
-      this.$emit('category-select', this.category)
+      this.isSelected = !this.isSelected
+      const itemData = {
+        isSel: this.isSelected,
+        cate: this.category,
+        idx: this.idx
+      }
+      this.$emit('category-select', itemData)
     }
   },
   computed: {
@@ -32,6 +43,7 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: space-around;
+  
   .img-wrapper {
     width: 40px;
     height: 40px;
