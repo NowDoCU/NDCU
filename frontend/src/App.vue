@@ -18,6 +18,7 @@ export default {
 
 <style lang="scss">
 @import 'src/css/common.scss';
+@import 'src/css/global.scss';
 
 #app {
    background-color: wheat;

@@ -1,27 +1,27 @@
 <template lang="">
-   <div class="container">
+   <div class="md-container">
       <div class="region-container">
          <span class="name"> {{ regionName }} </span>
          <div class="info">
             <div class="score">
                추천지수 <span class="number"> {{ score }} </span> 점
-               <i v-if='like' class="fas fa-star" @click='setLike'></i>
-               <i v-else class="far fa-star" @click='setLike'></i>
+               <i v-if="like" class="fas fa-star" @click="setLike"></i>
+               <i v-else class="far fa-star" @click="setLike"></i>
             </div>
-            <p class="description"> * 본 추천지수는 'KNN 알고리즘'을 적용하여 도출된 점수입니다. </p>
+            <p class="description">* 본 추천지수는 'KNN 알고리즘'을 적용하여 도출된 점수입니다.</p>
             <div class="info-boxes">
                <div class="info-box">
-                  <p> 평균 매출 </p>
+                  <p>평균 매출</p>
                   <span> {{ sales }} </span>
                </div>
                <div class="info-box">
-                  <p> 월 임대료 </p>
+                  <p>월 임대료</p>
                   <span> {{ rent }} </span>
                </div>
             </div>
          </div>
-         <DetailGraph :dataset='type' class="graph"/>
-         <DetailGraph :dataset='age' class="graph"/>
+         <DetailGraph :dataset="type" class="graph" />
+         <DetailGraph :dataset="age" class="graph" />
       </div>
    </div>
 </template>
@@ -34,8 +34,8 @@ var mapdata = {
    sales: '1억2844만',
    rent: '2000만',
    type: [49, 22, 11, 8, 4, 3, 2, 1],
-   age: [45, 22, 18, 8, 6, 1]
-}
+   age: [45, 22, 18, 8, 6, 1],
+};
 
 export default {
    name: 'MapDetail',
@@ -50,37 +50,37 @@ export default {
          rent: '',
          type: {
             name: '업종별 비율',
-            category: ['한식음식점', '양식음식점', '일식음식점', '분식전문점', '패스트푸드점',  '호프/간이주점', '커피/음료', '베이커리'],
-            value: ''
+            category: ['한식음식점', '양식음식점', '일식음식점', '분식전문점', '패스트푸드점', '호프/간이주점', '커피/음료', '베이커리'],
+            value: '',
          },
          age: {
             name: '연령대별 비율',
             category: ['10대', '20대', '30대', '40대', '50대', '60대 이상'],
-            value: ''
+            value: '',
          },
-         like: false
-      }
+         like: false,
+      };
    },
    methods: {
       getData: function() {
-         this.regionName = mapdata.name
-         this.score = mapdata.score
-         this.sales = mapdata.sales
-         this.rent = mapdata.rent
-         this.type.value = mapdata.type
-         this.age.value = mapdata.age
+         this.regionName = mapdata.name;
+         this.score = mapdata.score;
+         this.sales = mapdata.sales;
+         this.rent = mapdata.rent;
+         this.type.value = mapdata.type;
+         this.age.value = mapdata.age;
       },
       setLike: function() {
-         this.like = !this.like
-      }
+         this.like = !this.like;
+      },
    },
    created: function() {
-      this.getData()
-   }
+      this.getData();
+   },
 };
 </script>
 <style scoped lang="scss">
-.container {
+.md-container {
    width: 100%;
    height: 100%;
 
@@ -110,7 +110,7 @@ export default {
                background-color: black;
                color: greenyellow;
                font-size: 16pt;
-               border-radius: 15px;        
+               border-radius: 15px;
                padding: 4px 8px 4px 8px;
             }
 
@@ -120,9 +120,9 @@ export default {
          }
 
          .description {
-               font-size: 8pt;
-               color: grey;
-            }
+            font-size: 8pt;
+            color: grey;
+         }
 
          .info-box {
             margin: 10px 25px 0 25px;
