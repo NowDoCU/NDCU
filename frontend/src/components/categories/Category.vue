@@ -73,14 +73,14 @@ export default {
     border-radius: 10px;
   }
   .unsel {
-    background-color: rgba(204, 203, 203, 0.782);
+    background-color: #e7e7e7;
   }
   .unsel:hover {
-    background-color: rgba(147, 146, 146, 0.782);
+    background-color: #cccccc;
     cursor: pointer;
   }
   .sel {
-    background-color: rgba(147, 146, 146, 0.782);
+    background-color: #cccccc;
   }
   .sel:hover {
     cursor: pointer;

@@ -6,14 +6,18 @@
          <!-- 좌측 사이드 메뉴 위치 -->
          <!-- 내부에 컴포넌트 생성 후 배치 -->
       </div>
-      <div v-if="optionCompo || bookMarkCompo" class="menu-expand-compo floating">
-         <option-input v-if="optionCompo"></option-input>
+      <div v-show="optionCompo || bookMarkCompo" class="menu-expand-compo floating">
+         <option-input 
+            v-show="optionCompo" 
+            @close-expended="onClickClose"
+            @input-complete="onInputComplete"
+         ></option-input>
          <!-- 좌측 사이드 메뉴 위치 -->
          <!-- 내부에 컴포넌트 생성 후 배치 -->
       </div>
       <div class="sidemenu-compo floating">
-         <button @click="this.setRecommendMarker">TEST</button>
-         <side-menu></side-menu>
+         <!-- <button @click="this.setRecommendMarker">TEST</button> -->
+         <side-menu @open-input-form="onClickInputBt"></side-menu>
       </div>
 
       <vue-daum-map id="map" :appKey="appKey" :center.sync="center" :level.sync="level" :mapTypeId="mapTypeId" :libraries="libraries" @load="onLoad"> </vue-daum-map>
@@ -73,6 +77,19 @@ export default {
       this.initCenter();
    },
    methods: {
+      // sidemenu의 옵션입력 버튼 눌렀을 때
+      onClickInputBt: function () {
+         this.optionCompo = true
+      },
+      //expended compo 닫기 버튼 눌렀을 때
+      onClickClose: function () {
+         this.optionCompo = false
+      },
+      //추천조건 입력 완료했을 때(상권추천) 
+      onInputComplete: function () {
+         this.optionCompo = false
+         // 추천 결과 요청 추가해야함
+      },
       // 지도가 로드 완료되면 load 이벤트 발생
       onLoad(map) {
          // console.log(map);
@@ -257,7 +274,7 @@ export default {
    .menu-expand-compo {
       background-color: white;
 
-      width: 445px;
+      width: 500px;
       height: 100%;
       left: 0px;
 
@@ -268,7 +285,7 @@ export default {
    }
 
    .detail-compo {
-      // display: none; // 임시
+      display: none; // 임시
       top: 2%;
       right: 1%;
       background-color: white;

@@ -4,7 +4,7 @@
          <div class="logo">
             <img src="@/assets/smc_logo.png" alt="" />
          </div>
-         <div class="btn-search">
+         <div @click="onClickInputBt" class="btn-search">
             <i class="fas fa-search-location"></i>
          </div>
          <div class="btn-bookmark">
@@ -18,7 +18,15 @@
    </div>
 </template>
 <script>
-export default {};
+export default {
+   name: 'SideMenu',
+   methods: {
+      onClickInputBt: function () {
+         this.$emit('open-input-form')
+      }
+   }
+
+};
 </script>
 <style scoped lang="scss">
 .sm-container {
