@@ -1,40 +1,49 @@
 <template>
    <div class="oi-container">
-      <div class="top-wrapper">
-         <span>업종</span>
-         <category class="category" @category-select="onCateSelect"></category>
+      <div class="header">
+         <i @click="closeCompo" class="fas fa-angle-double-left"></i>
       </div>
-      <div class="middle-wrapper">
-         <span class="md-subtitle">지역</span>
-         <div :class="{ 'selected-ds': selectedDs.length }" v-if="showDsList">
-            <div class="ds-item" v-for="(ds, idx) in selectedDs" :key="idx">
-               <span class="ds-text">{{ ds }}</span>
-               <span @click="deleteDs(idx)" class="del">x</span>
+      <div class="content-wrapper">
+         <div class="top-wrapper">
+            <span>업종</span>
+            <category class="category" @category-select="onCateSelect"></category>
+         </div>
+         <div class="middle-wrapper">
+            <span class="md-subtitle">지역</span>
+            <div :class="{ 'selected-ds': selectedDs.length }" v-if="showDsList">
+               <div class="ds-item" v-for="(ds, idx) in selectedDs" :key="idx">
+                  <span class="ds-text">{{ ds }}</span>
+                  <span @click="deleteDs(idx)" class="del">x</span>
+               </div>
+            </div>
+            <div 
+               class="search" 
+               :class="[{'unsel': selectedDs.length == 0}, { 'selec': selectedDs.length }]"
+               @keyup.right="selectValue('right')" @keyup.left="selectValue('left')">
+               <input id="districtInput" class="ds-input" type="text" @input="filter($event.target.value)" @keypress.enter="addDistrct($event.target.value)" @click="getAllDs" autocomplete="off" />
+               <ul tabindex="0" class="ds-list" v-if="filterList.length" @mouseover="removeValue">
+                  <li
+                     class="ds-items"
+                     tabindex="-1"
+                     v-for="(district, idx) in filterList"
+                     :class="[{ unsel: selectedDs.indexOf(district) === -1 }, { sele: selectedDs.indexOf(district) !== -1 }]"
+                     :key="idx"
+                     @click="changeValue(district)"
+                     @keyup.enter="selectValue('enter', district)"
+                  >
+                     <span>{{ district }}</span>
+                  </li>
+               </ul>
             </div>
          </div>
-         <div class="search" @keyup.right="selectValue('right')" @keyup.left="selectValue('left')">
-            <input id="districtInput" class="ds-input" type="text" @input="filter($event.target.value)" @keypress.enter="addDistrct($event.target.value)" @click="getAllDs" autocomplete="off" />
-            <ul tabindex="0" class="ds-list" v-if="filterList.length" @mouseover="removeValue">
-               <li
-                  class="ds-items"
-                  tabindex="-1"
-                  v-for="(district, idx) in filterList"
-                  :class="[{ unsel: selectedDs.indexOf(district) === -1 }, { sele: selectedDs.indexOf(district) !== -1 }]"
-                  :key="idx"
-                  @click="changeValue(district)"
-                  @keyup.enter="selectValue('enter', district)"
-               >
-                  <span>{{ district }}</span>
-               </li>
-            </ul>
+         <div class="bottom-wrapper">
+            <span>추가정보</span>
+            <div class="option-wrapper"></div>
          </div>
-      </div>
-      <div class="bottom-wrapper">
-         <span>추가정보</span>
-         <div class="option-wrapper"></div>
+
       </div>
       <div class="footer">
-         <button @click="getRecommended" class="com-bt">완료</button>
+         <button @click="getRecommended" class="com-bt">추천 받아보기</button>
       </div>
    </div>
 </template>
@@ -49,10 +58,10 @@ export default {
    data: function() {
       return {
          selectedCate: '',
-         showDsList: false,
-         isActive: false,
-         query: '',
-         selectedDs: [],
+         showDsList: false, // 선택된 지역 목록
+         isActive: false, // 지역 input 자동완성
+         query: '', // 지역 검색어
+         selectedDs: [], // 선택된 지역
          districts: [
             '종로구',
             '중구',
@@ -80,33 +89,38 @@ export default {
             '송파구',
             '강동구',
          ],
-         filterList: [],
+         filterList: [], // 자동완성으로 걸러진 결과
       };
    },
    methods: {
+      // expeneded compo 닫기
+      closeCompo: function () {
+         this.$emit('close-expended')
+      },
+      // 업종 선택 완료햇을 때
       onCateSelect: function(category) {
-         console.log(category.cate, this.selectedCate);
          if (category.cate !== this.selectedCate) {
-            if (this.selectedCate === '') {
-               this.selectedCate = category.cate;
+            if (this.selectedCate === '') { // 현재 선택된 업종 없으면
+               this.selectedCate = category.cate; // 업종 선택 처리
             }
-         } else if (category.cate === this.selectedCate) {
-            this.selectedCate = '';
+         } else if (category.cate === this.selectedCate) { // 선택된 업종과 원래 선택 되어 있던 업종이 같으면
+            this.selectedCate = '' // 선택 취소
          }
       },
+      // 자동완성 결과에서 하나 선택 했을 때
       changeValue(district) {
-         this.addDistrct(district);
+         this.addDistrct(district); // 선택된 지역 목록에 추가
          this.filterList = [];
          document.querySelector('.ds-input').value = null;
       },
       addDistrct: function(district) {
          const isSel = this.selectedDs.indexOf(district);
-         if (isSel >= 0) {
+         if (isSel >= 0) { // 이미 선택된 지역이면
             alert('이미 선택된 지역입니다.');
          } else {
-            if (this.districts.indexOf(district) != -1) {
-               if (this.selectedDs.length < 3) {
-                  this.selectedDs.push(district);
+            if (this.districts.indexOf(district) != -1) { // 입력된 값이 유효한 지역구 이름이면(검색창에서 지역이름 아닌 것 입력한 경우나 오타났을 경우 차단)
+               if (this.selectedDs.length < 3) { // 선택된 지역목록이 최대목록이 아니면
+                  this.selectedDs.push(district); // 추가
                   this.filterList = [];
                   document.querySelector('.ds-input').value = null;
                } else {
@@ -117,9 +131,11 @@ export default {
             }
          }
       },
+      // 선택한 지역 제거
       deleteDs: function(idx) {
          this.selectedDs.splice(idx, 1);
       },
+      // 검색 결과에서 마우스 작동일 때
       removeValue: function() {
          if (document.querySelector('.ds-list').classList.contains('key')) {
             document.querySelector('.ds-list').classList.remove('key');
@@ -165,10 +181,12 @@ export default {
             }
          }
       },
+      // 검색결과 창에 모든 지역 보여주기
       getAllDs: function() {
          this.showDsList = true;
          this.filterList = this.districts;
       },
+      // 자동완성 위한 필터
       filter: function(q) {
          const reg = /[^가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9|\s]/.test(q);
          if (reg === false) {
@@ -180,6 +198,7 @@ export default {
             this.isActive = false;
          }
       },
+      // 조건 입력 완료했을 때
       getRecommended: function() {
          const options = {
             category: this.selectedCate,
@@ -192,173 +211,199 @@ export default {
 </script>
 <style scoped lang="scss">
 .oi-container {
-   height: 87%;
-   padding: 30px 10px;
+   height: 100%;
+   padding: 0 10px;
    display: flex;
    flex-direction: column;
-   justify-content: space-evenly;
+   justify-content: space-between;
    align-items: center;
-   .top-wrapper {
-      height: 30%;
-      width: 100%;
-      span {
-         font-size: 15pt;
-         font-weight: 900;
-         margin: 0 10px;
+   .header {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      i {
+         font-size: 24pt;
+         color: rgb(148, 148, 148);
       }
-      .category {
-         margin-top: 15px;
+      i:hover {
+         cursor: pointer;
+         color: #808080;
       }
    }
-   .middle-wrapper {
-      height: 15%;
-      width: 100%;
-      // display: flex;
-      // flex-direction: column;
-      // justify-content: center;
-      .md-subtitle {
-         font-size: 15pt;
-         font-weight: 900;
-         margin: 0 10px;
-      }
-      .selected-ds {
-         margin: 5px;
-         display: flex;
-         justify-content: center;
-         animation: 0.5s ease-out 0s 1 collapse;
-         @keyframes collapse {
-            0% {
-               height: 0;
-               display: none;
-            }
-            100% {
-               height: 30px;
-            }
+   .content-wrapper {
+      margin-top: 50px;
+      height: 80%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      .top-wrapper {
+         height: 200px;
+         width: 100%;
+         span {
+            font-size: 15pt;
+            font-weight: 900;
+            margin: 0 10px;
          }
-         .ds-item {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            background-color: rgb(80, 101, 176);
-            margin: 0 5px;
-            width: 58px;
-            height: 10px;
-            padding: 10px;
-            border-radius: 20px;
-            color: white;
-            text-align: center;
-            .ds-text {
-               font-size: 9pt;
-               font-weight: 100;
-            }
-            .del {
-               font-size: 6pt;
-            }
-            .del:hover {
-               cursor: pointer;
-            }
-            animation: 1s ease-out 0s 1 opacity-control;
-            @keyframes opacity-control {
-               0% {
-                  opacity: 0;
-               }
-               100% {
-                  opacity: 1;
-               }
-            }
+         .category {
+            margin-top: 15px;
          }
       }
-      .search {
-         margin-top: 20px;
-         display: flex;
-         flex-direction: column;
-         align-items: center;
-         .ds-input {
-            padding: 5px;
-            z-index: 100;
-            width: 380px;
-            height: 35px;
-            border-color: lightgray;
-            border-radius: 20px;
-            background-color: rgba(255, 255, 255, 0.68);
+      .middle-wrapper {
+         height: 120px;
+         width: 100%;
+         .md-subtitle {
+            font-size: 15pt;
+            font-weight: 900;
+            margin: 0 10px;
          }
-         .ds-input:focus {
-            outline: none;
-         }
-         .ds-list {
-            z-index: 50;
-            float: inherit;
-            margin-top: -42px;
-            border-radius: 20px;
-            width: 375px;
-            background-color: white;
-            box-shadow: 0px 9px 20px 0px #56565629;
-            padding: 50px 10px 10px 10px;
+         .selected-ds {
+            margin: 5px;
             display: flex;
             justify-content: center;
-            flex-wrap: wrap;
-            .ds-items {
-               font-size: 10pt;
-               margin: 3px;
-               padding: 10px 5px;
-               text-align: center;
-               border-radius: 20px;
-               color: white;
+            animation: 0.5s ease-out 0s 1 collapse;
+            @keyframes collapse {
+               0% {
+                  height: 10px;
+                  display: none;
+               }
+               100% {
+                  height: 30px;
+               }
+            }
+            .ds-item {
+               display: flex;
+               justify-content: space-around;
+               align-items: center;
+               background-color: rgb(57, 104, 235);
+               margin: 0 5px;
                width: 58px;
                height: 10px;
+               padding: 10px;
+               border-radius: 20px;
+               color: white;
+               text-align: center;
+               .ds-text {
+                  font-size: 9pt;
+                  font-weight: 100;
+               }
+               .del {
+                  font-size: 6pt;
+               }
+               .del:hover {
+                  cursor: pointer;
+               }
+               animation: 1s ease-out 0s 1 opacity-control;
+               @keyframes opacity-control {
+                  0% {
+                     opacity: 0;
+                  }
+                  100% {
+                     opacity: 1;
+                  }
+               }
             }
-            .ds-items:focus {
+         }
+         .search {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            .ds-input {
+               padding: 5px;
+               z-index: 100;
+               width: 380px;
+               height: 35px;
+               border-color: lightgray;
+               border-radius: 20px;
+               background-color: rgba(255, 255, 255, 0.68);
+            }
+            .ds-input:focus {
                outline: none;
             }
-            .unsel {
-               background-color: rgb(80, 101, 176);
+            .ds-list {
+               z-index: 50;
+               float: inherit;
+               margin-top: -42px;
+               border-radius: 20px;
+               width: 375px;
+               background-color: white;
+               box-shadow: 0px 9px 20px 0px #56565629;
+               padding: 50px 10px 10px 10px;
+               display: flex;
+               justify-content: center;
+               flex-wrap: wrap;
+               .ds-items {
+                  font-size: 10pt;
+                  margin: 3px;
+                  padding: 10px 5px;
+                  text-align: center;
+                  border-radius: 20px;
+                  color: white;
+                  width: 58px;
+                  height: 10px;
+               }
+               .ds-items:focus {
+                  outline: none;
+               }
+               .unsel {
+                  background-color: rgb(57, 104, 235);
+               }
+               .unsel:hover {
+                  cursor: pointer;
+                  background-color: rgb(45, 83, 186);
+               }
+               .sel {
+                  background-color: rgb(45, 83, 186);
+               }
+               .sele {
+                  background-color: gray;
+               }
             }
-            .unsel:hover {
-               cursor: pointer;
-               background-color: rgb(57, 72, 128);
-            }
-            .sele {
-               background-color: gray;
+            .ds-list:focus {
+               outline: none;
             }
          }
-         .ds-list:focus {
-            outline: none;
+         .unsel {
+            margin-top:30px;
+         }
+         .selec {
+            margin-top: 15px;
          }
       }
-   }
-   .bottom-wrapper {
-      margin-top: -10px;
-      z-index: -10;
-      height: 30%;
-      width: 100%;
-      span {
-         font-size: 15pt;
-         font-weight: 900;
-         margin: 0 10px;
-      }
-      .option-wrapper {
-         margin-top: 20px;
-         background-color: burlywood;
+      .bottom-wrapper {
+         z-index: -10;
+         height: 250px;
          width: 100%;
-         height: 100%;
+         display: flex;
+         flex-direction: column;
+         justify-content: space-between;
+         span {
+            font-size: 15pt;
+            font-weight: 900;
+            margin: 0 10px;
+         }
+         .option-wrapper {
+            margin-top: 20px;
+            background-color: burlywood;
+            width: 100%;
+            height: 90%;
+         }
       }
+
    }
    .footer {
-      position: absolute;
-      bottom: 30px;
-      right: 30px;
+      height: 10%;
       .com-bt {
          color: white;
          padding: 5px;
-         width: 70px;
-         height: 40px;
-         border-radius: 20px;
+         width: 150px;
+         height: 50px;
+         border-radius: 30px;
          border: none;
-         background-color: rgb(80, 101, 176);
+         background: linear-gradient(to bottom right, #7A9FFF, #1D3CAA);
       }
       .com-bt:hover {
          cursor: pointer;
-         background-color: rgb(57, 72, 128);
+         background: linear-gradient(to bottom right,#1D3CAA,  #7A9FFF);
       }
       .com-bt:focus {
          outline: none;

@@ -22,7 +22,7 @@ export default {
     return {
       selectedCate: '',
       categories: [
-        { name: '한식음식점', sel: false},
+        { name: '한식음식점', sel: false}, // sel >> 선택된 업종 스타일링 적용 위해
         { name: '중식음식점', sel: false},
         { name: '일식음식점', sel: false},
         { name: '양식음식점', sel: false},
@@ -73,14 +73,14 @@ export default {
     border-radius: 10px;
   }
   .unsel {
-    background-color: rgba(204, 203, 203, 0.782);
+    background-color: #e7e7e7;
   }
   .unsel:hover {
-    background-color: rgba(147, 146, 146, 0.782);
+    background-color: #cccccc;
     cursor: pointer;
   }
   .sel {
-    background-color: rgba(147, 146, 146, 0.782);
+    background-color: #cccccc;
   }
   .sel:hover {
     cursor: pointer;
