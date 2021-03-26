@@ -10,6 +10,7 @@
          <option-input v-if="optionCompo"></option-input>
          <!-- 좌측 사이드 메뉴 위치 -->
          <!-- 내부에 컴포넌트 생성 후 배치 -->
+         <BookmarkList />
       </div>
       <div class="sidemenu-compo floating">
          <button @click="this.setRecommendMarker">TEST</button>
@@ -24,12 +25,13 @@
 <script>
 import VueDaumMap from 'vue-daum-map';
 import MapDetail from '@/components/MapDetail/MapDetail.vue';
+import BookmarkList from '@/components/Bookmark/BookmarkList.vue'
 import OptionInput from '@/components/OptionInput.vue';
 import SideMenu from '@/components/SideMenu.vue';
 import axios from 'axios';
 
 export default {
-   components: { VueDaumMap, MapDetail, OptionInput, SideMenu },
+   components: { VueDaumMap, MapDetail, OptionInput, SideMenu, BookmarkList },
    data: () => ({
       appKey: 'b20bb90eb97f8724820808bd2047982e', //restAPI key
       center: { lat: '', lng: '' },
