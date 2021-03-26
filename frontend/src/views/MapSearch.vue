@@ -7,17 +7,13 @@
          <!-- 내부에 컴포넌트 생성 후 배치 -->
       </div>
       <div v-show="optionCompo || bookMarkCompo" class="menu-expand-compo floating">
-         <option-input 
-            v-show="optionCompo" 
-            @close-expended="onClickClose"
-            @input-complete="onInputComplete"
-         ></option-input>
+         <option-input v-show="optionCompo" @close-expended="onClickClose" @input-complete="onInputComplete"></option-input>
          <!-- 좌측 사이드 메뉴 위치 -->
          <!-- 내부에 컴포넌트 생성 후 배치 -->
          <BookmarkList />
       </div>
       <div class="sidemenu-compo floating">
-         <!-- <button @click="this.setRecommendMarker">TEST</button> -->
+         <button @click="this.setRecommendMarker">TEST</button>
          <side-menu @open-input-form="onClickInputBt"></side-menu>
       </div>
 
@@ -29,7 +25,7 @@
 <script>
 import VueDaumMap from 'vue-daum-map';
 import MapDetail from '@/components/MapDetail/MapDetail.vue';
-import BookmarkList from '@/components/Bookmark/BookmarkList.vue'
+import BookmarkList from '@/components/Bookmark/BookmarkList.vue';
 import OptionInput from '@/components/OptionInput.vue';
 import SideMenu from '@/components/SideMenu.vue';
 import axios from 'axios';
@@ -58,7 +54,7 @@ export default {
          {
             name: '교대역_1',
             score: 55,
-            x: '201023',
+            x: '201023', //상권영역.csv
             y: '443482',
          },
          {
@@ -80,16 +76,16 @@ export default {
    },
    methods: {
       // sidemenu의 옵션입력 버튼 눌렀을 때
-      onClickInputBt: function () {
-         this.optionCompo = true
+      onClickInputBt: function() {
+         this.optionCompo = true;
       },
       //expended compo 닫기 버튼 눌렀을 때
-      onClickClose: function () {
-         this.optionCompo = false
+      onClickClose: function() {
+         this.optionCompo = false;
       },
-      //추천조건 입력 완료했을 때(상권추천) 
-      onInputComplete: function () {
-         this.optionCompo = false
+      //추천조건 입력 완료했을 때(상권추천)
+      onInputComplete: function() {
+         this.optionCompo = false;
          // 추천 결과 요청 추가해야함
       },
       // 지도가 로드 완료되면 load 이벤트 발생
@@ -115,6 +111,13 @@ export default {
 
       //추천 상권 마커 표시
       setRecommendMarker() {
+         var imageSrc = require('/src/assets/image/categories/map/marker/marker.png'), // 마커이미지의 주소입니다
+            imageSize = new kakao.maps.Size(40, 40), // 마커이미지의 크기입니다
+            imageOption = { offset: new kakao.maps.Point(19, 40) }; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+
+         // 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다
+         var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+
          // 기존 마커 정보를 삭제
          this.removeLayers();
 
@@ -127,11 +130,12 @@ export default {
 
             // 커스텀 오버레이에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
             var content = `<div class="customoverlay">
-                                <span class="markerInfo">
-                                  <p class="name">${district.name}</p>
-                                  <p class="score">${district.score}</p>
-                                </span>
-                            </div>`;
+                  <span class="markerInfo">
+                     <p class="name"><i class="fas fa-map-marker-alt"></i> ${district.name} <br><br>
+                        <span class="score">${district.score}</span>점
+                     </p>
+                  </span>
+               </div>`;
 
             // 커스텀 오버레이를 생성합니다
             var customOverlay = new kakao.maps.CustomOverlay({
@@ -148,7 +152,7 @@ export default {
             marker = new kakao.maps.Marker({
                map: this.mapObject,
                position: position,
-               // image: markerImage, // 마커이미지 설정
+               image: markerImage, // 마커이미지 설정
                // clickable: true, // 마커를 클릭했을 때 지도의 클릭 이벤트가 발생하지 않도록 설정합니다
                // title: apt.no,
             });
@@ -221,9 +225,9 @@ export default {
             center: new kakao.maps.LatLng(position.Ma, position.La), // 원의 중심좌표 입니다
             radius: 100, // 미터 단위의 원의 반지름입니다
             strokeWeight: 3, // 선의 두께입니다
-            strokeColor: '#75B8FA', // 선의 색깔입니다
+            strokeColor: '#212121', // 선의 색깔입니다
             strokeOpacity: 0.8, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
-            strokeStyle: 'dashed', // 선의 스타일 입니다
+            strokeStyle: 'longdash', // 선의 스타일 입니다
             fillColor: '#CFE7FF', // 채우기 색깔입니다
             fillOpacity: 0.6, // 채우기 불투명도 입니다
          });
@@ -239,7 +243,7 @@ export default {
          var polygon = new kakao.maps.Polygon({
             path: polygonPath, // 그려질 다각형의 좌표 배열입니다
             strokeWeight: 3, // 선의 두께입니다
-            strokeColor: '#39DE2A', // 선의 색깔입니다
+            strokeColor: '#212121', // 선의 색깔입니다
             strokeOpacity: 0.8, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
             strokeStyle: 'longdash', // 선의 스타일입니다
             fillColor: '#A2FF99', // 채우기 색깔입니다
