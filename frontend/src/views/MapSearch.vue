@@ -12,13 +12,17 @@
             @close-expended="onClickClose"
             @input-complete="onInputComplete"
          ></option-input>
+         <bookmark-list
+            v-show="bookMarkCompo"
+            @close-expended="onClickClose"
+         ></bookmark-list>
+
          <!-- 좌측 사이드 메뉴 위치 -->
          <!-- 내부에 컴포넌트 생성 후 배치 -->
-         <BookmarkList />
       </div>
       <div class="sidemenu-compo floating">
          <!-- <button @click="this.setRecommendMarker">TEST</button> -->
-         <side-menu @open-input-form="onClickInputBt"></side-menu>
+         <side-menu @open-input-form="onClickInputBt" @open-bookmark="onClickBookmarkBt"></side-menu>
       </div>
 
       <vue-daum-map id="map" :appKey="appKey" :center.sync="center" :level.sync="level" :mapTypeId="mapTypeId" :libraries="libraries" @load="onLoad"> </vue-daum-map>
@@ -81,11 +85,17 @@ export default {
    methods: {
       // sidemenu의 옵션입력 버튼 눌렀을 때
       onClickInputBt: function () {
-         this.optionCompo = true
+         this.optionCompo = !this.optionCompo
+         this.bookMarkCompo = false
+      },
+      onClickBookmarkBt: function () {
+         this.bookMarkCompo = !this.bookMarkCompo
+         this.optionCompo = false
       },
       //expended compo 닫기 버튼 눌렀을 때
       onClickClose: function () {
          this.optionCompo = false
+         this.bookMarkCompo = false
       },
       //추천조건 입력 완료했을 때(상권추천) 
       onInputComplete: function () {
