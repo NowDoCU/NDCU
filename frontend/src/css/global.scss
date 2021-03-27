@@ -101,3 +101,18 @@ var content = `<div class="customoverlay">
       font-weight: 600;
    }
  }
+
+ .cell{
+   position: relative;
+   // bottom: 60px;
+   // right: 2px;
+   height: 70px;
+   width: 70px;
+   border-radius: 70px;
+   background-color: rgb(255, 229, 30);
+   text-align: center;
+   line-height: 70px;
+   opacity: .9;
+
+   font-size: 9pt;
+ }
