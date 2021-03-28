@@ -4,7 +4,7 @@
          <i @click="closeCompo" class="fas fa-angle-double-left"></i>
       </div>
       <div class="bookmark-name"> 즐겨찾기 </div>
-      <BookmarkListItem  v-for="(bookmark, idx) in bookmarklist" :key="idx" :bookmark="bookmark" />
+      <BookmarkListItem  @goDetail="goDetail" v-for="(bookmark, idx) in bookmarklist" :key="idx" :bookmark="bookmark" />
   </div>
 </template>
 
@@ -12,8 +12,8 @@
 import BookmarkListItem from './BookmarkListItem'
 var dummyBookmark = [
     {
-        regionName: '종로구 삼청동',
-        score: 81,
+        regionName: '마포구 서교동',
+        score: 88,
         rank: [1, 4, 3, 2]
     },
     {
@@ -36,6 +36,7 @@ export default {
     data: function() {
         return {
             bookmarklist: [],
+            goDetailValue: false,
         };
     },
     methods: {
@@ -45,6 +46,10 @@ export default {
         closeCompo: function () {
             this.$emit('close-expended')
         },
+        goDetail(value) {
+            this.goDetailValue = value;
+            this.$emit('goDetail', this.goDetailValue)
+        }
     },
     created: function() {
         this.getBookmark()

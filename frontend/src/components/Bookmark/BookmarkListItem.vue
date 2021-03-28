@@ -1,5 +1,5 @@
 <template>
-  <div class="bookmark-wrapper">
+  <div class="bookmark-wrapper" @click='goDetail'>
       <div class="bookmark-region">
           <div class="bookmark-region-name"> {{ bookmark.regionName }} </div>
           <span> 추천지수 {{ bookmark.score }}점 </span>
@@ -19,6 +19,11 @@
 <script>
 export default {
     name: 'BookmarkListItem',
+    data: function() {
+        return {
+            goDetailValue: false,
+        }
+    },
     props: {
         bookmark: Object,
     },
@@ -27,7 +32,14 @@ export default {
             var deletelike = confirm('즐겨찾기에서 삭제하시겠습니까?');
             if (deletelike) {
                 console.log('삭제됐습니다.')
+                // 즐겨찾기 삭제 기능 구현
+
             }
+        },
+        goDetail: function() {
+            this.goDetailValue = true;
+            // 정보도 가져가기 구현
+            this.$emit('goDetail', this.goDetailValue);
         }
     }
 }

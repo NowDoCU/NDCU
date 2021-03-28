@@ -15,6 +15,7 @@
          <bookmark-list
             v-show="bookMarkCompo"
             @close-expended="onClickClose"
+            @goDetail='goDetail'
          ></bookmark-list>
 
          <!-- 좌측 사이드 메뉴 위치 -->
@@ -105,6 +106,10 @@ export default {
 
          // 검색 결과 조회
          this.detailCompo = true
+      },
+      goDetail(value) {
+         this.detailCompo = value
+         this.bookMarkCompo = false;
       },
       // 지도가 로드 완료되면 load 이벤트 발생
       onLoad(map) {
