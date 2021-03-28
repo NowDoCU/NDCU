@@ -1,5 +1,8 @@
 <template lang="">
    <div class="md-container">
+      <div class="header">
+         <i @click="closeCompo" class="fas fa-angle-double-right"></i>
+      </div>
       <div class="region-container">
          <span class="name"> {{ regionName }} </span>
          <div class="info">
@@ -73,6 +76,9 @@ export default {
       setLike: function() {
          this.like = !this.like;
       },
+      closeCompo: function () {
+         this.$emit('close-expended')
+      },
    },
    created: function() {
       this.getData();
@@ -83,6 +89,21 @@ export default {
 .md-container {
    width: 100%;
    height: 100%;
+   display: flex;
+
+   .header {
+      position: absolute;
+      left: 20px;
+      top: 20px;
+      i {
+         font-size: 24pt;
+         color: rgb(148, 148, 148);
+      }
+      i:hover {
+         cursor: pointer;
+         color: #808080;
+      }
+   }
 
    .region-container {
       margin: 30px;
@@ -91,7 +112,7 @@ export default {
       height: 90%;
 
       .name {
-         font-size: 25pt;
+         font-size: 20pt;
          margin: 20px;
       }
 
