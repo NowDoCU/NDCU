@@ -1,6 +1,6 @@
 <template lang="">
    <div class="container">
-      <div class="detail-compo floating">
+      <div v-show="detailCompo" class="detail-compo floating">
          <map-detail></map-detail>
 
          <!-- 좌측 사이드 메뉴 위치 -->
@@ -48,6 +48,7 @@ export default {
       libraries: [],
       mapObject: null,
 
+      detailCompo: false,
       optionCompo: true,
       bookMarkCompo: false,
 
@@ -101,6 +102,9 @@ export default {
       onInputComplete: function () {
          this.optionCompo = false
          // 추천 결과 요청 추가해야함
+
+         // 검색 결과 조회
+         this.detailCompo = true
       },
       // 지도가 로드 완료되면 load 이벤트 발생
       onLoad(map) {
@@ -297,7 +301,7 @@ export default {
    }
 
    .detail-compo {
-      display: none; // 임시
+      // display: none; // 임시
       top: 2%;
       right: 1%;
       background-color: white;
