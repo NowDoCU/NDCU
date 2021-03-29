@@ -1,7 +1,7 @@
 <template lang="">
    <div class="container">
       <div v-show="detailCompo" class="detail-compo floating">
-         <map-detail></map-detail>
+         <map-detail @close-expended="onClickCloseDetail"></map-detail>
 
          <!-- 좌측 사이드 메뉴 위치 -->
          <!-- 내부에 컴포넌트 생성 후 배치 -->
@@ -52,6 +52,7 @@ export default {
       detailCompo: false,
       optionCompo: true,
       bookMarkCompo: false,
+      detailCompo: true,
 
       // 지도 위에 표시되는 마커 등.. 의 추가 정보 표시
       markers: [],
@@ -98,6 +99,9 @@ export default {
       onClickClose: function () {
          this.optionCompo = false
          this.bookMarkCompo = false
+      },
+      onClickCloseDetail: function() {
+         this.detailCompo = false
       },
       //추천조건 입력 완료했을 때(상권추천) 
       onInputComplete: function () {
