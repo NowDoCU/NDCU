@@ -7,7 +7,7 @@
          <div @click="onClickInputBt" class="btn-search">
             <i class="fas fa-search-location"></i>
          </div>
-         <div class="btn-bookmark">
+         <div @click="onClickBookmarkBt" class="btn-bookmark">
             <i class="far fa-bookmark"></i>
          </div>
       </div>
@@ -23,6 +23,9 @@ export default {
    methods: {
       onClickInputBt: function () {
          this.$emit('open-input-form')
+      },
+      onClickBookmarkBt: function () {
+         this.$emit('open-bookmark')
       }
    }
 
