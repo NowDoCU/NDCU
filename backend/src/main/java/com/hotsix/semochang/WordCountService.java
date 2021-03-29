@@ -2,11 +2,9 @@ package com.hotsix.semochang;
 
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +25,7 @@ public class WordCountService {
         JavaRDD<String> words = sc.parallelize(wordList);
         Map<String, Long> wordCounts = words.countByValue();
         readCSV();
+        //readHDFS();
         return wordCounts;
     }
 
@@ -34,12 +33,11 @@ public class WordCountService {
         JavaRDD<String> data = sc.textFile(PATH);
         System.out.println(data);
         System.out.println(data.count());
-        System.out.println(data.collect().stream().iterator().hasNext());
 
         Iterator iter = data.collect().stream().iterator();
-//        while(iter.hasNext()) {
-//            // System.out.println(iter.next());
-//        }
+        while(iter.hasNext()) {
+            System.out.println(iter.next());
+        }
 
 //        data.map(new Function<String, EstimatedSales>() {
 //
@@ -51,6 +49,11 @@ public class WordCountService {
 //                return null;
 //            }
 //        });
+    }
+
+    public void readHDFS() {
+        JavaRDD<String> data = sc.textFile("hdfs://54.180.65.171/user/hduser2/estimated_sales2.csv");
+        System.out.println(data.count());
     }
 
 }

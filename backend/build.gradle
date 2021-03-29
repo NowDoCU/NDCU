@@ -27,8 +27,7 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    runtimeOnly 'com.h2database:h2'
-
+    runtimeOnly 'mysql:mysql-connector-java'
     // https://mvnrepository.com/artifact/org.apache.spark/spark-core
     implementation group: 'org.apache.spark', name: 'spark-core_2.12', version: '3.0.1'
 }
