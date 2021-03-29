@@ -48,7 +48,7 @@
    </div>
 </template>
 <script>
-import Category from './categories/Category.vue';
+import Category from '@/components/Categories/Category.vue';
 
 export default {
    name: 'OptionInput',
