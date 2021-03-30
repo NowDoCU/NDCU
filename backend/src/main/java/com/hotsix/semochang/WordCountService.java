@@ -3,11 +3,9 @@ package com.hotsix.semochang;
 import com.hotsix.semochang.model.RecommendDto;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.Function;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +36,7 @@ public class WordCountService {
         JavaRDD<String> words = sc.parallelize(wordList);
         Map<String, Long> wordCounts = words.countByValue();
         readCSV();
+        //readHDFS();
         return wordCounts;
     }
 
@@ -82,8 +81,11 @@ public class WordCountService {
     }
 
     public void commercialAreaRecommendation(RecommendDto recommendDto) {
-        JavaRDD<String> data = sc.textFile(PATH);
-        System.out.println(data.collect());
+    }
+
+    public void readHDFS() {
+        JavaRDD<String> data = sc.textFile("hdfs://54.180.65.171/user/hduser2/estimated_sales2.csv");
+        System.out.println(data.count());
     }
 
 }

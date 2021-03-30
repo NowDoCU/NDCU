@@ -26,6 +26,10 @@ public class SparkConfig {
     @Bean
     public SparkConf conf() {
         return new SparkConf().setAppName(appName).setMaster(masterUri);
+//                .set("spark.hadoop.fs.default.name", "hdfs://54.180.65.171:8020").set("spark.hadoop.fs.defaultFS", "hdfs://54.180.65.171:8020")
+//                .set("spark.hadoop.fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName())
+//                .set("spark.hadoop.fs.hdfs.server", org.apache.hadoop.hdfs.server.namenode.NameNode.class.getName())
+//                .set("spark.hadoop.conf", org.apache.hadoop.hdfs.HdfsConfiguration.class.getName());
     }
 
     @Bean

@@ -1,7 +1,7 @@
 <template lang="">
    <div class="container">
-      <div class="detail-compo floating">
-         <map-detail></map-detail>
+      <div v-show="detailCompo" class="detail-compo floating">
+         <map-detail @close-expended="onClickCloseDetail"></map-detail>
 
          <!-- 좌측 사이드 메뉴 위치 -->
          <!-- 내부에 컴포넌트 생성 후 배치 -->
@@ -12,15 +12,19 @@
             @close-expended="onClickClose"
             @input-complete="onInputComplete"
          ></option-input>
+         <bookmark-list
+            v-show="bookMarkCompo"
+            @close-expended="onClickClose"
+            @goDetail='goDetail'
+         ></bookmark-list>
+
          <!-- 좌측 사이드 메뉴 위치 -->
          <!-- 내부에 컴포넌트 생성 후 배치 -->
-         <BookmarkList />
       </div>
       <div class="sidemenu-compo floating">
          <!-- <button @click="this.setRecommendMarker">TEST</button> -->
-         <side-menu @open-input-form="onClickInputBt"></side-menu>
+         <side-menu @open-input-form="onClickInputBt" @open-bookmark="onClickBookmarkBt"></side-menu>
       </div>
-
       <vue-daum-map id="map" :appKey="appKey" :center.sync="center" :level.sync="level" :mapTypeId="mapTypeId" :libraries="libraries" @load="onLoad"> </vue-daum-map>
    </div>
 </template>
@@ -44,8 +48,10 @@ export default {
       libraries: [],
       mapObject: null,
 
+      detailCompo: false,
       optionCompo: true,
       bookMarkCompo: false,
+      detailCompo: true,
 
       // 지도 위에 표시되는 마커 등.. 의 추가 정보 표시
       markers: [],
@@ -81,16 +87,32 @@ export default {
    methods: {
       // sidemenu의 옵션입력 버튼 눌렀을 때
       onClickInputBt: function () {
-         this.optionCompo = true
+         this.optionCompo = !this.optionCompo
+         this.bookMarkCompo = false
+      },
+      onClickBookmarkBt: function () {
+         this.bookMarkCompo = !this.bookMarkCompo
+         this.optionCompo = false
       },
       //expended compo 닫기 버튼 눌렀을 때
       onClickClose: function () {
          this.optionCompo = false
+         this.bookMarkCompo = false
+      },
+      onClickCloseDetail: function() {
+         this.detailCompo = false
       },
       //추천조건 입력 완료했을 때(상권추천) 
       onInputComplete: function () {
          this.optionCompo = false
          // 추천 결과 요청 추가해야함
+
+         // 검색 결과 조회
+         this.detailCompo = true
+      },
+      goDetail(value) {
+         this.detailCompo = value
+         this.bookMarkCompo = false;
       },
       // 지도가 로드 완료되면 load 이벤트 발생
       onLoad(map) {
@@ -250,10 +272,31 @@ export default {
          polygon.setMap(this.mapObject);
          this.polygons.push(polygon);
       },
+      onDialogChange: function (dialog) {
+         if (dialog === true) {
+            document.querySelector('.container').classList.add('blur-display')
+         } else {
+            document.querySelector('.container').classList.remove('blur-display')
+         }
+      }
    },
 };
 </script>
 <style scoped lang="scss">
+.blur-display > *:not(.sidemenu-compo) {
+   pointer-events: none;
+   filter: blur(5px);
+   animation: 0.5s ease-out 0s 1 blur;
+   @keyframes blur {
+      0% {
+         filter: blur(0)
+      }
+      100% {
+         filter: blur(5px)
+      }
+   }
+   
+}
 .container {
    background-color: white;
    width: 100%;
@@ -287,7 +330,7 @@ export default {
    }
 
    .detail-compo {
-      display: none; // 임시
+      // display: none; // 임시
       top: 2%;
       right: 1%;
       background-color: white;
@@ -306,4 +349,5 @@ export default {
       float: right; // 크기가 줄면 좌측부터 붙어서, 우측으로 이동
    }
 }
+
 </style>
