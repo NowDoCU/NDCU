@@ -59,6 +59,7 @@ export default {
       gu_Overlays: [],
       dong_Overlays: [],
       dong_Markers: [],
+      dong_Boundarys: [],
       clusterer: null,
 
       // 테스트를 위한 샘플 코드
@@ -94,11 +95,11 @@ export default {
    watch: {
       level: function() {
          // 조건 만족 시 1회만 생성 -> 성능..
-         if (this.level >= 7 && this.gu_Overlays.length == 0) {
+         if (this.level >= 6 && this.gu_Overlays.length == 0) {
             console.log('구 생성');
             this.setGuMarker('make');
             this.setDongMarker('del');
-         } else if (this.level <= 6 && this.dong_Overlays.length == 0) {
+         } else if (this.level <= 5 && this.dong_Overlays.length == 0) {
             console.log('동 생성');
             this.setGuMarker('del');
          }
@@ -146,14 +147,14 @@ export default {
 
       // 줌 이벤트에 걸면, level값 반영이 즉각으로 안이루어짐
       onMapEvent(event) {
-         console.log('onMapEvent : ', this.level);
+         // console.log('onMapEvent : ', this.level);
          var bounds = this.mapObject.getBounds();
 
-         if (this.level <= 6) {
+         if (this.level <= 5) {
             this.setDongMarker('del');
             this.setDongMarker('make', bounds);
          }
-         console.log(this.dong_Overlays.length);
+         // console.log(this.dong_Overlays.length);
       },
 
       // =========================================
@@ -195,31 +196,32 @@ export default {
             var clusterer = new kakao.maps.MarkerClusterer({
                map: this.mapObject, // 마커들을 클러스터로 관리하고 표시할 지도 객체
                averageCenter: true, // 클러스터에 포함된 마커들의 평균 위치를 클러스터 마커 위치로 설정
-               minLevel: 3, // 클러스터 할 최소 지도 레벨
+               minLevel: 4, // 클러스터 할 최소 지도 레벨
                disableClickZoom: true, // 클러스터 마커를 클릭했을 때 지도가 확대되지 않도록 설정한다
-               minClusterSize: 3, // 클러스터링 할 최소 마커 수
-               calculator: [5, 11, 20], // 클러스터의 크기 구분 값, 각 사이값마다 설정된 text나 style이 적용된다
+               minClusterSize: 4, // 클러스터링 할 최소 마커 수
+               texts: ['보통', '밀집', '혼잡'],
+               calculator: [6, 12, 20], // 클러스터의 크기 구분 값, 각 사이값마다 설정된 text나 style이 적용된다
                styles: [
                   {
-                     width: '30px',
-                     height: '30px',
+                     width: '32px',
+                     height: '32px',
                      background: 'rgba(127, 225, 150, .8)',
                      borderRadius: '4px',
                      color: '#000',
                      textAlign: 'center',
                      fontWeight: 'bold',
-                     lineHeight: '31px',
+                     lineHeight: '33px',
                      border: '1px solid #292929',
                   },
                   {
-                     width: '37px',
-                     height: '37px',
+                     width: '38px',
+                     height: '38px',
                      background: 'rgba(255, 238, 52, .8)',
                      borderRadius: '4px',
                      color: '#000',
                      textAlign: 'center',
                      fontWeight: 'bold',
-                     lineHeight: '38px',
+                     lineHeight: '39x',
                      border: '1px solid #292929',
                   },
                   {
@@ -246,16 +248,9 @@ export default {
                if (bounds.qa <= item.lat && item.lat <= bounds.pa && bounds.ha <= item.lng && item.lng <= bounds.oa) {
                   var position = new kakao.maps.LatLng(item.lat, item.lng);
 
-                  // 동 선택 시 함수 실행을 위한 DOM Manipulation 생성
-                  var content = document.createElement('div');
-                  content.className = 'dong';
-
-                  var icon = document.createElement('i');
-                  icon.className = 'fas fa-map-pin';
-                  content.appendChild(icon);
-
-                  content.appendChild(document.createTextNode(item.emd_nm));
-                  // content.onclick = pointClick(item);
+                  var content = `<div class="dong">
+                                    <i class="fas fa-map-pin"></i> ${item.emd_nm}
+                                 </div>`;
 
                   // 커스텀 오버레이를 생성합니다
                   var dongOverlay = new kakao.maps.CustomOverlay({
@@ -270,7 +265,8 @@ export default {
                      image: markerImage, // 마커이미지 설정
                      clickable: true, // 마커를 클릭했을 때 지도의 클릭 이벤트가 발생하지 않도록 설정합니다
                   });
-                  // emd_cd: item.emd_cd,
+                  marker.emd_cd = item.emd_cd;
+                  marker.position = position;
 
                   dongOverlay.setMap(this.mapObject);
                   this.dong_Overlays.push(dongOverlay);
@@ -283,7 +279,8 @@ export default {
             clusterer.addMarkers(this.dong_Overlays);
             clusterer.addMarkers(this.dong_Markers);
 
-            // 생성된 커스텀 동 마커에 클릭 이벤트 생성
+            // 생성된 동 이미지 마커에 클릭 이벤트 생성
+            this.apiDongMarker();
 
             kakao.maps.event.addListener(clusterer, 'clusterclick', function(cluster) {
                // 현재 지도 레벨에서 1레벨 확대한 레벨
@@ -309,42 +306,51 @@ export default {
       },
 
       // 동 마커 클릭 이벤트 -> 해당 동 폴리곤 반환 / API 동코드 보내기
-      apiDongMarker(item) {
-         console.log('click');
-         console.log(item);
-         // this.dong_Overlays.forEach((item, i) => {
-         //    kakao.maps.event.addListener(item, 'click', () => {
-         //       console.log(item.emd_cd);
-         //    });
-         // });
+      apiDongMarker() {
+         this.dong_Markers.forEach((item, i) => {
+            kakao.maps.event.addListener(item, 'click', () => {
+               this.getPolygon('dong', item.emd_cd, item.position);
+            });
+         });
       },
 
       // 구, 동 등의 경계 정보를 초기화함
-      removeBoundarys() {
-         for (const key in this.gu_Boundarys) {
-            this.gu_Boundarys[key].setMap(null);
+      removeBoundarys(type) {
+         if (type == 'gu') {
+            for (const key in this.gu_Boundarys) {
+               this.gu_Boundarys[key].setMap(null);
+            }
+            this.gu_Boundarys = [];
+         } else if (type == 'dong') {
+            for (const key in this.dong_Boundarys) {
+               this.dong_Boundarys[key].setMap(null);
+            }
+            this.dong_Boundarys = [];
          }
-         this.gu_Boundarys = [];
       },
 
       // 구, 동을 구분하는 폴리곤 정보를 요청함
-      getPolygon(type, bounds) {
+      getPolygon(type, params, coords) {
          var key = '13C339D4-B453-3C5E-A6A1-CCA6792A2D6B'; // 공간정보 오픈플랫폼
          var domain = 'http://localhost:8080';
          var crs = 'EPSG:4326'; // 반환되는 좌표(WGS84)
-         var geo = `BOX(${bounds.ha},${bounds.qa},${bounds.oa},${bounds.pa})`; //minx, miny, maxx, maxy로 검색 범위 설정
-         var filter = 'full_nm:like:서울'; // 11740이 서울시 마지막 행정동코드(강동구)
+         var filter;
          var data;
+         var geo;
 
          // 구 정보를 반환해서 폴리곤에 표시
          if (type == 'gu') {
             data = 'LT_C_ADSIGG_INFO'; // 시군구 조회
+            geo = `BOX(${params.ha},${params.qa},${params.oa},${params.pa})`; //minx, miny, maxx, maxy로 검색 범위 설정
+            filter = 'full_nm:like:서울'; // 11740이 서울시 마지막 행정동코드(강동구)
          } else if (type == 'dong') {
             data = 'LT_C_ADEMD_INFO'; // 읍면동 조회
+            geo = '';
+            filter = `emd_cd:=:${params}`;
          }
 
          axios
-            .get(`http://api.vworld.kr/req/data?request=GetFeature&data=${data}&key=${key}&format=json&domain=${domain}&crs=${crs}&geomFilter=${geo}&attrFilter=${filter}&size=100`)
+            .get(`http://api.vworld.kr/req/data?request=GetFeature&data=${data}&key=${key}&format=json&domain=${domain}&crs=${crs}&attrFilter=${filter}&size=100&geomFilter=${geo}`)
             .then((response) => {
                var local = response.data.response.result.featureCollection.features;
 
@@ -358,7 +364,14 @@ export default {
                      polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
                   }
 
-                  this.setPolygonBoundary(polygonPath, korName);
+                  if (type == 'dong') {
+                     this.removeBoundarys('dong');
+                     this.setPolygonDong(polygonPath);
+                     this.mapObject.setCenter(coords);
+                     this.mapObject.setLevel(4, { animate: true });
+                  } else {
+                     this.setPolygonBoundary(polygonPath, korName);
+                  }
                }
             })
             .catch((err) => {
@@ -366,7 +379,24 @@ export default {
             });
       },
 
-      // 지도에 시, 동 경계 및 이름을 표시
+      // 지도에 선택한 동 을 표시
+      setPolygonDong(polygonPath) {
+         var polygon = new kakao.maps.Polygon({
+            path: polygonPath, // 그려질 다각형의 좌표 배열입니다
+            strokeWeight: 3, // 선의 두께입니다
+            strokeColor: 'rgb(0, 68, 227)', // 선의 색깔입니다
+            strokeOpacity: 0.8, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+            strokeStyle: 'solid', // 선의 스타일입니다
+            fillColor: '#fff', // 채우기 색깔입니다
+            fillOpacity: 0.5, // 채우기 불투명도 입니다
+         });
+
+         // 지도에 구 정보 다각형을 표시합니다
+         polygon.setMap(this.mapObject);
+         this.dong_Boundarys.push(polygon);
+      },
+
+      // 지도에 시 경계 표시
       setPolygonBoundary(polygonPath, korName) {
          var polygon = new kakao.maps.Polygon({
             path: polygonPath, // 그려질 다각형의 좌표 배열입니다
