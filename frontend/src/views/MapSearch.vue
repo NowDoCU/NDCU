@@ -17,7 +17,8 @@
          <side-menu @open-input-form="onClickInputBt"></side-menu>
       </div>
 
-      <vue-daum-map id="map" :appKey="appKey" :center.sync="center" :level.sync="level" :mapTypeId="mapTypeId" :libraries="libraries" @load="onLoad"> </vue-daum-map>
+      <vue-daum-map id="map" :appKey="appKey" :center.sync="center" :level.sync="level" :mapTypeId="mapTypeId" :libraries="libraries" @load="onLoad" @tilesloaded="onMapEvent('titlesloaded', $event)">
+      </vue-daum-map>
    </div>
 </template>
 
@@ -57,6 +58,7 @@ export default {
       gu_Boundarys: [],
       gu_Overlays: [],
       dong_Overlays: [],
+      dong_Markers: [],
       clusterer: null,
 
       // 테스트를 위한 샘플 코드
@@ -99,7 +101,6 @@ export default {
          } else if (this.level <= 6 && this.dong_Overlays.length == 0) {
             console.log('동 생성');
             this.setGuMarker('del');
-            this.setDongMarker('make');
          }
       },
    },
@@ -131,7 +132,7 @@ export default {
             oa: 127.17018320519693,
             pa: 37.7014997773775,
          };
-         // this.getPolygon('gu', bounds);
+
          this.setGuMarker('make');
       },
 
@@ -148,16 +149,11 @@ export default {
          console.log('onMapEvent : ', this.level);
          var bounds = this.mapObject.getBounds();
 
-         // 조건 만족 시 1회만 생성 -> 성능..
-         if (this.level >= 7 && this.gu_Overlays.length == 0) {
-            console.log('구 생성');
-            this.setGuMarker('make');
+         if (this.level <= 6) {
             this.setDongMarker('del');
-         } else if (this.level <= 6 && this.dong_Overlays.length == 0) {
-            console.log('동 생성');
-            this.setGuMarker('del');
-            this.setDongMarker('make');
+            this.setDongMarker('make', bounds);
          }
+         console.log(this.dong_Overlays.length);
       },
 
       // =========================================
@@ -194,7 +190,7 @@ export default {
       },
 
       // 동별로 마커 표시
-      setDongMarker(type) {
+      setDongMarker(type, bounds) {
          if (type == 'make') {
             var clusterer = new kakao.maps.MarkerClusterer({
                map: this.mapObject, // 마커들을 클러스터로 관리하고 표시할 지도 객체
@@ -241,24 +237,53 @@ export default {
             });
 
             this.dongCoords.forEach((item) => {
-               var position = new kakao.maps.LatLng(item.lat, item.lng);
+               var imageSrc = require('/src/assets/image/categories/map/marker/dong_marker2.png'), // 마커이미지의 주소입니다
+                  imageSize = new kakao.maps.Size(35, 35), // 마커이미지의 크기입니다
+                  imageOption = { offset: new kakao.maps.Point(12, -15) }; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
 
-               var content = `<div class="dong">
-                              <i class="fas fa-map-pin"></i> ${item.emd_nm}
-                           </div>`;
+               var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
 
-               // 커스텀 오버레이를 생성합니다
-               var dongOverlay = new kakao.maps.CustomOverlay({
-                  map: this.mapObject,
-                  position: position,
-                  content: content,
-               });
+               if (bounds.qa <= item.lat && item.lat <= bounds.pa && bounds.ha <= item.lng && item.lng <= bounds.oa) {
+                  var position = new kakao.maps.LatLng(item.lat, item.lng);
 
-               dongOverlay.setMap(this.mapObject);
-               this.dong_Overlays.push(dongOverlay);
+                  // 동 선택 시 함수 실행을 위한 DOM Manipulation 생성
+                  var content = document.createElement('div');
+                  content.className = 'dong';
+
+                  var icon = document.createElement('i');
+                  icon.className = 'fas fa-map-pin';
+                  content.appendChild(icon);
+
+                  content.appendChild(document.createTextNode(item.emd_nm));
+                  // content.onclick = pointClick(item);
+
+                  // 커스텀 오버레이를 생성합니다
+                  var dongOverlay = new kakao.maps.CustomOverlay({
+                     map: this.mapObject,
+                     position: position,
+                     content: content,
+                  });
+
+                  var marker = new kakao.maps.Marker({
+                     map: this.mapObject,
+                     position: position,
+                     image: markerImage, // 마커이미지 설정
+                     clickable: true, // 마커를 클릭했을 때 지도의 클릭 이벤트가 발생하지 않도록 설정합니다
+                  });
+                  // emd_cd: item.emd_cd,
+
+                  dongOverlay.setMap(this.mapObject);
+                  this.dong_Overlays.push(dongOverlay);
+
+                  marker.setMap(this.mapObject);
+                  this.dong_Markers.push(marker);
+               }
             });
 
             clusterer.addMarkers(this.dong_Overlays);
+            clusterer.addMarkers(this.dong_Markers);
+
+            // 생성된 커스텀 동 마커에 클릭 이벤트 생성
 
             kakao.maps.event.addListener(clusterer, 'clusterclick', function(cluster) {
                // 현재 지도 레벨에서 1레벨 확대한 레벨
@@ -268,17 +293,31 @@ export default {
                cluster._map.setLevel(level, { anchor: cluster.getCenter(), animate: true });
             });
 
-            this.clusterer = clusterer;
+            // this.apiDongMarker();
+            this.clusterer = clusterer; // 삭제를 위한 클러스터 할당
+
+            // 동 마커와 동 클러스터 모두 삭제
          } else if (type == 'del' && this.dong_Overlays.length != 0) {
             for (const key in this.dong_Overlays) {
                this.dong_Overlays[key].setMap(null);
+               this.dong_Markers[key].setMap(null);
             }
             this.dong_Overlays = [];
+            this.dong_Markers = [];
             this.clusterer.clear();
          }
       },
 
-      // 동 마커 클릭 이벤트 ->
+      // 동 마커 클릭 이벤트 -> 해당 동 폴리곤 반환 / API 동코드 보내기
+      apiDongMarker(item) {
+         console.log('click');
+         console.log(item);
+         // this.dong_Overlays.forEach((item, i) => {
+         //    kakao.maps.event.addListener(item, 'click', () => {
+         //       console.log(item.emd_cd);
+         //    });
+         // });
+      },
 
       // 구, 동 등의 경계 정보를 초기화함
       removeBoundarys() {
