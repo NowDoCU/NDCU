@@ -9,5 +9,4 @@ public class SemochangApplication {
     public static void main(String[] args) {
         SpringApplication.run(SemochangApplication.class, args);
     }
-
 }
