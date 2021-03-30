@@ -25,7 +25,6 @@
          <!-- <button @click="this.setRecommendMarker">TEST</button> -->
          <side-menu @open-input-form="onClickInputBt" @open-bookmark="onClickBookmarkBt"></side-menu>
       </div>
-
       <vue-daum-map id="map" :appKey="appKey" :center.sync="center" :level.sync="level" :mapTypeId="mapTypeId" :libraries="libraries" @load="onLoad"> </vue-daum-map>
    </div>
 </template>
@@ -273,10 +272,31 @@ export default {
          polygon.setMap(this.mapObject);
          this.polygons.push(polygon);
       },
+      onDialogChange: function (dialog) {
+         if (dialog === true) {
+            document.querySelector('.container').classList.add('blur-display')
+         } else {
+            document.querySelector('.container').classList.remove('blur-display')
+         }
+      }
    },
 };
 </script>
 <style scoped lang="scss">
+.blur-display > *:not(.sidemenu-compo) {
+   pointer-events: none;
+   filter: blur(5px);
+   animation: 0.5s ease-out 0s 1 blur;
+   @keyframes blur {
+      0% {
+         filter: blur(0)
+      }
+      100% {
+         filter: blur(5px)
+      }
+   }
+   
+}
 .container {
    background-color: white;
    width: 100%;
@@ -329,4 +349,5 @@ export default {
       float: right; // 크기가 줄면 좌측부터 붙어서, 우측으로 이동
    }
 }
+
 </style>
