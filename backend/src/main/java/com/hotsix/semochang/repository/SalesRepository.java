@@ -9,8 +9,8 @@ import java.util.List;
 @Repository
 public interface SalesRepository extends JpaRepository<EstimatedSales, Long> {
 
-    /***
-     * 상권코드를 이용한 매출변화 조회
-     */
-    List<EstimatedSales> findByCommercialCodeOrderByIndustryCodeAscYearAscQuarterAsc(String code);
+//    /***
+//     * 상권코드를 이용한 매출변화 조회
+//     */
+//    List<EstimatedSales> findByCommercialCodeOrderByIndustryCodeAscYearAscQuarterAsc(String code);
 }
