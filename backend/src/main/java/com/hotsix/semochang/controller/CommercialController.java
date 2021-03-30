@@ -1,5 +1,6 @@
 package com.hotsix.semochang.controller;
 
+import com.hotsix.semochang.model.Commercial;
 import com.hotsix.semochang.model.EstimatedPopulation;
 import com.hotsix.semochang.model.EstimatedSales;
 import com.hotsix.semochang.service.CommercialService;
@@ -25,19 +26,17 @@ public class CommercialController {
     @Autowired
     CommercialService commercialService;
 
-    @GetMapping("/sales/{code}")
-    public ResponseEntity<?> salesList(@PathVariable("code") String code) {
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getCommercialInfo(@PathVariable("id") Long id) {
 
-        List<EstimatedSales> salesList = commercialService.findSalesByCommercialCode(code);
+        Commercial commercial = commercialService.findCommercialById(id);
 
-        return new ResponseEntity<>(salesList, HttpStatus.OK);
+        return new ResponseEntity<>(commercial, HttpStatus.OK);
     }
 
-    @GetMapping("/population/{code}")
-    public ResponseEntity<?> populationList(@PathVariable("code") String code) {
-
-        List<EstimatedPopulation> populationList = commercialService.findPopulationByCommercialCode(code);
-
-        return new ResponseEntity<>(populationList, HttpStatus.OK);
+    @GetMapping("/list/{dongCode}")
+    public ResponseEntity<?> commercialList(@PathVariable("dongCode") String dongCode) {
+        List<Commercial> commercialList = commercialService.findCommercialByDongCode(dongCode);
+        return new ResponseEntity<>(commercialList, HttpStatus.OK);
     }
 }

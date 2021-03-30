@@ -1,14 +1,9 @@
 package com.hotsix.semochang.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 /**
  * author: pinest94
@@ -20,6 +15,7 @@ import javax.persistence.Id;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = {"commercial"})
 public class EstimatedPopulation {
 
     /***
@@ -38,26 +34,6 @@ public class EstimatedPopulation {
      * 분기
      */
     private String quarter;
-
-    /***
-     * 상권분류코드
-     */
-    private String divisionCode;
-
-    /***
-     * 상권분류명
-     */
-    private String divisionName;
-
-    /***
-     * 상권코드
-     */
-    private String commercialCode;
-
-    /***
-     * 상권명
-     */
-    private String commercialName;
 
     /***
      * 전체 유동인구
@@ -168,4 +144,11 @@ public class EstimatedPopulation {
      * 일요일 유동인구
      */
     private int sunPopulation;
+
+    /***
+     * 해당 상권정보
+     */
+    @ManyToOne
+    @JsonIgnore
+    private Commercial commercial;
 }
