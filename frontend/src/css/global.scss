@@ -116,3 +116,20 @@ var content = `<div class="customoverlay">
 
    font-size: 9pt;
  }
+
+
+ .dong{
+   position: relative;
+   // bottom: 65px;
+   // right: -55px;
+   height: 10px;
+   padding: 8px 10px;
+   // width: 70px;
+   border-radius: 5px;
+   background-color: rgb(255, 255, 255);
+   border: 1px solid rgb(58, 58, 58);
+   text-align: center;
+   opacity: .9;
+
+   font-size: 9pt;
+ }

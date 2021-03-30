@@ -17,18 +17,7 @@
          <side-menu @open-input-form="onClickInputBt"></side-menu>
       </div>
 
-      <vue-daum-map
-         id="map"
-         :appKey="appKey"
-         :center.sync="center"
-         :level.sync="level"
-         :mapTypeId="mapTypeId"
-         :libraries="libraries"
-         @load="onLoad"
-         @tilesloaded="onMapEvent('titlesloaded', $event)"
-         @zoom_changed="onMapEvent('zoom_changed', $event)"
-      >
-      </vue-daum-map>
+      <vue-daum-map id="map" :appKey="appKey" :center.sync="center" :level.sync="level" :mapTypeId="mapTypeId" :libraries="libraries" @load="onLoad"> </vue-daum-map>
    </div>
 </template>
 
@@ -68,6 +57,7 @@ export default {
       gu_Boundarys: [],
       gu_Overlays: [],
       dong_Overlays: [],
+      clusterer: null,
 
       // 테스트를 위한 샘플 코드
       sample: [
@@ -99,6 +89,21 @@ export default {
       this.initCenter();
    },
 
+   watch: {
+      level: function() {
+         // 조건 만족 시 1회만 생성 -> 성능..
+         if (this.level >= 7 && this.gu_Overlays.length == 0) {
+            console.log('구 생성');
+            this.setGuMarker('make');
+            this.setDongMarker('del');
+         } else if (this.level <= 6 && this.dong_Overlays.length == 0) {
+            console.log('동 생성');
+            this.setGuMarker('del');
+            this.setDongMarker('make');
+         }
+      },
+   },
+
    methods: {
       // sidemenu의 옵션입력 버튼 눌렀을 때
       onClickInputBt: function() {
@@ -126,9 +131,8 @@ export default {
             oa: 127.17018320519693,
             pa: 37.7014997773775,
          };
-         this.getPolygon('gu', bounds);
-
-         this.setDongMarker('make');
+         // this.getPolygon('gu', bounds);
+         this.setGuMarker('make');
       },
 
       initCenter() {
@@ -136,19 +140,23 @@ export default {
          // 중심위치 세팅
          this.center.lat = 37.5642135; // 위도
          this.center.lng = 127.0016985; // 경로
-         this.level = 7;
+         this.level = 8;
       },
 
+      // 줌 이벤트에 걸면, level값 반영이 즉각으로 안이루어짐
       onMapEvent(event) {
-         // console.log('onMapEvent : ' + event + ' / level : ' + this.level);
+         console.log('onMapEvent : ', this.level);
          var bounds = this.mapObject.getBounds();
 
-         if (this.level >= 7) {
+         // 조건 만족 시 1회만 생성 -> 성능..
+         if (this.level >= 7 && this.gu_Overlays.length == 0) {
+            console.log('구 생성');
             this.setGuMarker('make');
-            // this.setDongMarker('del');
-         } else if (this.level <= 6) {
+            this.setDongMarker('del');
+         } else if (this.level <= 6 && this.dong_Overlays.length == 0) {
+            console.log('동 생성');
             this.setGuMarker('del');
-            // this.getPolygon('dong', bounds);
+            this.setDongMarker('make');
          }
       },
 
@@ -193,13 +201,50 @@ export default {
                averageCenter: true, // 클러스터에 포함된 마커들의 평균 위치를 클러스터 마커 위치로 설정
                minLevel: 3, // 클러스터 할 최소 지도 레벨
                disableClickZoom: true, // 클러스터 마커를 클릭했을 때 지도가 확대되지 않도록 설정한다
+               minClusterSize: 3, // 클러스터링 할 최소 마커 수
+               calculator: [5, 11, 20], // 클러스터의 크기 구분 값, 각 사이값마다 설정된 text나 style이 적용된다
+               styles: [
+                  {
+                     width: '30px',
+                     height: '30px',
+                     background: 'rgba(127, 225, 150, .8)',
+                     borderRadius: '4px',
+                     color: '#000',
+                     textAlign: 'center',
+                     fontWeight: 'bold',
+                     lineHeight: '31px',
+                     border: '1px solid #292929',
+                  },
+                  {
+                     width: '37px',
+                     height: '37px',
+                     background: 'rgba(255, 238, 52, .8)',
+                     borderRadius: '4px',
+                     color: '#000',
+                     textAlign: 'center',
+                     fontWeight: 'bold',
+                     lineHeight: '38px',
+                     border: '1px solid #292929',
+                  },
+                  {
+                     width: '45px',
+                     height: '45px',
+                     background: 'rgba(255, 52, 52, .8)',
+                     borderRadius: '4px',
+                     color: '#000',
+                     textAlign: 'center',
+                     fontWeight: 'bold',
+                     lineHeight: '46px',
+                     border: '1px solid #292929',
+                  },
+               ],
             });
 
             this.dongCoords.forEach((item) => {
                var position = new kakao.maps.LatLng(item.lat, item.lng);
 
-               var content = `<div class="cell">
-                              ${item.emd_nm}
+               var content = `<div class="dong">
+                              <i class="fas fa-map-pin"></i> ${item.emd_nm}
                            </div>`;
 
                // 커스텀 오버레이를 생성합니다
@@ -220,15 +265,20 @@ export default {
                var level = cluster._map.getLevel() - 1;
 
                // 지도를 클릭된 클러스터의 마커의 위치를 기준으로 확대합니다
-               cluster._map.setLevel(level, { anchor: cluster.getCenter() });
+               cluster._map.setLevel(level, { anchor: cluster.getCenter(), animate: true });
             });
+
+            this.clusterer = clusterer;
          } else if (type == 'del' && this.dong_Overlays.length != 0) {
             for (const key in this.dong_Overlays) {
                this.dong_Overlays[key].setMap(null);
             }
             this.dong_Overlays = [];
+            this.clusterer.clear();
          }
       },
+
+      // 동 마커 클릭 이벤트 ->
 
       // 구, 동 등의 경계 정보를 초기화함
       removeBoundarys() {
