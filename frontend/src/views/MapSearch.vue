@@ -1,24 +1,18 @@
 <template lang="">
    <div class="container">
+      <toast class="toast-pop-up floating"></toast>
       <transition name="collapse-right">
          <div v-show="detailCompo" class="detail-compo floating">
             <map-detail @close-expended="onClickCloseDetail"></map-detail>
-
-            <!-- 좌측 사이드 메뉴 위치 -->
-            <!-- 내부에 컴포넌트 생성 후 배치 -->
          </div>
       </transition>
       <transition name="collapse">
          <div v-show="optionCompo || bookMarkCompo" class="menu-expand-compo floating">
             <option-input v-show="optionCompo" @close-expended="onClickClose" @input-complete="onInputComplete"></option-input>
             <bookmark-list v-show="bookMarkCompo" @close-expended="onClickClose" @goDetail="goDetail"></bookmark-list>
-
-            <!-- 좌측 사이드 메뉴 위치 -->
-            <!-- 내부에 컴포넌트 생성 후 배치 -->
          </div>
       </transition>
       <div class="sidemenu-compo floating">
-         <!-- <button @click="this.setRecommendMarker">TEST</button> -->
          <side-menu @open-input-form="onClickInputBt" @open-bookmark="onClickBookmarkBt" @dialog-change="onDialogChange"></side-menu>
       </div>
       <vue-daum-map id="map" :appKey="appKey" :center.sync="center" :level.sync="level" :mapTypeId="mapTypeId" :libraries="libraries" @load="onLoad" @tilesloaded="onMapEvent('titlesloaded', $event)">
@@ -33,6 +27,8 @@ import MapDetail from '@/components/MapDetail/MapDetail.vue';
 import BookmarkList from '@/components/Bookmark/BookmarkList.vue';
 import OptionInput from '@/components/OptionInput.vue';
 import SideMenu from '@/components/SideMenu.vue';
+import Toast from '@/components/Toast.vue';
+
 import axios from 'axios';
 
 // 동코드 JSON 파일 import
@@ -40,7 +36,7 @@ import guCoords from '@/assets/data/gu_coords.json';
 import dongCoords from '@/assets/data/dong_coords.json';
 
 export default {
-   components: { VueDaumMap, MapDetail, OptionInput, SideMenu, BookmarkList },
+   components: { VueDaumMap, MapDetail, OptionInput, SideMenu, BookmarkList, Toast },
    data: () => ({
       appKey: 'b20bb90eb97f8724820808bd2047982e', //restAPI key
       center: { lat: '', lng: '' },
@@ -68,28 +64,6 @@ export default {
       dong_Markers: [],
       dong_Boundarys: [], // 선택한 동의 폴리곤
       clusterer: null,
-
-      // 테스트를 위한 샘플 코드
-      sample: [
-         {
-            name: '교대역_1',
-            score: 55,
-            x: '201023', //상권영역.csv
-            y: '443482',
-         },
-         {
-            name: '천호대로129길',
-            score: 81,
-            x: '208103',
-            y: '450391',
-         },
-         {
-            name: '공덕시장',
-            score: 90,
-            x: '195838',
-            y: '449448',
-         },
-      ],
 
       // 동별로 마커를 찍기 위한 json파일 import
       guCoords: guCoords,
@@ -134,13 +108,31 @@ export default {
       onClickCloseDetail: function() {
          this.detailCompo = false;
       },
+
       //추천조건 입력 완료했을 때(상권추천)
-      onInputComplete: function() {
+      onInputComplete: function(options) {
          this.optionCompo = false;
-         // 추천 결과 요청 추가해야함
+         /*
+         options
+         {
+         category: "일식음식점"
+         districts: {
+                        0: "중구"
+                        1: "용산구"
+                        2: "중랑구"
+                     }
+         }
+         */
+
+         // options 데이터를 추천 API 요청 -> 상권명 / 추천 지수 / 상권영역 내 x,y 좌표 받음
+         var result = this.apiRecommend(options);
+         console.log(result);
+
+         // 추천 받은 상권들을 마커로 표시
+         this.setRecommendMarker(result);
 
          // 검색 결과 조회
-         this.detailCompo = true;
+         // this.detailCompo = true;
       },
       goDetail(value) {
          this.detailCompo = value;
@@ -504,8 +496,35 @@ export default {
       //  추천 받은 상권들에 대해, 커스텀 마커 + 폴리곤 반환
       // =========================================
 
+      // 서버에 요청을 보내서 추천 결과를 받음
+      apiRecommend(option) {
+         // 테스트를 위한 샘플 코드
+         var sample = [
+            {
+               name: '교대역_1',
+               score: 55,
+               x: '201023', //상권영역.csv
+               y: '443482',
+            },
+            {
+               name: '천호대로129길',
+               score: 81,
+               x: '208103',
+               y: '450391',
+            },
+            {
+               name: '공덕시장',
+               score: 90,
+               x: '195838',
+               y: '449448',
+            },
+         ];
+
+         return sample;
+      },
+
       //추천 상권 마커 표시
-      setRecommendMarker() {
+      setRecommendMarker(result) {
          var imageSrc = require('/src/assets/image/categories/map/marker/marker.png'), // 마커이미지의 주소입니다
             imageSize = new kakao.maps.Size(40, 40), // 마커이미지의 크기입니다
             imageOption = { offset: new kakao.maps.Point(19, 40) }; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
@@ -519,8 +538,8 @@ export default {
          // 개별 마커 변수 생성
          var marker;
 
-         for (var idx in this.sample) {
-            var district = this.sample[idx];
+         for (var idx in result) {
+            var district = result[idx];
             var position = new this.coordsChange(district);
 
             // 커스텀 오버레이에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
@@ -752,6 +771,21 @@ export default {
 
       border-radius: 0px 30px 30px 0px;
    }
+
+   .toast-pop-up {
+      background-color: rgb(255, 255, 255);
+
+      width: 400px;
+      height: 50px;
+
+      top: 40px;
+      left: 50%;
+
+      transform: translate(-50%, -50%);
+
+      border-radius: 30px;
+   }
+
    // detail-compo slide in 기능
    .collapse-right-enter-active,
    .collapse-right-leave-active {
