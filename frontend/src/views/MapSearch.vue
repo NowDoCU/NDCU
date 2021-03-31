@@ -702,7 +702,7 @@ export default {
 .blur-display > *:not(.sidemenu-compo) {
    pointer-events: none;
    filter: blur(5px);
-   animation: 0.5s ease-out 0s 1 blur;
+   animation: 0.3s ease-out 0s 1 blur;
    @keyframes blur {
       0% {
          filter: blur(0);
