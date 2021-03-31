@@ -24,20 +24,8 @@ public class CommercialServiceImpl implements CommercialService{
     CommercialRepository commercialRepository;
 
     @Override
-    public List<EstimatedSales> findSalesByCommercialCode(String commercialCode) {
-        // return salesRepository.findByCommercialCodeOrderByIndustryCodeAscYearAscQuarterAsc(commercialCode);
-        return null;
-    }
-
-    @Override
-    public List<EstimatedPopulation> findPopulationByCommercialCode(String commercialCode) {
-        // return populationRepository.findByCommercialCodeOrderByYearAscQuarterAsc(commercialCode);
-        return null;
-    }
-
-    @Override
     @Transactional
-    public List<Commercial> findCommercialByDongCode(String dongCode) {
+    public List<Commercial> findByDongCode(String dongCode) {
         List<Commercial> commercialList = commercialRepository.findByDongCode(dongCode);
 
         // 상권리스트에 세부정보는 전달할 필요가 없기 때문에 제외시켜준다.
@@ -51,8 +39,8 @@ public class CommercialServiceImpl implements CommercialService{
 
     @Override
     @Transactional
-    public Commercial findCommercialById(Long id) {
-        Commercial commercial = commercialRepository.findById(id).orElseThrow(null);
+    public Commercial findByCommercialCode(String commercialCode) {
+        Commercial commercial = commercialRepository.findByCommercialCode(commercialCode).orElse(null);
 
         // 상권리스트에 세부정보는 전달할 필요가 없기 때문에 제외시켜준다.
         commercial.setEstimatedPopulationList(

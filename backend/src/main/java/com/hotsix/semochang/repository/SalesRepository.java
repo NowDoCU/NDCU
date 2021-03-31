@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface SalesRepository extends JpaRepository<EstimatedSales, Long> {
+public interface SalesRepository extends JpaRepository<EstimatedSales, String> {
 
 //    /***
 //     * 상권코드를 이용한 매출변화 조회
