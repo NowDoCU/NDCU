@@ -102,19 +102,23 @@ var content = `<div class="customoverlay">
    }
  }
 
- .cell{
+ .gu{
    position: relative;
    // bottom: 60px;
    // right: 2px;
-   height: 70px;
-   width: 70px;
-   border-radius: 70px;
-   background-color: rgb(255, 229, 30);
+   // height: 70px;
+   // width: 70px;
+   // border-radius: 70px;
+   // background-color: rgb(255, 229, 30);
    text-align: center;
-   line-height: 70px;
+   // line-height: 70px;
    opacity: .9;
 
-   font-size: 9pt;
+   font-weight: bold;
+   font-size: 18pt;
+
+   color: rgb(14, 122, 255);
+   text-shadow: -1px 0 #fff, 0 1px #fff, 1px 0 #fff, 0 -1px #fff;
  }
 
  .dong {
