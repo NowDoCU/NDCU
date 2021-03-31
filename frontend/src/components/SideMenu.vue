@@ -22,7 +22,7 @@
         로고
       </div>
       <div class="modal__content">
-        <div class="form-wrapper">
+        <div class="form-wrapper form-su">
           <div class="input-wrapper">
             <input v-model="suEmail" id="email-ip" type="email" placeholder="이메일" @focus="onFocused('email')" @blur="onBlured('email')">
             <div id="email-dv" class="divider"></div>
@@ -46,7 +46,9 @@
           :class="{ 'vali': emailVali(suEmail) && pwdVali(suPwd) && pwdConfVali(suPwdConf) }"
         >회원가입</button>
       </div>
-      <a @click="controlModal(2, 'close')" class="modal__close">x</a>
+      <a class="modal__close">
+        <i @click="controlModal(2, 'close')"  class="far fa-times-circle"></i>
+      </a>
     </div>
     <!--  로그인 모달  -->
     <div v-if="dialog2" class="modal">
@@ -54,7 +56,7 @@
         로고
       </div>
       <div class="modal__content">
-        <div class="form-wrapper">
+        <div class="form-wrapper form-li">
           <div class="input-wrapper">
             <input v-model="liEmail" id="email-ip" type="email" placeholder="이메일" @focus="onFocused('email')" @blur="onBlured('email')">
             <div id="email-dv" class="divider"></div>
@@ -66,6 +68,17 @@
             <span v-if="!pwdVal1" class="tip">영문, 숫자 포함 6-20자 이내여야 합니다.</span>
           </div>
         </div>
+        <div class="account-wrapper">
+          <span class="pwd-forgotten">비밀번호를 잊으셨나요</span>
+          <div class="signup-wrapper">
+            <div class="left-wrapper">
+              계정이 없으신가요?
+            </div>
+            <div @click="[controlModal(1, 'close'), controlModal(2, 'open')]" class="right-wrapper">
+              가입하기
+            </div>
+          </div>
+        </div>
       </div>
       <div class="modal__footer">
         <button 
@@ -73,7 +86,9 @@
           :class="{ 'vali': emailVali(liEmail) && pwdVali(liPwd) }"
         >로그인</button>
       </div>
-      <a @click="controlModal(1, 'close')" class="modal__close">x</a>
+      <a class="modal__close">
+        <i @click="controlModal(1, 'close')"  class="far fa-times-circle"></i>
+      </a>
     </div>
   </div>
 </template>
@@ -108,10 +123,10 @@ export default {
       return false
     },
     pwdConfVali: function (str) {
-      if (str == this.suPwd) {
-        return true
-      }
-      return false
+      if (str !== this.suPwd) {
+        return false
+      } else
+      return true
     },
     emailVali: function (str) {
       if (EmailValidator.validate(str)) {
@@ -193,7 +208,7 @@ export default {
           this.pwdVal1 = true
         }
       } else {
-        if (!reg_pwd.test(targetInput) && this.suPwd !== targetInput) {
+        if ((!reg_pwd.test(targetInput) && this.suPwd !== targetInput) || (!reg_pwd.test(targetInput) && !targetInput)) {
           targetDiv.classList.add('unval')
           this.pwdVal2 = false
         } else {
@@ -298,24 +313,26 @@ export default {
   }
   .modal__header {
     height: 30%;
-    width: 100%;
+    width: 300px;
     background: rgb(57, 104, 235);
   }
   .modal__content {
     height: 60%;
     width: 70%;
     padding: 20px;
-    .form-wrapper {
+    .form-li {
+      height: 75%;
+    }
+    .form-su {
       height: 100%;
+    }
+    .form-wrapper {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: space-around;
       .input-wrapper {
         width: 100%;
-        // display: flex;
-        // flex-direction: column;
-        // align-items: center;
         input {
           width: 100%;
           height: 50px;
@@ -354,6 +371,33 @@ export default {
         }
       }
     }
+    .account-wrapper {
+      width: 100%;
+      height: 25%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-around;
+      .pwd-forgotten {
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .signup-wrapper {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        .left-wrapper {
+          color: gray;
+        }
+        .right-wrapper {
+          color: #5082ff;
+        }
+        .right-wrapper:hover {
+          text-decoration-line: underline;
+          cursor: pointer;
+        }
+      }
+    }
   }
   .modal__footer {
     height: 10%;
@@ -372,14 +416,22 @@ export default {
     .vali {
       background: linear-gradient(to bottom right, #7A9FFF, #1D3CAA);
       pointer-events: auto;
+      box-shadow: 0 4px 4px lightgray;
       cursor: pointer;
+    }
+    .vali:hover {
+      background: linear-gradient(to bottom right,#1D3CAA, #7A9FFF);
     }
   }
   .modal__close {
     position: inherit;
     top: 10px;
     right: 10px;
-    cursor: pointer;
+    i {
+      cursor: pointer;
+      font-size: 20pt;
+      color: gray;
+    }
   }
 }
 .blur-display > *:not(.modal) {
