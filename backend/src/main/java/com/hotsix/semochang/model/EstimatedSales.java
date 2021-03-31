@@ -54,6 +54,7 @@ public class EstimatedSales {
      * 해당 상권정보
      */
     @ManyToOne
+    @JoinColumn(name = "commercial_code")
     @JsonIgnore
     private Commercial commercial;
 }

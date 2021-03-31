@@ -7,8 +7,6 @@ import java.util.List;
 
 public interface PopulationRepository extends JpaRepository<EstimatedPopulation, Long> {
 
-    List<EstimatedPopulation> findByCommercialId(Long commercialId);
-
 //    /***
 //     * 상권코드를 이용한 유동인구 변화 조회
 //     */

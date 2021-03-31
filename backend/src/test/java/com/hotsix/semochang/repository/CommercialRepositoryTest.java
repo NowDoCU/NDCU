@@ -3,6 +3,7 @@ package com.hotsix.semochang.repository;
 import com.hotsix.semochang.model.Commercial;
 import com.hotsix.semochang.model.EstimatedPopulation;
 import com.hotsix.semochang.model.EstimatedSales;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +21,17 @@ class CommercialRepositoryTest {
     @Autowired
     CommercialRepository commercialRepository;
 
+    private Commercial commercial;
+    private final static String COMMERCIAL_CODE = "1001182";
+
+    @BeforeEach
+    public void init() {
+        commercial = commercialRepository.findByCommercialCode(COMMERCIAL_CODE).orElse(null);
+    }
+
     @Test
-    @DisplayName("행정동 코드를 통한 상권조회")
-    public void listTest() {
+    @DisplayName("행정동 코드를 통한 상권 리스트 조회")
+    public void 상권리스트를_조회한다() {
 
         /***
          * 1. 행정동 코드를 통한 상권조회
@@ -37,16 +46,11 @@ class CommercialRepositoryTest {
     @Test
     @DisplayName("하나의 상권에서 추정매출흐름 조회")
     @Transactional
-    public void findByIdAndSalesListTest() {
+    public void 상권에서_추정매출의_흐름을_조회한다() {
         
         /***
          * 2. 하나의 상권에서 추정매출흐름 조회
          */
-
-        Long commercialId = 1157L;
-
-        Commercial commercial = commercialRepository.findById(commercialId).orElse(null);
-
         // 상권 정보 조회
         System.out.println(commercial);
 
@@ -60,14 +64,7 @@ class CommercialRepositoryTest {
     @Test
     @DisplayName("하나의 상권에서 추정유동인구 조회")
     @Transactional
-    public void findByIdAndPopulationListTest() {
-
-        /***
-         * 2. 하나의 상권에서 추정매출흐름 조회
-         */
-        Long commercialId = 1157L;
-
-        Commercial commercial = commercialRepository.findById(commercialId).orElse(null);
+    public void 상권에서_추정유동인구의_흐름을_조회한다() {
 
         // 상권 정보 조회
         System.out.println(commercial);
@@ -76,5 +73,17 @@ class CommercialRepositoryTest {
         commercial.getEstimatedPopulationList().stream()
                 .sorted(Comparator.comparing(EstimatedPopulation::getQuarter))
                 .sorted(Comparator.comparing(EstimatedPopulation::getYear)).forEach(System.out::println);
+    }
+
+    @Test
+    @DisplayName("하나의 상권에서 임대시세 조회")
+    @Transactional
+    public void 상권에서_임대시세를_조회한다() {
+
+        // 상권 정보 조회
+        System.out.println(commercial);
+
+        // 상권에서_임대시세를_조회한다
+        System.out.println(commercial.getStoreRentalPrice().toString());
     }
 }

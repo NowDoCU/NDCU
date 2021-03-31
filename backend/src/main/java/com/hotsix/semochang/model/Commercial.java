@@ -1,7 +1,6 @@
 package com.hotsix.semochang.model;
 
 import lombok.*;
-import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.util.List;
@@ -16,15 +15,15 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"estimatedPopulationList", "estimatedSalesList"})
+@ToString(exclude = {"estimatedPopulationList", "estimatedSalesList", "storeRentalPrice"})
 public class Commercial {
 
     /***
-     * 상권 아이디
+     * 상권 코드
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String commercialCode;
 
     /***
      * 상권 구분코드
@@ -35,11 +34,6 @@ public class Commercial {
      * 상권 구분명
      */
     private String divisionName;
-
-    /***
-     * 상권 코드
-     */
-    private String commercialCode;
 
     /***
      * 상권명
@@ -71,4 +65,8 @@ public class Commercial {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "commercial")
     private List<EstimatedSales> estimatedSalesList;
+
+    @OneToOne
+    @JoinColumn(name = "commercial_code")
+    private StoreRentalPrice storeRentalPrice;
 }

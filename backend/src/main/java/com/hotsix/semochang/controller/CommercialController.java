@@ -26,17 +26,19 @@ public class CommercialController {
     @Autowired
     CommercialService commercialService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getCommercialInfo(@PathVariable("id") Long id) {
+    @GetMapping("/{commercialCode}")
+    public ResponseEntity<?> getCommercialInfo(@PathVariable("commercialCode") String commercialCode) {
 
-        Commercial commercial = commercialService.findCommercialById(id);
+        Commercial commercial = commercialService.findByCommercialCode(commercialCode);
 
         return new ResponseEntity<>(commercial, HttpStatus.OK);
     }
 
     @GetMapping("/list/{dongCode}")
     public ResponseEntity<?> commercialList(@PathVariable("dongCode") String dongCode) {
-        List<Commercial> commercialList = commercialService.findCommercialByDongCode(dongCode);
+
+        List<Commercial> commercialList = commercialService.findByDongCode(dongCode);
+
         return new ResponseEntity<>(commercialList, HttpStatus.OK);
     }
 }
