@@ -1,5 +1,6 @@
 package com.hotsix.semochang;
 
+import com.hotsix.semochang.model.RecommendDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,5 +23,10 @@ public class WordCountController {
         System.out.println(words);
         List<String> wordList = Arrays.asList(words.split(" "));
         return service.getCount(wordList);
+    }
+
+    @PostMapping("/recommendation")
+    public void recommendation(@RequestBody RecommendDto recommendDto) {
+        service.commercialAreaRecommendation(recommendDto);
     }
 }
