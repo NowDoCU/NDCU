@@ -7,6 +7,15 @@ global.scss
 
 // @MapSearch.vue
 // 내부 지도 커스텀오버레이 부분
+/*
+var content = `<div class="customoverlay">
+                  <span class="markerInfo">
+                     <p class="name"><i class="fas fa-map-marker-alt"></i> ${district.name} <br><br>
+                        <span class="score">${district.score}</span>점
+                     </p>
+                  </span>
+               </div>`;
+*/
 .customoverlay {
     position: relative;
     bottom: 80px;
@@ -42,7 +51,7 @@ global.scss
         margin: 0;
     }
 
-    & p.score {
+    & span.score {
         margin-top: 8px;
         font-size: 28pt;
         color: rgb(18, 6, 254);
@@ -58,4 +67,73 @@ global.scss
        height: 12px;
        background: url('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/vertex_white.png');
     }
+ }
+
+ .customoverlay2 {
+   position: relative;
+   bottom: 60px;
+   right: 2px;
+   // background-color: rgba(255, 55, 55, 0.6);
+   width: 100%;
+   height: 70px;
+
+   display: flex;
+   flex-direction: column;
+   justify-content: space-between;
+   align-items: center;
+
+   .top{
+      .score{
+         font-size: 36pt;
+         font-weight: 700;
+         color: rgb(59, 191, 107);
+         -webkit-text-stroke: 2px #000
+      }
+   }
+
+   .name{
+      background-color: rgba(0, 0, 0, 0.8);
+      padding: 6px 12px;
+      border-radius: 6px;
+      
+      color: white;
+      font-size: 10pt;
+      font-weight: 600;
+   }
+ }
+
+ .gu{
+   position: relative;
+   // bottom: 60px;
+   // right: 2px;
+   // height: 70px;
+   // width: 70px;
+   // border-radius: 70px;
+   // background-color: rgb(255, 229, 30);
+   text-align: center;
+   // line-height: 70px;
+   opacity: .9;
+
+   font-weight: bold;
+   font-size: 18pt;
+
+   color: rgb(14, 122, 255);
+   text-shadow: -1px 0 #fff, 0 1px #fff, 1px 0 #fff, 0 -1px #fff;
+ }
+
+ .dong {
+   position: relative;
+   bottom: -1px;
+   right: -6px;
+   height: 10px;
+   padding: 6px 10px;
+   // width: 70px;
+   border-radius: 5px;
+   background-color: #fff;
+   border: 1px solid rgb(0, 68, 227);
+   color: rgb(0, 68, 227);
+   text-align: center;
+   opacity: .9;
+
+   font-size: 9pt;
  }
