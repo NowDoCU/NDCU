@@ -1,29 +1,40 @@
 <template lang="">
    <div class="container">
-      <div v-show="detailCompo" class="detail-compo floating">
-         <map-detail @close-expended="onClickCloseDetail"></map-detail>
+      <transition name="collapse-right"> 
+         <div v-show="detailCompo" class="detail-compo floating">
+            <map-detail @close-expended="onClickCloseDetail"></map-detail>
 
-         <!-- 좌측 사이드 메뉴 위치 -->
-         <!-- 내부에 컴포넌트 생성 후 배치 -->
-      </div>
-      <div v-show="optionCompo || bookMarkCompo" class="menu-expand-compo floating">
-         <option-input 
-            v-show="optionCompo" 
-            @close-expended="onClickClose"
-            @input-complete="onInputComplete"
-         ></option-input>
-         <bookmark-list
-            v-show="bookMarkCompo"
-            @close-expended="onClickClose"
-            @goDetail='goDetail'
-         ></bookmark-list>
+            <!-- 좌측 사이드 메뉴 위치 -->
+            <!-- 내부에 컴포넌트 생성 후 배치 -->
+         </div>
+      </transition>
+      <transition
+         name="collapse"
+      >
+         <div v-show="optionCompo || bookMarkCompo" class="menu-expand-compo floating">
+            <option-input 
+               v-show="optionCompo" 
+               @close-expended="onClickClose"
+               @input-complete="onInputComplete"
+            ></option-input>
+            <bookmark-list
+               v-show="bookMarkCompo"
+               @close-expended="onClickClose"
+               @goDetail='goDetail'
+            ></bookmark-list>
 
-         <!-- 좌측 사이드 메뉴 위치 -->
-         <!-- 내부에 컴포넌트 생성 후 배치 -->
-      </div>
+            <!-- 좌측 사이드 메뉴 위치 -->
+            <!-- 내부에 컴포넌트 생성 후 배치 -->
+         </div>
+      
+      </transition>
       <div class="sidemenu-compo floating">
          <!-- <button @click="this.setRecommendMarker">TEST</button> -->
-         <side-menu @open-input-form="onClickInputBt" @open-bookmark="onClickBookmarkBt"></side-menu>
+         <side-menu 
+            @open-input-form="onClickInputBt" 
+            @open-bookmark="onClickBookmarkBt"
+            @dialog-change="onDialogChange"
+         ></side-menu>
       </div>
       <vue-daum-map id="map" :appKey="appKey" :center.sync="center" :level.sync="level" :mapTypeId="mapTypeId" :libraries="libraries" @load="onLoad"> </vue-daum-map>
    </div>
@@ -283,6 +294,7 @@ export default {
 };
 </script>
 <style scoped lang="scss">
+// 로그인, 회원가임 모달 눌렸을 때 배경 블러처리
 .blur-display > *:not(.sidemenu-compo) {
    pointer-events: none;
    filter: blur(5px);
@@ -316,6 +328,12 @@ export default {
 
       border-radius: 0px 30px 30px 0px;
    }
+   .collapse-enter-active, .collapse-leave-active {
+      transition: all .2s ease;
+   }
+   .collapse-enter, .collapse-leave-to {
+      transform: translateX(-500px);
+   }
    .menu-expand-compo {
       background-color: white;
 
@@ -328,9 +346,14 @@ export default {
 
       border-radius: 0px 30px 30px 0px;
    }
-
+   // detail-compo slide in 기능
+   .collapse-right-enter-active, .collapse-right-leave-active {
+      transition: all .2s ease;
+   }
+   .collapse-right-enter, .collapse-right-leave-to {
+      transform: translateX(1000px);
+   }
    .detail-compo {
-      // display: none; // 임시
       top: 2%;
       right: 1%;
       background-color: white;

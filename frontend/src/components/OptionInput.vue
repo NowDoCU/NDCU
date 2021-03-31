@@ -13,15 +13,16 @@
             <div :class="{ 'selected-ds': selectedDs.length }" v-if="showDsList">
                <div class="ds-item" v-for="(ds, idx) in selectedDs" :key="idx">
                   <span class="ds-text">{{ ds }}</span>
-                  <span @click="deleteDs(idx)" class="del">x</span>
+                  <i @click="deleteDs(idx)" class="fas fa-times-circle del"></i>
                </div>
             </div>
             <div 
                class="search" 
                :class="[{'unsel': selectedDs.length == 0}, { 'selec': selectedDs.length }]"
                @keyup.right="selectValue('right')" @keyup.left="selectValue('left')">
-               <input id="districtInput" class="ds-input" type="text" @input="filter($event.target.value)" @keypress.enter="addDistrct($event.target.value)" @click="getAllDs" autocomplete="off" />
-               <ul tabindex="0" class="ds-list" v-if="filterList.length" @mouseover="removeValue">
+               <input id="districtInput" class="ds-input" type="text" @input="filter($event.target.value)" @keypress.enter="addDistrct($event.target.value)" @click="[showUl=!showUl, showDsList=true]" autocomplete="off" />
+               <i v-show="showUl" @click="showUl=false" class="fas fa-times-circle cancle"></i>
+               <ul tabindex="0" class="ds-list" v-if="showUl" @mouseover="removeValue">
                   <li
                      class="ds-items"
                      tabindex="-1"
@@ -59,6 +60,7 @@ export default {
       return {
          selectedCate: '',
          showDsList: false, // 선택된 지역 목록
+         showUl: false,
          isActive: false, // 지역 input 자동완성
          query: '', // 지역 검색어
          selectedDs: [], // 선택된 지역
@@ -89,7 +91,33 @@ export default {
             '송파구',
             '강동구',
          ],
-         filterList: [], // 자동완성으로 걸러진 결과
+         filterList: [
+            '종로구',
+            '중구',
+            '용산구',
+            '성동구',
+            '광진구',
+            '동대문구',
+            '중랑구',
+            '성북구',
+            '강북구',
+            '도봉구',
+            '노원구',
+            '은평구',
+            '서대문구',
+            '마포구',
+            '양천구',
+            '강서구',
+            '구로구',
+            '금천구',
+            '영등포구',
+            '동작구',
+            '관악구',
+            '서초구',
+            '강남구',
+            '송파구',
+            '강동구',
+         ], // 자동완성으로 걸러진 결과
       };
    },
    methods: {
@@ -110,8 +138,8 @@ export default {
       // 자동완성 결과에서 하나 선택 했을 때
       changeValue(district) {
          this.addDistrct(district); // 선택된 지역 목록에 추가
-         this.filterList = [];
-         document.querySelector('.ds-input').value = null;
+         document.querySelector('.ds-input').focus()
+         this.filterList = this.districts
       },
       addDistrct: function(district) {
          const isSel = this.selectedDs.indexOf(district);
@@ -121,12 +149,16 @@ export default {
             if (this.districts.indexOf(district) != -1) { // 입력된 값이 유효한 지역구 이름이면(검색창에서 지역이름 아닌 것 입력한 경우나 오타났을 경우 차단)
                if (this.selectedDs.length < 3) { // 선택된 지역목록이 최대목록이 아니면
                   this.selectedDs.push(district); // 추가
-                  this.filterList = [];
                   document.querySelector('.ds-input').value = null;
+                  if (this.selectedDs.length === 3) {
+                     this.showUl = false
+                  } 
                } else {
+                  this.showUl = false
                   alert('지역은 최대 3개까지 선택가능합니다.');
                }
             } else {
+               document.querySelector('.ds-input').value = null;
                alert('올바른 지역명이 아닙니다.');
             }
          }
@@ -276,9 +308,8 @@ export default {
                align-items: center;
                background-color: rgb(57, 104, 235);
                margin: 0 5px;
-               width: 58px;
                height: 10px;
-               padding: 10px;
+               padding: 10px 12px;
                border-radius: 20px;
                color: white;
                text-align: center;
@@ -287,7 +318,8 @@ export default {
                   font-weight: 100;
                }
                .del {
-                  font-size: 6pt;
+                  font-size: 8pt;
+                  margin-left: 6px;
                }
                .del:hover {
                   cursor: pointer;
@@ -307,6 +339,13 @@ export default {
             display: flex;
             flex-direction: column;
             align-items: center;
+            i {
+               z-index: 150;
+               position: relative;
+               top: -32px;
+               right: -175px;
+               cursor: pointer;
+            }
             .ds-input {
                padding: 5px;
                z-index: 100;
@@ -397,6 +436,7 @@ export default {
          padding: 5px;
          width: 150px;
          height: 50px;
+         box-shadow: 0 4px 4px lightgray;
          border-radius: 30px;
          border: none;
          background: linear-gradient(to bottom right, #7A9FFF, #1D3CAA);

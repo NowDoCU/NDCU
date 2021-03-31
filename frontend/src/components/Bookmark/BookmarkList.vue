@@ -60,7 +60,7 @@ export default {
 <style scoped lang="scss">
 .bookmark-container {
     height: 100%;
-    padding: 20px;
+    padding: 0 20px;
 
     .header {
         position: absolute;
@@ -76,7 +76,7 @@ export default {
         }
     }
     .bookmark-name {
-        margin-top: 50px;
+        padding-top: 50px;
         font-size: 20pt;
     }
 
