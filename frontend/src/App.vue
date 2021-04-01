@@ -24,5 +24,10 @@ export default {
    background-color: wheat;
    width: 100%;
    height: 100vh;
+   -ms-user-select: none; 
+   -moz-user-select: -moz-none; 
+   -webkit-user-select: none; 
+   -khtml-user-select: none; 
+   user-select:none;
 }
 </style>

@@ -113,9 +113,18 @@
             데이터 출처
           </div>
           <div class="r-right-wrapper">
-            <a>서울신용보증재단</a>
-            <a>서울 열린데이터 광장</a>
-            <a>소상공인시장진흥공단</a>
+            <div class="site-wrapper">
+              <img src="@/assets/image/data-source/logo3.png" alt="">
+              <a>서울신용보증재단</a>
+            </div>
+            <div class="site-wrapper">
+              <img src="@/assets/image/data-source/logo1.png" alt="">
+              <a>서울 열린데이터 광장</a>
+            </div>
+            <div class="site-wrapper">
+              <img src="@/assets/image/data-source/logo2.png" alt="">
+              <a>소상공인시장진흥공단</a>
+            </div>
           </div>
         </div>
         <i @click="aboutDialog = false" class="fas fa-times about-close"></i>
@@ -143,6 +152,11 @@ export default {
       // login value
       liEmail: '',
       liPwd: '',
+      herf: {
+        1: 'https://www.naver.com/',
+        2: 'https://www.naver.com/',
+        3: 'https://www.naver.com/'
+      }
     };
   },
   methods: {
@@ -333,12 +347,13 @@ export default {
   transform: translateY(200px);
 }
 .about-modal {
+  border-radius: 30px 30px 0 0;
   position: fixed;
   width: 100vw;
   bottom: 0;
   height: 200px;
   padding: 10px 0;
-  background-color: #284ac7a1;
+  background-color: #284ac7bb;
   display: flex;
   justify-content: space-evenly;
   align-items: center;
@@ -384,20 +399,30 @@ export default {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      a {
-        font-size: 11pt;
-        cursor: pointer;
-      }
-      a:hover {
-        text-decoration: underline;
+      .site-wrapper {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        img {
+          width: 30px;
+          height: 30px;
+          margin-right: 10px;
+        }
+        a {
+          font-size: 11pt;
+          // cursor: pointer;
+        }
+        // a:hover {
+        //   text-decoration: underline;
+        // }
       }
       
     }
   }
   .about-close {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 20px;
+    right: 20px;
     cursor: pointer;
   }
 }
