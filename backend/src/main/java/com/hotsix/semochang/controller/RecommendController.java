@@ -1,6 +1,7 @@
-package com.hotsix.semochang;
+package com.hotsix.semochang.controller;
 
-import com.hotsix.semochang.model.RecommendDto;
+import com.hotsix.semochang.service.RecommendService;
+import com.hotsix.semochang.model.RecommendDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -8,15 +9,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-/**
- * author: pinest94
- * since: 2021-03-25
- */
 @RestController
-public class WordCountController {
+public class RecommendController {
 
     @Autowired
-    WordCountService service;
+    RecommendService service;
 
     @GetMapping("/wordcount/{words}")
     public Map<String, Long> count(@PathVariable String words) {
@@ -26,7 +23,7 @@ public class WordCountController {
     }
 
     @PostMapping("/recommendation")
-    public void recommendation(@RequestBody RecommendDto recommendDto) {
-        service.commercialAreaRecommendation(recommendDto);
+    public void recommendation(@RequestBody RecommendDTO recommendDto) {
+        service.commercialAreaRecommend(recommendDto);
     }
 }
