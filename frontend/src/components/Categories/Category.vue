@@ -21,6 +21,7 @@ export default {
   data: function () {
     return {
       selectedCate: '',
+      selectedIdx: 10,
       categories: [
         { name: '한식음식점', sel: false}, // sel >> 선택된 업종 스타일링 적용 위해
         { name: '중식음식점', sel: false},
@@ -38,18 +39,20 @@ export default {
   methods: {
     onCateSelect: function (category) {
       if (this.selectedCate !== category.cate) {
-        if(this.selectedCate === '') {
-          this.selectedCate = category.cate
-          this.categories[category.idx].sel = true
-          this.$emit('category-select', category)
-        } else {
-          alert('업종은 한 개만 선택할 수 있습니다.')
-        } 
+        if (this.selectedIdx <= 9) {
+          this.categories[this.selectedIdx].sel = false //기존에 선택되있던 업종 선택해제
+        }
+        this.selectedCate = category.cate
+        this.categories[category.idx].sel = true
+        this.selectedIdx = category.idx
+        this.$emit('category-select', this.selectedCate)
       } else {
         this.selectedCate = ''
+        this.selectedIdx = 10
         this.categories[category.idx].sel = false
-        this.$emit('category-select', category)
+        this.$emit('category-select', this.selectedCate)
       }
+
     }
   }
 
@@ -64,12 +67,11 @@ export default {
   align-self: center;
   flex-wrap: wrap;
   .button-wrapper {
-    width: 65px;
-    height: 65px;
+    width: 75px;
+    height: 75px;
     display: flex;
     justify-content: center;
     margin: 5px;
-    padding: 5px;
     border-radius: 10px;
   }
   .unsel {

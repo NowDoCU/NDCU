@@ -38,11 +38,21 @@ export default {
 </script>
 <style scoped lang="scss">
 .bt-wrapper {
+  // .button-wrapper {
+  //   width: 65px;
+  //   height: 65px;
+  //   display: flex;
+  //   justify-content: center;
+  //   margin: 5px;
+  //   padding: 5px;
+  //   border-radius: 10px;
+  // }
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-around;
+  padding: 5px;
   
   .img-wrapper {
     width: 40px;

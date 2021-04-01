@@ -3,8 +3,10 @@
       <div class="header">
          <i @click="closeCompo" class="fas fa-angle-double-left"></i>
       </div>
-      <div class="bookmark-name"> 즐겨찾기 </div>
-      <BookmarkListItem  @goDetail="goDetail" v-for="(bookmark, idx) in bookmarklist" :key="idx" :bookmark="bookmark" />
+      <div class="bookmark-name">📌 즐겨찾기</div>
+      <div class="bookmarks">
+        <BookmarkListItem  @delete-bm="onDeleteBm" @goDetail="goDetail" v-for="(bookmark, idx) in bookmarklist" :key="idx" :bookmark="bookmark" :idx="idx"/>
+      </div>
   </div>
 </template>
 
@@ -12,19 +14,46 @@
 import BookmarkListItem from './BookmarkListItem'
 var dummyBookmark = [
     {
-        regionName: '마포구 서교동',
-        score: 88,
-        rank: [1, 4, 3, 2]
+        commercialCode: 1000681,
+        commercialName: '시흥대로 84길',
+        divisionName: '골목상권',
+        dongName: '독산2동'
     },
     {
-        regionName: '서대문구 창천동',
-        score: 91,
-        rank: [1, 5, 5, 3]
+        commercialCode: 1000681,
+        commercialName: '시흥대로 84길',
+        divisionName: '골목상권',
+        dongName: '독산2동'
     },
     {
-        regionName: '은평구 북가좌동',
-        score: 81,
-        rank: [3, 1, 2, 4]
+        commercialCode: 1000681,
+        commercialName: '시흥대로 84길',
+        divisionName: '골목상권',
+        dongName: '독산2동'
+    },
+    {
+        commercialCode: 1000681,
+        commercialName: '시흥대로 84길',
+        divisionName: '골목상권',
+        dongName: '독산2동'
+    },
+    {
+        commercialCode: 1000681,
+        commercialName: '시흥대로 84길',
+        divisionName: '골목상권',
+        dongName: '독산2동'
+    },
+    {
+        commercialCode: 1000681,
+        commercialName: '시흥대로 84길',
+        divisionName: '골목상권',
+        dongName: '독산2동'
+    },
+    {
+        commercialCode: 1000681,
+        commercialName: '시흥대로 84길',
+        divisionName: '골목상권',
+        dongName: '독산2동'
     },
 ]
 
@@ -49,6 +78,9 @@ export default {
         goDetail(value) {
             this.goDetailValue = value;
             this.$emit('goDetail', this.goDetailValue)
+        },
+        onDeleteBm: function (idx) {
+            this.bookmarklist.splice(idx, 1)
         }
     },
     created: function() {
@@ -61,7 +93,8 @@ export default {
 .bookmark-container {
     height: 100%;
     padding: 0 20px;
-
+    display: flex;
+    flex-direction: column;
     .header {
         position: absolute;
         right: 20px;
@@ -76,19 +109,24 @@ export default {
         }
     }
     .bookmark-name {
-        padding-top: 50px;
+        padding: 50px 0 20px 20px;
         font-size: 20pt;
+        font-weight: 700;
     }
-
-    .bookmark-wrapper {
-        margin-bottom: 10px;
-
-        background-color: white;
-        border-radius: 8px;
-        border: 1px solid rgb(228, 228, 228);
-
-        display: flex;
-        flex-direction: column;
+    .bookmarks {
+        height: 83%;
+        overflow-y: scroll;
+    }
+    .bookmarks::-webkit-scrollbar {
+        width: 6px;
+    }
+    .bookmarks::-webkit-scrollbar-thumb {
+        background-color: rgb(157, 157, 157);
+        border-radius: 30px;
+    }
+    .bookmarks::-webkit-scrollbar-track {
+        background-color: rgb(225, 225, 225);
+        border-radius: 20px;
     }
 }
 

@@ -726,7 +726,7 @@ export default {
    // 좌측에 고정되어 떠다니는 사이드메뉴
    .sidemenu-compo {
       background-color: white;
-
+      box-shadow: -1px 0px 20px #23232363;;
       width: 100px;
       height: 100%;
 
@@ -762,6 +762,7 @@ export default {
       transform: translateX(1000px);
    }
    .detail-compo {
+      
       top: 2%;
       right: 1%;
       background-color: white;
