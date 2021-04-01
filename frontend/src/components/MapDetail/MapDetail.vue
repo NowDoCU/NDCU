@@ -35,6 +35,7 @@
 import DetailGraph from './DetailGraph';
 import PieChart from './PieChart'
 import LineGraph from './LineGraph'
+import { findAllData } from '@/api/mapdetail.js'
 
 var mapdata = {
    name: '마포구 서교동',
@@ -94,6 +95,17 @@ export default {
          this.ysales.value = mapdata.ysales;
          this.week.value = mapdata.week;
       },
+      getDataAxios: function() {
+         findAllData(
+            '1001182',
+            (res) => {
+               console.log(res);
+            },
+            (error) => {
+               console.log(error);
+            }
+         );
+      },
       setLike: function() {
          this.like = !this.like;
       },
@@ -103,6 +115,7 @@ export default {
    },
    created: function() {
       this.getData();
+      this.getDataAxios();
    },
 };
 </script>
