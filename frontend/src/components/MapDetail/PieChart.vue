@@ -26,7 +26,9 @@ export default {
     },
     methods: {
         getValue: function() {
+            // 그래프의 카테고리
             this.datacollection.labels = this.dataset.category
+            // 각각의 카테고리에 해당하는 데이터 값
             this.datacollection.datasets[0].data = this.dataset.value
         }
     },
