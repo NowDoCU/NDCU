@@ -1,10 +1,17 @@
 <template lang="">
    <div class="to-container">
-      토스트 메늄다!
+      현재 [ㅇㅇ동]을(를) 검색중이에요
+      <button @click="getRecommended">리셋</button>
    </div>
 </template>
 <script>
-export default {};
+export default {
+   methods: {
+      getRecommended: function() {
+         this.$emit('input-complete', null);
+      },
+   },
+};
 </script>
 <style scoped lang="scss">
 .to-container {

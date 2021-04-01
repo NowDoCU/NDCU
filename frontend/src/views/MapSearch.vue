@@ -1,6 +1,6 @@
 <template lang="">
    <div class="container">
-      <toast class="toast-pop-up floating"></toast>
+      <toast v-show="toastShow" class="toast-pop-up floating" @input-complete="onInputComplete"></toast>
       <transition name="collapse-right">
          <div v-show="detailCompo" class="detail-compo floating">
             <map-detail @close-expended="onClickCloseDetail"></map-detail>
@@ -48,9 +48,12 @@ export default {
       detailCompo: false,
       optionCompo: true,
       bookMarkCompo: false,
-      detailCompo: true,
+
+      // 토스트 메뉴를 표시하기 위한
+      toastShow: false,
 
       // [추천 상권]
+      recommendResult: null,
       markers: [],
       customOverlays: [],
       circles: [],
@@ -76,21 +79,35 @@ export default {
    watch: {
       level: function() {
          // 조건 만족 시 1회만 생성 -> 성능..
-         if (this.level >= 6 && this.gu_Overlays.length == 0) {
-            console.log('# 레벨 6 이상 => 동 삭제, 구 생성');
-            // 구 생성, 동 삭제
-            this.makeGuBoundary();
-            this.removeDongLayer('total');
-            this.removeDongLayer('polyon');
-         } else if (this.level <= 5 && this.dong_Overlays.length == 0) {
-            console.log('# 레벨 5 아래 => 구 삭제, 동 생성');
-            // 구 삭제, 동 생성
-            this.removeGuLayer();
+         if (this.toastShow == false) {
+            if (this.level >= 6 && this.gu_Overlays.length == 0) {
+               console.log('# 레벨 6 이상 => 동 삭제, 구 생성');
+               // 구 생성, 동 삭제
+               this.makeGuBoundary();
+               this.removeDongLayer('total');
+               this.removeDongLayer('polygon');
+            } else if (this.level <= 5 && this.dong_Overlays.length == 0) {
+               console.log('# 레벨 5 아래 => 구 삭제, 동 생성');
+               // 구 삭제, 동 생성
+               this.removeGuLayer();
+            }
+         } else {
+            console.log('# 토스트메뉴 On');
+            // this.makeRecommendMarkerClick();
          }
       },
    },
 
    methods: {
+      // 모달 생성시 블러 적용
+      onDialogChange: function(dialog) {
+         if (dialog === true) {
+            document.querySelector('.container').classList.add('blur-display');
+         } else {
+            document.querySelector('.container').classList.remove('blur-display');
+         }
+      },
+
       // sidemenu의 옵션입력 버튼 눌렀을 때
       onClickInputBt: function() {
          this.optionCompo = !this.optionCompo;
@@ -109,9 +126,14 @@ export default {
          this.detailCompo = false;
       },
 
-      //추천조건 입력 완료했을 때(상권추천)
+      //추천조건 입력 완료되어 버튼 클릭시 (상권추천)
       onInputComplete: function(options) {
+         console.log('## 추천 버튼 클릭');
+
          this.optionCompo = false;
+         this.detailCompo = false;
+         this.toastShow = false;
+
          /*
          options
          {
@@ -126,18 +148,43 @@ export default {
 
          // options 데이터를 추천 API 요청 -> 상권명 / 추천 지수 / 상권영역 내 x,y 좌표 받음
          var result = this.apiRecommend(options);
-         console.log(result);
+         this.recommendResult = JSON.stringify(result);
+         // console.log(result);
+
+         this.removeDongLayer('total');
+         this.removeDongLayer('polygon');
+         this.removeGuLayer();
+         this.removeRcommendLayers();
+
+         this.initCenter();
+         this.chageToastShow('recommend');
 
          // 추천 받은 상권들을 마커로 표시
-         this.setRecommendMarker(result);
-
-         // 검색 결과 조회
-         // this.detailCompo = true;
+         this.setRecommendMarker();
       },
+
+      // 토스트 툴팁 상태 변경
+      chageToastShow(type) {
+         /*
+            상권 추천)
+            1. 토스트 메뉴
+             - 메뉴 보이기(toastShow)
+             - 내용 변경('현재 ㅇㅇㅇ 조건으로 추천중입니다.')
+            2. 구, 동 관련 정보 삭제
+          */
+
+         if (type == 'recommend') {
+            this.toastShow = true;
+
+            // 기존 마커 정보를 삭제
+         }
+      },
+
       goDetail(value) {
          this.detailCompo = value;
          this.bookMarkCompo = false;
       },
+
       // 지도가 로드 완료되면 load 이벤트 발생
       onLoad(map) {
          console.log('# 맵이 로딩됨 => 바로 구 셋팅');
@@ -149,7 +196,7 @@ export default {
       },
 
       initCenter() {
-         console.log('initCenter');
+         // console.log('initCenter');
          // 중심위치 세팅
          this.center.lat = 37.5642135; // 위도
          this.center.lng = 127.0016985; // 경로
@@ -158,13 +205,20 @@ export default {
 
       // 줌 이벤트에 걸면, level값 반영이 즉각으로 안이루어짐
       onMapEvent(event) {
-         // console.log('onMapEvent : ', this.level);
+         // console.log('onMapEvent : ', event);
          var bounds = this.mapObject.getBounds();
 
-         if (this.level <= 5) {
+         // console.log(this.option);
+
+         if (!this.toastShow && this.level <= 5) {
             console.log('# 드래그 + 레벨 5 아래 => 범위에 따라 동 랜더링');
             this.removeDongLayer('total');
             this.makeDongMarker(bounds);
+         } else if (this.recommendResult != null && this.toastShow) {
+            console.log('# 상권 추천 재랜더링');
+            this.removeRcommendLayers();
+            this.chageToastShow('recommend');
+            this.setRecommendMarker();
          }
          // console.log(this.dong_Overlays.length);
       },
@@ -346,7 +400,7 @@ export default {
          });
 
          this.dongCoords.forEach((item) => {
-            var imageSrc = require('/src/assets/image/categories/map/marker/dong_marker2.png'), // 마커이미지의 주소입니다
+            var imageSrc = require('/src/assets/image/map/marker/dong_marker2.png'), // 마커이미지의 주소입니다
                imageSize = new kakao.maps.Size(35, 35), // 마커이미지의 크기입니다
                imageOption = { offset: new kakao.maps.Point(12, -15) }; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
 
@@ -434,7 +488,7 @@ export default {
                      polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
                   }
 
-                  this.removeDongLayer('polyon');
+                  this.removeDongLayer('polygon');
                   this.makeDongPolygon(polygonPath);
 
                   this.mapObject.setCenter(center);
@@ -482,7 +536,7 @@ export default {
 
             this.dong_Overlays = [];
             this.dong_Markers = [];
-         } else if (type == 'polyon') {
+         } else if (type == 'polygon') {
             console.log('[remove] 동 폴리곤 삭제');
             for (const key in this.dong_Boundarys) {
                this.dong_Boundarys[key].setMap(null);
@@ -496,23 +550,26 @@ export default {
       //  추천 받은 상권들에 대해, 커스텀 마커 + 폴리곤 반환
       // =========================================
 
-      // 서버에 요청을 보내서 추천 결과를 받음
+      // 추천) 추천 결과 받기
       apiRecommend(option) {
          // 테스트를 위한 샘플 코드
          var sample = [
             {
+               code: 12314,
                name: '교대역_1',
                score: 55,
                x: '201023', //상권영역.csv
                y: '443482',
             },
             {
+               code: 12314,
                name: '천호대로129길',
                score: 81,
                x: '208103',
                y: '450391',
             },
             {
+               code: 12314,
                name: '공덕시장',
                score: 90,
                x: '195838',
@@ -523,23 +580,22 @@ export default {
          return sample;
       },
 
-      //추천 상권 마커 표시
-      setRecommendMarker(result) {
-         var imageSrc = require('/src/assets/image/categories/map/marker/marker.png'), // 마커이미지의 주소입니다
+      // 추천-1) 추천받은 상권들의 마커 정보 입력
+      setRecommendMarker() {
+         var imageSrc = require('/src/assets/image/map/marker/marker.png'), // 마커이미지의 주소입니다
             imageSize = new kakao.maps.Size(40, 40), // 마커이미지의 크기입니다
             imageOption = { offset: new kakao.maps.Point(19, 40) }; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
 
          // 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다
          var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
 
-         // 기존 마커 정보를 삭제
-         this.removeRcommendLayers();
+         // console.log('# 추천 마커를 찍습니다. (JAON)', this.recommendResult);
 
-         // 개별 마커 변수 생성
-         var marker;
+         var recommendObj = JSON.parse(this.recommendResult);
+         // console.log('# 추천 마커를 찍습니다. (obj)', recommendObj);
 
-         for (var idx in result) {
-            var district = result[idx];
+         recommendObj.forEach((row) => {
+            var district = row;
             var position = new this.coordsChange(district);
 
             // 커스텀 오버레이에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
@@ -565,13 +621,15 @@ export default {
             this.getPolygonDistrict(position);
 
             // 마커를 생성합니다
-            marker = new kakao.maps.Marker({
+            var marker = new kakao.maps.Marker({
                map: this.mapObject,
                position: position,
                image: markerImage, // 마커이미지 설정
-               // clickable: true, // 마커를 클릭했을 때 지도의 클릭 이벤트가 발생하지 않도록 설정합니다
-               // title: apt.no,
+               clickable: true,
             });
+
+            marker.district = district;
+            marker.position = position;
 
             // 마커가 지도 위에 표시되도록 설정합니다
             marker.setMap(this.mapObject);
@@ -579,10 +637,40 @@ export default {
 
             customOverlay.setMap(this.mapObject);
             this.customOverlays.push(customOverlay);
-         }
+         });
+
+         // 추천 상권 마커에 이벤트 등록 (츄파츕스)
+         this.makeRecommendMarkerClick();
       },
 
-      //오픈 API를 통해 폴리곤 정보를 불러옴
+      // 추천-2) 추천 마커 이미지에 클릭 이벤트
+      makeRecommendMarkerClick() {
+         this.markers.forEach((item) => {
+            // kakao.maps.event.removeListener(item, 'click', this.setEventRecommendClick);
+            kakao.maps.event.addListener(item, 'click', () => {
+               this.setEventRecommendClick(item);
+            });
+         });
+      },
+
+      // 추천-2-1) 추천 상권 클릭 이벤트 발생 시, 순서에 따라 이벤트 처리 및 결과 재표시
+      setEventRecommendClick(item) {
+         // 서버로 해당 상권 코드 보내서, 상권 상세 정보를 받아옴 (일단 공동으로 하기 위해 상권번호만 넘기는 식)
+
+         this.mapObject.setLevel(4, { animate: true });
+         this.mapObject.setCenter(item.position);
+
+         // 검색 결과 조회
+         this.detailCompo = true;
+      },
+
+      //서버로 선택한 상권의 상세 정보를 요청함
+      getDistrictDetail(code) {
+         // 선택한 상권에 대한 상세 정보를 요청함
+         return '';
+      },
+
+      // 추천-3) 오픈 API를 통해 폴리곤 정보를 불러옴
       getPolygonDistrict(position) {
          var key = '13C339D4-B453-3C5E-A6A1-CCA6792A2D6B'; // 공간정보 오픈플랫폼
          var domain = 'http://localhost:8080';
@@ -606,10 +694,10 @@ export default {
                      polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
                   }
 
-                  this.setPolygonDistrict(polygonPath);
+                  this.makePolygonDistrict(polygonPath);
                } else {
                   // 상권 영역 없으면, 원형
-                  this.setCircleDistrict(position);
+                  this.makeCircleDistrict(position);
                }
             })
             .catch((err) => {
@@ -617,8 +705,8 @@ export default {
             });
       },
 
-      //상권 영역이 없는 경우, 원형으로 표시
-      setCircleDistrict(position) {
+      // 추천-3-1) 상권 영역이 없는 경우, 원형으로 표시
+      makeCircleDistrict(position) {
          // 지도에 표시할 원을 생성합니다
          var circle = new kakao.maps.Circle({
             center: new kakao.maps.LatLng(position.Ma, position.La), // 원의 중심좌표 입니다
@@ -636,8 +724,8 @@ export default {
          this.circles.push(circle);
       },
 
-      //상권 영역이 존재하는 경우, 폴리곤 생성
-      setPolygonDistrict(polygonPath) {
+      // 추천-3-2) 상권 영역이 존재하는 경우, 폴리곤 생성
+      makePolygonDistrict(polygonPath) {
          // 지도에 표시할 다각형을 생성합니다
          var polygon = new kakao.maps.Polygon({
             path: polygonPath, // 그려질 다각형의 좌표 배열입니다
@@ -654,17 +742,9 @@ export default {
          this.polygons.push(polygon);
       },
 
-      // 모달 생성시 블러 적용
-      onDialogChange: function(dialog) {
-         if (dialog === true) {
-            document.querySelector('.container').classList.add('blur-display');
-         } else {
-            document.querySelector('.container').classList.remove('blur-display');
-         }
-      },
-
-      //레이어(마커, 커스텀오버레이, 폴리곤 등) 삭제
+      // 추천-0) 레이어(마커, 커스텀오버레이, 폴리곤 등) 삭제
       removeRcommendLayers() {
+         console.log('# 추천 마커, 상권, 폴리곤 모두 초기화');
          for (var i = 0; i < this.markers.length; i++) {
             this.markers[i].setMap(null);
             this.customOverlays[i].setMap(null);
