@@ -49,6 +49,8 @@ dependencies {
     // https://mvnrepository.com/artifact/org.apache.spark/spark-mllib
     implementation group: 'org.apache.spark', name: 'spark-mllib_2.12', version: '3.0.1'
 
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'io.jsonwebtoken:jjwt-api:0.10.7'
 }
 
 test {
