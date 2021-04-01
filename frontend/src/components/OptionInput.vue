@@ -5,11 +5,11 @@
       </div>
       <div class="content-wrapper">
          <div class="top-wrapper">
-            <span>업종</span>
+            <span>🍳업종</span>
             <category class="category" @category-select="onCateSelect"></category>
          </div>
          <div class="middle-wrapper">
-            <span class="md-subtitle">지역</span>
+            <span class="md-subtitle">🌏지역</span>
             <div :class="{ 'selected-ds': selectedDs.length }" v-if="showDsList">
                <div class="ds-item" v-for="(ds, idx) in selectedDs" :key="idx">
                   <span class="ds-text">{{ ds }}</span>
@@ -38,7 +38,7 @@
             </div>
          </div>
          <div class="bottom-wrapper">
-            <span>추가정보</span>
+            <span>📋추가정보</span>
             <div class="option-wrapper"></div>
          </div>
 
@@ -347,13 +347,13 @@ export default {
                cursor: pointer;
             }
             .ds-input {
-               padding: 5px;
+               padding: 5px 20px;
                z-index: 100;
-               width: 380px;
+               width: 350px;
                height: 35px;
-               border-color: lightgray;
+               border:none;
                border-radius: 20px;
-               background-color: rgba(255, 255, 255, 0.68);
+               background-color: #e7e7e7;
             }
             .ds-input:focus {
                outline: none;
@@ -361,9 +361,9 @@ export default {
             .ds-list {
                z-index: 50;
                float: inherit;
-               margin-top: -42px;
+               margin-top: -50px;
                border-radius: 20px;
-               width: 375px;
+               width: 370px;
                background-color: white;
                box-shadow: 0px 9px 20px 0px #56565629;
                padding: 50px 10px 10px 10px;
@@ -431,19 +431,26 @@ export default {
    }
    .footer {
       height: 10%;
+      margin-bottom: 25px;
       .com-bt {
-         color: white;
+         color: rgb(57, 104, 235);
+         font-weight: 700;
          padding: 5px;
          width: 150px;
          height: 50px;
-         box-shadow: 0 4px 4px lightgray;
+         box-shadow: 5px 5px 0 rgb(57, 104, 235);
          border-radius: 30px;
-         border: none;
-         background: linear-gradient(to bottom right, #7A9FFF, #1D3CAA);
+         border: rgb(57, 104, 235) solid 2px;
+         // background: linear-gradient(to bottom right, #7A9FFF, #1D3CAA);
+         background: white;
       }
       .com-bt:hover {
+         margin-top: 5px;
+         margin-left: 5px;
          cursor: pointer;
-         background: linear-gradient(to bottom right,#1D3CAA,  #7A9FFF);
+         // background: linear-gradient(to bottom right,#1D3CAA,  #7A9FFF);
+         // background: rgb(45, 83, 186);
+         box-shadow: none;
       }
       .com-bt:focus {
          outline: none;

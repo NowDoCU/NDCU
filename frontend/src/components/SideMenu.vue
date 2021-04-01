@@ -12,84 +12,124 @@
       </div>
     </div>
     <div class="bottom-wrapper">
+      <i @click="aboutDialog = true" class="fas fa-info-circle about"></i><br><br><br><br>
       <!--  login == 1 signup == 2 -->
       <span @click="controlModal(1, 'open')">로그인</span><br /><br /> 
       <span @click="controlModal(2, 'open')">회원가입</span>
     </div>
     <!-- 회원가입모달 -->
-    <div v-if="dialog" class="modal">
-      <div class="modal__header">
-        로고
-      </div>
-      <div class="modal__content">
-        <div class="form-wrapper form-su">
-          <div class="input-wrapper">
-            <input v-model="suEmail" id="email-ip" type="email" placeholder="이메일" @focus="onFocused('email')" @blur="onBlured('email')">
-            <div id="email-dv" class="divider"></div>
-            <span v-if="!emailVal" class="tip">이메일 형식이 아닙니다.</span>
-          </div>
-          <div class="input-wrapper">
-            <input v-model="suPwd" id="pwd-ip" type="password" placeholder="비밀번호" @focus="onFocused('pwd')" @blur="onBlured('pwd')">
-            <div id="pwd-dv" class="divider"></div>
-            <span v-if="!pwdVal1" class="tip">영문, 숫자 포함 6-20자 이내여야 합니다.</span>
-          </div>
-          <div class="input-wrapper">
-            <input v-model="suPwdConf" id="pwdc-ip" type="password" placeholder="비밀번호 확인" @focus="onFocused('pwdc')" @blur="onBlured('pwdc')">
-            <div id="pwdc-dv" class="divider"></div>
-            <span v-if="!pwdVal2" class="tip">비밀번호가 일치하지 않습니다.</span>
+    <transition name="slide-to-middle">
+      <div v-if="dialog" class="modal">
+        <div class="modal__header">
+          로고
+        </div>
+        <div class="modal__content">
+          <div class="form-wrapper form-su">
+            <div class="input-wrapper">
+              <input v-model="suEmail" id="email-ip" type="email" placeholder="이메일" @focus="onFocused('email')" @blur="onBlured('email')">
+              <div id="email-dv" class="divider"></div>
+              <span v-if="!emailVal" class="tip">이메일 형식이 아닙니다.</span>
+            </div>
+            <div class="input-wrapper">
+              <input v-model="suPwd" id="pwd-ip" type="password" placeholder="비밀번호" @focus="onFocused('pwd')" @blur="onBlured('pwd')">
+              <div id="pwd-dv" class="divider"></div>
+              <span v-if="!pwdVal1" class="tip">영문, 숫자 포함 6-20자 이내여야 합니다.</span>
+            </div>
+            <div class="input-wrapper">
+              <input v-model="suPwdConf" id="pwdc-ip" type="password" placeholder="비밀번호 확인" @focus="onFocused('pwdc')" @blur="onBlured('pwdc')">
+              <div id="pwdc-dv" class="divider"></div>
+              <span v-if="!pwdVal2" class="tip">비밀번호가 일치하지 않습니다.</span>
+            </div>
           </div>
         </div>
+        <div class="modal__footer">
+          <button 
+            class="login-bt"
+            :class="{ 'vali': emailVali(suEmail) && pwdVali(suPwd) && pwdConfVali(suPwdConf) }"
+          >회원가입</button>
+        </div>
+        <a class="modal__close">
+          <i @click="controlModal(2, 'close')"  class="far fa-times-circle"></i>
+        </a>
       </div>
-      <div class="modal__footer">
-        <button 
-          class="login-bt"
-          :class="{ 'vali': emailVali(suEmail) && pwdVali(suPwd) && pwdConfVali(suPwdConf) }"
-        >회원가입</button>
-      </div>
-      <a class="modal__close">
-        <i @click="controlModal(2, 'close')"  class="far fa-times-circle"></i>
-      </a>
-    </div>
+    </transition>
     <!--  로그인 모달  -->
-    <div v-if="dialog2" class="modal">
-      <div class="modal__header">
-        로고
-      </div>
-      <div class="modal__content">
-        <div class="form-wrapper form-li">
-          <div class="input-wrapper">
-            <input v-model="liEmail" id="email-ip" type="email" placeholder="이메일" @focus="onFocused('email')" @blur="onBlured('email')">
-            <div id="email-dv" class="divider"></div>
-            <span v-if="!emailVal" class="tip">이메일 형식이 아닙니다.</span>
-          </div>
-          <div class="input-wrapper">
-            <input v-model="liPwd" id="pwd-ip" type="password" placeholder="비밀번호" @focus="onFocused('pwd')" @blur="onBlured('pwd')">
-            <div id="pwd-dv" class="divider"></div>
-            <span v-if="!pwdVal1" class="tip">영문, 숫자 포함 6-20자 이내여야 합니다.</span>
-          </div>
+    <transition name="slide-to-middle"> 
+      <div v-if="dialog2" class="modal">
+        <div class="modal__header">
+          로고
         </div>
-        <div class="account-wrapper">
-          <span class="pwd-forgotten">비밀번호를 잊으셨나요</span>
-          <div class="signup-wrapper">
-            <div class="left-wrapper">
-              계정이 없으신가요?
+        <div class="modal__content">
+          <div class="form-wrapper form-li">
+            <div class="input-wrapper">
+              <input v-model="liEmail" id="email-ip" type="email" placeholder="이메일" @focus="onFocused('email')" @blur="onBlured('email')">
+              <div id="email-dv" class="divider"></div>
+              <span v-if="!emailVal" class="tip">이메일 형식이 아닙니다.</span>
             </div>
-            <div @click="[controlModal(1, 'close'), controlModal(2, 'open')]" class="right-wrapper">
-              가입하기
+            <div class="input-wrapper">
+              <input v-model="liPwd" id="pwd-ip" type="password" placeholder="비밀번호" @focus="onFocused('pwd')" @blur="onBlured('pwd')">
+              <div id="pwd-dv" class="divider"></div>
+              <span v-if="!pwdVal1" class="tip">영문, 숫자 포함 6-20자 이내여야 합니다.</span>
             </div>
           </div>
+          <div class="account-wrapper">
+            <span class="pwd-forgotten">비밀번호를 잊으셨나요</span>
+            <div class="signup-wrapper">
+              <div class="left-wrapper">
+                계정이 없으신가요?
+              </div>
+              <div @click="[controlModal(1, 'close'), controlModal(2, 'open')]" class="right-wrapper">
+                가입하기
+              </div>
+            </div>
+          </div>
         </div>
+        <div class="modal__footer">
+          <button 
+            class="login-bt"
+            :class="{ 'vali': emailVali(liEmail) && pwdVali(liPwd) }"
+          >로그인</button>
+        </div>
+        <a class="modal__close">
+          <i @click="controlModal(1, 'close')"  class="far fa-times-circle"></i>
+        </a>
       </div>
-      <div class="modal__footer">
-        <button 
-          class="login-bt"
-          :class="{ 'vali': emailVali(liEmail) && pwdVali(liPwd) }"
-        >로그인</button>
+    </transition>
+    <!-- about modal -->
+    <transition name="slide-up">
+      <div v-if="aboutDialog" class="about-modal">
+        <div class="left-wrapper">
+          <div class="l-top-wrapper">
+            <span class="name">세모창</span><br>
+            <span class="description">Lorem ipsum dolor sit amet consectetur adipisicing elit.</span>
+          </div>
+          <div class="l-bottom-wrapper">
+            <span>본 사이트의 저작권은 SSAFY 4기 핫식스팀에게 있습니다.</span><br>
+            <span>Copyright © Hot6 All Rights Reserved.</span>
+          </div>
+        </div>
+        <div class="right-wrapper">
+          <div class="r-left-wrapper">
+            데이터 출처
+          </div>
+          <div class="r-right-wrapper">
+            <div class="site-wrapper">
+              <img src="@/assets/image/data-source/logo3.png" alt="">
+              <a>서울신용보증재단</a>
+            </div>
+            <div class="site-wrapper">
+              <img src="@/assets/image/data-source/logo1.png" alt="">
+              <a>서울 열린데이터 광장</a>
+            </div>
+            <div class="site-wrapper">
+              <img src="@/assets/image/data-source/logo2.png" alt="">
+              <a>소상공인시장진흥공단</a>
+            </div>
+          </div>
+        </div>
+        <i @click="aboutDialog = false" class="fas fa-times about-close"></i>
       </div>
-      <a class="modal__close">
-        <i @click="controlModal(1, 'close')"  class="far fa-times-circle"></i>
-      </a>
-    </div>
+    </transition>
   </div>
 </template>
 <script>
@@ -101,6 +141,7 @@ export default {
     return {
       dialog2: false, // signup modal
       dialog: false, // login modal
+      aboutDialog: false,
       emailVal: true,
       pwdVal1: true,
       pwdVal2: true,
@@ -111,6 +152,11 @@ export default {
       // login value
       liEmail: '',
       liPwd: '',
+      herf: {
+        1: 'https://www.naver.com/',
+        2: 'https://www.naver.com/',
+        3: 'https://www.naver.com/'
+      }
     };
   },
   methods: {
@@ -283,10 +329,110 @@ export default {
     color: gray;
     padding-bottom: 40px;
     font-size: 12px;
+    .about {
+      cursor: pointer;
+      font-size: 15pt;
+    }
     span {
       cursor: pointer;
     }
   }
+}
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: all 0.2s ease;
+}
+.slide-up-enter,
+.slide-up-leave-to {
+  transform: translateY(200px);
+}
+.about-modal {
+  border-radius: 30px 30px 0 0;
+  position: fixed;
+  width: 100vw;
+  bottom: 0;
+  height: 200px;
+  padding: 10px 0;
+  background-color: #284ac7bb;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  color: whitesmoke;
+  .left-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    padding-left: 150px;
+    height: 100%;
+    width: 40%;
+    .l-top-wrapper {
+      .name {
+        font-size: 18pt;
+        font-weight: 800;
+      }
+      .description {
+        
+        font-size: 11pt;
+        font-weight: 100;
+      }
+    }
+    .l-bottom-wrapper {
+      span {
+        font-size: 10pt;
+      }
+    }
+  }
+  .right-wrapper {
+    padding-right: 150px;
+    display: flex;
+    width: 40%;
+    height: 80px;
+    justify-content: center;
+    .r-left-wrapper {
+      font-size: 13pt;
+      font-weight: 600;
+      margin-right: 30px
+    }
+    .r-right-wrapper {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      .site-wrapper {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        img {
+          width: 30px;
+          height: 30px;
+          margin-right: 10px;
+        }
+        a {
+          font-size: 11pt;
+          // cursor: pointer;
+        }
+        // a:hover {
+        //   text-decoration: underline;
+        // }
+      }
+      
+    }
+  }
+  .about-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+  }
+}
+.slide-to-middle-enter-active,
+.slide-to-middle-leave-active {
+  transition: all 0.3s ease;
+}
+.slide-to-middle-enter,
+.slide-to-middle-leave-to {
+  opacity: 0;
 }
 .modal {
   background-color: white;
@@ -301,16 +447,6 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  animation: 0.5s ease-out 0s 1 pop-up;
-  @keyframes pop-up {
-    0% {
-      margin-top: -50px;
-      opacity: 0;
-    }
-    100% {
-      opacity: 1;
-    }
-  }
   .modal__header {
     height: 30%;
     width: 300px;
@@ -401,6 +537,7 @@ export default {
   }
   .modal__footer {
     height: 10%;
+    
     .login-bt {
       width: 200px;
       height: 50px;
@@ -436,7 +573,7 @@ export default {
 }
 .blur-display > *:not(.modal) {
   filter: blur(5px);
-  animation: 0.5s ease-out 0s 1 blur;
+  animation: 0.3s ease-out 0s 1 blur;
   pointer-events: none;
   @keyframes blur {
     0% {
