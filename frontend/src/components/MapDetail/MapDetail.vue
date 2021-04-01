@@ -25,25 +25,34 @@
          </div>
          <DetailGraph :dataset="type" class="graph" />
          <DetailGraph :dataset="age" class="graph" />
+         <LineGraph :dataset="ysales" class="graph" />
+         <PieChart :dataset="week" class="graph" />
       </div>
    </div>
 </template>
 
 <script>
 import DetailGraph from './DetailGraph';
+import PieChart from './PieChart'
+import LineGraph from './LineGraph'
+
 var mapdata = {
    name: '마포구 서교동',
    score: '88',
    sales: '1억2844만',
    rent: '2000만',
-   type: [49, 22, 11, 8, 4, 3, 2, 1],
-   age: [45, 22, 18, 8, 6, 1],
+   type: [22, 30, 11, 27, 4, 3, 2, 1],
+   age: [28, 22, 35, 8, 6, 1],
+   ysales: [54, 62, 49],
+   week: [45, 55],
 };
 
 export default {
    name: 'MapDetail',
    components: {
       DetailGraph,
+      PieChart,
+      LineGraph
    },
    data: function() {
       return {
@@ -61,6 +70,16 @@ export default {
             category: ['10대', '20대', '30대', '40대', '50대', '60대 이상'],
             value: '',
          },
+         ysales: {
+            name: '연도별 매출',
+            category: ['2018년', '2019년', '2020년'],
+            value: '',
+         },
+         week: {
+            name: '주중/주말 매출',
+            category: ['주중', '주말'],
+            value: '',
+         },
          like: false,
       };
    },
@@ -72,6 +91,8 @@ export default {
          this.rent = mapdata.rent;
          this.type.value = mapdata.type;
          this.age.value = mapdata.age;
+         this.ysales.value = mapdata.ysales;
+         this.week.value = mapdata.week;
       },
       setLike: function() {
          this.like = !this.like;
@@ -110,6 +131,7 @@ export default {
       padding: 20px;
       width: 80%;
       height: 90%;
+      overflow-y: auto;
 
       .name {
          font-size: 20pt;

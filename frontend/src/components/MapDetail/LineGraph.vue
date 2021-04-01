@@ -1,9 +1,8 @@
 <script>
-import {Bar} from 'vue-chartjs'
+import {Line} from 'vue-chartjs'
 
 export default {
-    name: 'DetailGraph',
-    extends: Bar,
+    extends: Line,
     data: function() {
         return {
             datacollection: {
@@ -11,25 +10,20 @@ export default {
                 datasets: [
                     {
                         label: '',
-                        backgroundColor: [],
-                        pointBackgroundColor: 'white',
-                        borderWidth: 1,
+                        pointBackgroudColor: 'white',
+                        pointBorderColor: '#cccccc',
+                        borderColor: '#cccccc',
                         data: []
                     }
                 ]
             },
             options: {
-                maintainAspectRatio: false,
+                maintainAspectRatio: true,
                 scales: {
                     yAxes: [{
                         ticks: {
                             beginAtZero: true,
-                            stepSize: 10,
-                        },
-                    }],
-                    xAxes: [{
-                        gridLines: {
-                            lineWidth: 0
+                            stepSize: 20,
                         }
                     }]
                 }
@@ -39,28 +33,20 @@ export default {
     props: {
         dataset: Object
     },
-    methods:{
+    methods: {
         getValue: function() {
             this.datacollection.datasets[0].label = this.dataset.name
             this.datacollection.labels = this.dataset.category
             this.datacollection.datasets[0].data = this.dataset.value
-            var maxValue = Math.max.apply(null, this.dataset.value)
-            for(var i=0;i<this.dataset.value.length;i++) {
-                if(this.dataset.value[i] == maxValue) {
-                    this.datacollection.datasets[0].backgroundColor.push('rgb(220, 27, 27, 0.7)')
-                }
-                else {
-                    this.datacollection.datasets[0].backgroundColor.push('#cccccc')
-                }
-            }
         }
     },
     mounted () {
         this.getValue()
         this.renderChart(this.datacollection, this.options)
-    },
-};
+    }
+}
 </script>
+
 <style scoped lang="scss">
 
 </style>
