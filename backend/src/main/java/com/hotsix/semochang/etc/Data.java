@@ -1,4 +1,4 @@
-package com.hotsix.semochang;
+package com.hotsix.semochang.etc;
 
 public class Data {
     private String name;
