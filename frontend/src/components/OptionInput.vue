@@ -5,11 +5,11 @@
       </div>
       <div class="content-wrapper">
          <div class="top-wrapper">
-            <span>🍳업종</span>
+            <span>🍳 업종</span>
             <category class="category" @category-select="onCateSelect"></category>
          </div>
          <div class="middle-wrapper">
-            <span class="md-subtitle">🌏지역</span>
+            <span class="md-subtitle">🌏 지역</span>
             <div :class="{ 'selected-ds': selectedDs.length }" v-if="showDsList">
                <div class="ds-item" v-for="(ds, idx) in selectedDs" :key="idx">
                   <span class="ds-text">{{ ds }}</span>
@@ -38,7 +38,7 @@
             </div>
          </div>
          <div class="bottom-wrapper">
-            <span>📋추가정보</span>
+            <span>📋 추가정보</span>
             <div class="option-wrapper"></div>
          </div>
 
@@ -127,13 +127,7 @@ export default {
       },
       // 업종 선택 완료햇을 때
       onCateSelect: function(category) {
-         if (category.cate !== this.selectedCate) {
-            if (this.selectedCate === '') { // 현재 선택된 업종 없으면
-               this.selectedCate = category.cate; // 업종 선택 처리
-            }
-         } else if (category.cate === this.selectedCate) { // 선택된 업종과 원래 선택 되어 있던 업종이 같으면
-            this.selectedCate = '' // 선택 취소
-         }
+         this.selectedCate = category
       },
       // 자동완성 결과에서 하나 선택 했을 때
       changeValue(district) {
@@ -232,11 +226,15 @@ export default {
       },
       // 조건 입력 완료했을 때
       getRecommended: function() {
-         const options = {
-            category: this.selectedCate,
-            districts: this.selectedDs,
-         };
-         this.$emit('input-complete', options);
+         if (this.selectedCate && this.selectedDs) {
+            const options = {
+               category: this.selectedCate,
+               districts: this.selectedDs,
+            };
+            this.$emit('input-complete', options);
+         } else {
+            alert('필수 조건을 입력해주세요. (업종, 지역)')
+         }
       },
    },
 };
@@ -244,7 +242,7 @@ export default {
 <style scoped lang="scss">
 .oi-container {
    height: 100%;
-   padding: 0 10px;
+   padding: 0 20px;
    display: flex;
    flex-direction: column;
    justify-content: space-between;
@@ -421,8 +419,9 @@ export default {
             margin: 0 10px;
          }
          .option-wrapper {
+            border-radius: 20px;
             margin-top: 20px;
-            background-color: burlywood;
+            background-color: rgba(222, 184, 135, 0.415);
             width: 100%;
             height: 90%;
          }
