@@ -55,6 +55,7 @@ public class FounderServiceImpl implements FounderService{
 
         // 3. autoKey 생성
         founder.setVerificationKey(new TempKeyUtil().getKey(50, false));
+        founder.setStatus("ACTIVATED");
 
         // 4. founder 저장
         founderRepository.save(founder);
@@ -91,9 +92,7 @@ public class FounderServiceImpl implements FounderService{
                             .setName(founder.getName())
                             .setEmail(founder.getEmail())
                             .setPassword(passwordEncoder.encode(founder.getPassword()))
-                            .setStatus(founder.getStatus())
-                            .setPhoneNumber(founder.getPhoneNumber())
-                            .setVerificationKey(founder.getVerificationKey());
+                            .setPhoneNumber(founder.getPhoneNumber());
 
                     return updateFounder;
                 })
@@ -116,6 +115,7 @@ public class FounderServiceImpl implements FounderService{
     }
 
     @Override
+    @Transactional
     public ResponseEntity<?> authenticate(LoginRequestDTO loginRequestDTO) {
 
         String email = loginRequestDTO.getEmail();

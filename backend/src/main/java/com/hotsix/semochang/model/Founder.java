@@ -22,7 +22,7 @@ import javax.persistence.Id;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
-public class Founder {
+public class Founder extends BaseTimeEntity {
 
     /***
      * 창업자 id
