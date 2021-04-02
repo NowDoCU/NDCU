@@ -70,7 +70,7 @@ public class FounderServiceImpl implements FounderService{
         Optional<Founder> optional = founderRepository.findById(id);
         
         return optional
-                .map(founder -> ResponseEntity.ok(founder))
+                .map(founder -> new ResponseEntity<>(founder, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity("No Data", HttpStatus.OK));
     }
 
@@ -97,8 +97,8 @@ public class FounderServiceImpl implements FounderService{
                     return updateFounder;
                 })
                 .map(updatedFounder -> founderRepository.save(updatedFounder))
-                .map(updatedFounder -> ResponseEntity.ok(updatedFounder))
-                .orElseGet(() -> new ResponseEntity("No Data", HttpStatus.OK));
+                .map(updatedFounder -> new ResponseEntity<>(updatedFounder, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity("No Data", HttpStatus.NO_CONTENT));
     }
 
     @Override
@@ -111,7 +111,7 @@ public class FounderServiceImpl implements FounderService{
                     founderRepository.delete(founder);
                     return new ResponseEntity<>(HttpStatus.OK);
                 })
-                .orElseGet(() -> new ResponseEntity("No Data", HttpStatus.OK));
+                .orElseGet(() -> new ResponseEntity<>("No Data", HttpStatus.NO_CONTENT));
     }
 
     @Override

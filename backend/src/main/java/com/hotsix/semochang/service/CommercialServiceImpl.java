@@ -32,6 +32,7 @@ public class CommercialServiceImpl implements CommercialService{
         for(Commercial commercial : commercialList) {
             commercial.setEstimatedPopulationList(null);
             commercial.setEstimatedSalesList(null);
+            commercial.setStoreRentalPrice(null);
         }
 
         return commercialList;
