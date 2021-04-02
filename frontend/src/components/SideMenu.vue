@@ -2,7 +2,7 @@
    <div class="sm-container">
       <div class="top-wrapper">
          <div class="logo">
-            <img src="@/assets/image/NDCU.png" alt="" />
+            <img src="@/assets/image/NDCU_logo_2.png" alt="" />
          </div>
          <div @click="onClickInputBt" class="btn-search">
             <i class="fas fa-search-location"></i>
@@ -246,7 +246,7 @@ export default {
          margin-bottom: 20px;
 
          img {
-            width: 60%;
+            width: 70%;
          }
       }
 

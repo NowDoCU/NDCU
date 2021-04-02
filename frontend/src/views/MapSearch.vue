@@ -1,6 +1,6 @@
 <template lang="">
    <div class="container">
-      <toast v-show="toastShow" class="toast-pop-up floating" @input-complete="onInputComplete"></toast>
+      <toast v-show="toastShow" :toastDist="toastDist" class="toast-pop-up floating" @emit-initRecommend="onInputComplete" @emit-closeRecommend="clearRecommend"></toast>
       <transition name="collapse-right">
          <div v-show="detailCompo" class="detail-compo floating">
             <map-detail @close-expended="onClickCloseDetail"></map-detail>
@@ -46,11 +46,12 @@ export default {
       mapObject: null,
 
       detailCompo: false,
-      optionCompo: true,
+      optionCompo: false,
       bookMarkCompo: false,
 
       // 토스트 메뉴를 표시하기 위한
       toastShow: false,
+      toastDist: null, // 토스트 메뉴에게 건내줄 상권명
 
       // [추천 상권]
       recommendResult: null,
@@ -79,7 +80,7 @@ export default {
    watch: {
       level: function() {
          // 조건 만족 시 1회만 생성 -> 성능..
-         if (this.toastShow == false) {
+         if (this.recommendResult == null) {
             if (this.level >= 6 && this.gu_Overlays.length == 0) {
                console.log('# 레벨 6 이상 => 동 삭제, 구 생성');
                // 구 생성, 동 삭제
@@ -133,6 +134,7 @@ export default {
          this.optionCompo = false;
          this.detailCompo = false;
          this.toastShow = false;
+         this.toastDist = '';
 
          /*
          options
@@ -157,12 +159,16 @@ export default {
          this.removeRcommendLayers();
 
          this.initCenter();
-         this.chageToastShow('recommend');
+         // this.chageToastShow('recommend');
 
          // 추천 받은 상권들을 마커로 표시
          this.setRecommendMarker();
       },
 
+      /* ==========================
+               토스트 메뉴 관련
+         =========================
+      */
       // 토스트 툴팁 상태 변경
       chageToastShow(type) {
          /*
@@ -175,9 +181,20 @@ export default {
 
          if (type == 'recommend') {
             this.toastShow = true;
-
             // 기존 마커 정보를 삭제
          }
+      },
+
+      clearRecommend() {
+         this.toastShow = false;
+         this.optionCompo = false;
+         this.bookMarkCompo = false;
+         this.detailCompo = false;
+
+         this.initCenter();
+
+         this.removeRcommendLayers();
+         this.recommendResult = null;
       },
 
       goDetail(value) {
@@ -210,14 +227,13 @@ export default {
 
          // console.log(this.option);
 
-         if (!this.toastShow && this.level <= 5) {
+         if (this.recommendResult == null && this.level <= 5) {
             console.log('# 드래그 + 레벨 5 아래 => 범위에 따라 동 랜더링');
             this.removeDongLayer('total');
             this.makeDongMarker(bounds);
-         } else if (this.recommendResult != null && this.toastShow) {
+         } else if (this.recommendResult != null) {
             console.log('# 상권 추천 재랜더링');
             this.removeRcommendLayers();
-            this.chageToastShow('recommend');
             this.setRecommendMarker();
          }
          // console.log(this.dong_Overlays.length);
@@ -645,6 +661,7 @@ export default {
 
       // 추천-2) 추천 마커 이미지에 클릭 이벤트
       makeRecommendMarkerClick() {
+         console.log('# 마커별 클릭 이벤트 생성');
          this.markers.forEach((item) => {
             // kakao.maps.event.removeListener(item, 'click', this.setEventRecommendClick);
             kakao.maps.event.addListener(item, 'click', () => {
@@ -662,6 +679,9 @@ export default {
 
          // 검색 결과 조회
          this.detailCompo = true;
+         this.chageToastShow('recommend');
+         this.toastDist = item.district.name;
+         // 토스트 메뉴
       },
 
       //서버로 선택한 상권의 상세 정보를 요청함
@@ -855,8 +875,8 @@ export default {
    .toast-pop-up {
       background-color: rgb(255, 255, 255);
 
-      width: 400px;
-      height: 50px;
+      width: 380px;
+      height: 40px;
 
       top: 40px;
       left: 50%;
