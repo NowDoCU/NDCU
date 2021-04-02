@@ -1,6 +1,7 @@
 package com.hotsix.semochang.service;
 
 import com.hotsix.semochang.model.Founder;
+import com.hotsix.semochang.model.LoginRequestDTO;
 import org.springframework.http.ResponseEntity;
 
 /**
@@ -33,5 +34,5 @@ public interface FounderService {
     /***
      * 로그인 인증
      */
-    ResponseEntity<?> authenticate(String email, String password);
+    ResponseEntity<?> authenticate(LoginRequestDTO loginRequestDTO);
 }

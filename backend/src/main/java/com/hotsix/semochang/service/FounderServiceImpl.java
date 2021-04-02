@@ -1,6 +1,7 @@
 package com.hotsix.semochang.service;
 
 import com.hotsix.semochang.model.Founder;
+import com.hotsix.semochang.model.LoginRequestDTO;
 import com.hotsix.semochang.model.LoginResponseDTO;
 import com.hotsix.semochang.repository.FounderRepository;
 import com.hotsix.semochang.utils.JWTUtil;
@@ -54,6 +55,7 @@ public class FounderServiceImpl implements FounderService{
 
         // 3. autoKey 생성
         founder.setVerificationKey(new TempKeyUtil().getKey(50, false));
+        founder.setStatus("ACTIVATED");
 
         // 4. founder 저장
         founderRepository.save(founder);
@@ -90,9 +92,7 @@ public class FounderServiceImpl implements FounderService{
                             .setName(founder.getName())
                             .setEmail(founder.getEmail())
                             .setPassword(passwordEncoder.encode(founder.getPassword()))
-                            .setStatus(founder.getStatus())
-                            .setPhoneNumber(founder.getPhoneNumber())
-                            .setVerificationKey(founder.getVerificationKey());
+                            .setPhoneNumber(founder.getPhoneNumber());
 
                     return updateFounder;
                 })
@@ -115,7 +115,11 @@ public class FounderServiceImpl implements FounderService{
     }
 
     @Override
-    public ResponseEntity<?> authenticate(String email, String password) {
+    @Transactional
+    public ResponseEntity<?> authenticate(LoginRequestDTO loginRequestDTO) {
+
+        String email = loginRequestDTO.getEmail();
+        String password = loginRequestDTO.getPassword();
         
         // 1. 해당 founder가 있는지 확인 -> 인증 X(unauthorized) 리턴
         Optional<Founder> optional = founderRepository.findByEmail(email);
