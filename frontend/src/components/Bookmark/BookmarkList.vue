@@ -117,17 +117,6 @@ export default {
         height: 83%;
         overflow-y: scroll;
     }
-    .bookmarks::-webkit-scrollbar {
-        width: 6px;
-    }
-    .bookmarks::-webkit-scrollbar-thumb {
-        background-color: rgb(157, 157, 157);
-        border-radius: 30px;
-    }
-    .bookmarks::-webkit-scrollbar-track {
-        background-color: rgb(225, 225, 225);
-        border-radius: 20px;
-    }
 }
 
 </style>

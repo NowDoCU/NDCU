@@ -29,5 +29,17 @@ export default {
    -webkit-user-select: none; 
    -khtml-user-select: none; 
    user-select:none;
+   // 스크롤바
+   ::-webkit-scrollbar {
+      width: 6px;
+   }
+   ::-webkit-scrollbar-thumb {
+      background-color: rgb(157, 157, 157);
+      border-radius: 30px;
+   }
+   ::-webkit-scrollbar-track {
+      background-color: rgb(225, 225, 225);
+      border-radius: 20px;
+   }
 }
 </style>
