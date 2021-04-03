@@ -1,15 +1,10 @@
 package com.hotsix.semochang.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.Accessors;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.List;
 
 /**
  * author: pinest94
@@ -22,6 +17,8 @@ import javax.persistence.Id;
 @NoArgsConstructor
 @AllArgsConstructor
 @Accessors(chain = true)
+@EqualsAndHashCode(callSuper=false)
+@ToString(exclude = {"bookmarkList"})
 public class Founder extends BaseTimeEntity {
 
     /***
@@ -62,4 +59,10 @@ public class Founder extends BaseTimeEntity {
      * 창업자 이메일 인증키
      */
     private String verificationKey;
+
+    /***
+     * 북마크 목록
+     */
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "founder")
+    private List<Bookmark> bookmarkList;
 }

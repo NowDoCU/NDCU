@@ -17,9 +17,6 @@ import java.util.List;
 @RestController
 @RequestMapping("${api}/commercial")
 @CrossOrigin(origins = {"*"}, maxAge = 6000)
-
-
-
 public class CommercialController {
 
     @Autowired
