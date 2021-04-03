@@ -136,4 +136,14 @@ var content = `<div class="customoverlay">
    opacity: .9;
 
    font-size: 9pt;
+
+   &.inner{
+      bottom: 75px !important;
+      right: 40px !important;
+
+      border-color: #ff6633;
+      color: #ff6633;
+
+      text-align: center;
+   }
  }
