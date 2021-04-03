@@ -49,7 +49,7 @@ public class RecommendService {
 //        Dataset<Row> people = sparkSession.read().format("csv").load(PATH_csv);
 //        Dataset<Row> cluster_col = sparkSession.read().format("csv").load(PATH_col);
 //        people.show();
-        
+
         Dataset<Row> people = sparkSession.read().format("libsvm").load(PATH_svm);
 //        people.show();
 //        people.createOrReplaceTempView("people");
