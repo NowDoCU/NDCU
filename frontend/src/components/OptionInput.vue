@@ -10,7 +10,7 @@
          </div>
          <div class="middle-wrapper">
             <span class="md-subtitle">🌏 지역</span>
-            <div :class="{ 'selected-ds': selectedDs.length }" v-if="showDsList">
+            <div :class="{ 'selected-ds': selectedDs.length }" v-if="selectedDs">
                <div class="ds-item" v-for="(ds, idx) in selectedDs" :key="idx">
                   <span class="ds-text">{{ ds }}</span>
                   <i @click="deleteDs(idx)" class="fas fa-times-circle del"></i>
@@ -19,8 +19,19 @@
             <div 
                class="search" 
                :class="[{'unsel': selectedDs.length == 0}, { 'selec': selectedDs.length }]"
-               @keyup.right="selectValue('right')" @keyup.left="selectValue('left')">
-               <input id="districtInput" class="ds-input" type="text" @input="filter($event.target.value)" @keypress.enter="addDistrct($event.target.value)" @click="[showUl=!showUl, showDsList=true]" autocomplete="off" />
+               @keyup.up="selectValue('up')"
+               @keyup.down="selectValue('down')"
+               @keyup.right="selectValue('right')" 
+               @keyup.left="selectValue('left')">
+               <input 
+                  id="districtInput" 
+                  class="ds-input" 
+                  type="text" 
+                  @input="filter($event.target.value)" 
+                  @keypress.enter="addDistrct($event.target.value)" 
+                  @click="showUl=!showUl" 
+                  autocomplete="off" 
+               />
                <i v-show="showUl" @click="showUl=false" class="fas fa-times-circle cancle"></i>
                <ul tabindex="0" class="ds-list" v-if="showUl" @mouseover="removeValue">
                   <li
@@ -59,9 +70,7 @@ export default {
    data: function() {
       return {
          selectedCate: '',
-         showDsList: false, // 선택된 지역 목록
          showUl: false,
-         isActive: false, // 지역 input 자동완성
          query: '', // 지역 검색어
          selectedDs: [], // 선택된 지역
          districts: [
@@ -117,7 +126,7 @@ export default {
             '강남구',
             '송파구',
             '강동구',
-         ], // 자동완성으로 걸러진 결과
+         ], // 자동완성으로 걸러진 결과 (초기리스트는 모든 구)
       };
    },
    methods: {
@@ -132,6 +141,7 @@ export default {
       // 자동완성 결과에서 하나 선택 했을 때
       changeValue(district) {
          this.addDistrct(district); // 선택된 지역 목록에 추가
+         document.querySelector('.ds-list').classList.remove('key') // ul에 포커싱된 항목 없다는 것 표시
          document.querySelector('.ds-input').focus()
          this.filterList = this.districts
       },
@@ -168,10 +178,11 @@ export default {
             document.querySelector('.ds-list li.sel').classList.remove('sel');
          }
       },
+      // search내에서 키보드 상하좌우 컨트롤
       selectValue: function(keycode, ds) {
-         if (this.isActive === true) {
+         if (this.filterList && this.showUl) {
             const hasClass = document.querySelector('.ds-list').classList.contains('key');
-            if (keycode === 'right') {
+            if (keycode === 'down') {
                if (!hasClass) {
                   // 선택된 항목이 없으면
                   const thisEl = document.querySelectorAll('.ds-list li')[0];
@@ -182,13 +193,26 @@ export default {
                   // 이미 선택된 항목이 있으면
                   const lastEl = document.querySelector('.ds-list li:last-child');
                   const thisEl = document.querySelector('.ds-list li.sel');
-                  const nextEl = thisEl.nextElementSibling;
-                  if (!lastEl.classList.contains('sel')) {
-                     // 현재 선택된 항목이 마지막항목이 아니면
-                     thisEl.classList.remove('sel'); // 현재 선택된 항목 선택 제거
-                     nextEl.classList.add('sel'); //다음 항목 선택
-                     nextEl.focus();
+                  if (this.filterList.indexOf(thisEl.innerText) < 20 && this.filterList.length > 5) { // 선택된 항목이 맨 밑줄 항목이 아니면 (ul에서)
+                     const lowerEl = thisEl.nextElementSibling.nextElementSibling.nextElementSibling.nextElementSibling.nextElementSibling; //밑의 항목(index 5차이남)
+                     if (!lastEl.classList.contains('sel') && lowerEl) {
+                        // 현재 선택된 항목이 마지막항목이 아니면
+                        thisEl.classList.remove('sel'); // 현재 선택된 항목 선택 제거
+                        lowerEl.classList.add('sel'); // 선택됐다는 클래스(스타일링) 적용 
+                        lowerEl.focus(); //다음 항목 선택
+                     }
                   }
+               }
+            } else if (keycode === 'right' && hasClass) {
+               // 이미 선택된 항목이 있으면
+               const lastEl = document.querySelector('.ds-list li:last-child');
+               const thisEl = document.querySelector('.ds-list li.sel');
+               const nextEl = thisEl.nextElementSibling;
+               if (!lastEl.classList.contains('sel')) {
+                  // 현재 선택된 항목이 마지막항목이 아니면
+                  thisEl.classList.remove('sel'); // 현재 선택된 항목 선택 제거
+                  nextEl.classList.add('sel'); //다음 항목 선택
+                  nextEl.focus();
                }
             } else if (keycode === 'left' && hasClass) {
                const firstEl = document.querySelectorAll('.ds-list li')[0];
@@ -199,29 +223,35 @@ export default {
                   thisEl.classList.remove('sel');
                   prevEl.classList.add('sel');
                   prevEl.focus();
-               } else {
-                  document.querySelector('.ds-input').focus();
+               }
+            } else if (keycode === 'up' && hasClass) {
+               const firstEl = document.querySelectorAll('.ds-list li')[0];
+               const thisEl = document.querySelector('.ds-list li.sel');
+               if (this.filterList.indexOf(thisEl.innerText) >= 5 && this.filterList.length > 5) { // 선택된 항목이 맨 윗줄 항목이 아니면 (ul에서)
+                  const upperEl = thisEl.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling;
+                  if (!firstEl.classList.contains('sel') && upperEl) {
+                     //현재 선택된 항목이 첫번쨰 항목이 아니면
+                     thisEl.classList.remove('sel');
+                     upperEl.classList.add('sel');
+                     upperEl.focus();
+                  } 
+               } else if (firstEl === thisEl) { // 맨 윗줄 항목이면
+                  thisEl.classList.remove('sel'); 
+                  document.querySelector('.ds-list').classList.remove('key')
+                  document.querySelector('.ds-input').focus(); // input 으로 포커싱
                }
             } else if (keycode === 'enter' && hasClass) {
                this.changeValue(ds);
             }
          }
       },
-      // 검색결과 창에 모든 지역 보여주기
-      getAllDs: function() {
-         this.showDsList = true;
-         this.filterList = this.districts;
-      },
       // 자동완성 위한 필터
       filter: function(q) {
          const reg = /[^가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9|\s]/.test(q);
          if (reg === false) {
-            this.isActive = true;
             this.filterList = this.districts.filter((el) => {
                return el.match(q);
             });
-         } else {
-            this.isActive = false;
          }
       },
       // 조건 입력 완료했을 때
