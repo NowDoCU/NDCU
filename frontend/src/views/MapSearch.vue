@@ -1,14 +1,16 @@
 <template lang="">
    <div class="container">
-      <toast
-         v-show="toastShow"
-         :isExplore="isExplore"
-         :toastDist="toastDist"
-         class="toast-pop-up floating"
-         @emit-initRecommend="onInputComplete"
-         @emit-closeRecommend="closeRecommend"
-         @emit-closeExplore="closeExplore"
-      ></toast>
+      <transition name="slide-down">
+         <toast
+            v-show="toastShow"
+            :isExplore="isExplore"
+            :toastDist="toastDist"
+            class="toast-pop-up floating"
+            @emit-initRecommend="onInputComplete"
+            @emit-closeRecommend="closeRecommend"
+            @emit-closeExplore="closeExplore"
+         ></toast>
+      </transition>
       <transition name="collapse-right">
          <div v-show="detailCompo" class="detail-compo floating">
             <map-detail @close-expended="onClickCloseDetail"></map-detail>
@@ -1093,6 +1095,18 @@ export default {
    .collapse-right-leave-to {
       transform: translateX(1000px);
    }
+
+   // 토스트 팝업 위에서 떨어지는 기능
+   .slide-down-enter-active,
+   .slide-down-leave-active {
+      transition: all 0.4s ease;
+   }
+
+   .slide-down-enter,
+   .slide-down-leave-to {
+      transform: translateY(-1000px);
+   }
+
    .detail-compo {
       top: 2%;
       right: 1%;
