@@ -1,24 +1,28 @@
 <template lang="">
    <div class="container">
+      <transition name="slide-down">
+         <toast
+            v-show="toastShow"
+            :isExplore="isExplore"
+            :toastDist="toastDist"
+            class="toast-pop-up floating"
+            @emit-initRecommend="onInputComplete"
+            @emit-closeRecommend="closeRecommend"
+            @emit-closeExplore="closeExplore"
+         ></toast>
+      </transition>
       <transition name="collapse-right">
          <div v-show="detailCompo" class="detail-compo floating">
             <map-detail @close-expended="onClickCloseDetail"></map-detail>
-
-            <!-- 좌측 사이드 메뉴 위치 -->
-            <!-- 내부에 컴포넌트 생성 후 배치 -->
          </div>
       </transition>
       <transition name="collapse">
          <div v-show="optionCompo || bookMarkCompo" class="menu-expand-compo floating">
             <option-input v-show="optionCompo" @close-expended="onClickClose" @input-complete="onInputComplete"></option-input>
             <bookmark-list v-show="bookMarkCompo" @close-expended="onClickClose" @goDetail="goDetail"></bookmark-list>
-
-            <!-- 좌측 사이드 메뉴 위치 -->
-            <!-- 내부에 컴포넌트 생성 후 배치 -->
          </div>
       </transition>
       <div class="sidemenu-compo floating">
-         <!-- <button @click="this.setRecommendMarker">TEST</button> -->
          <side-menu @open-input-form="onClickInputBt" @open-bookmark="onClickBookmarkBt" @dialog-change="onDialogChange"></side-menu>
       </div>
       <vue-daum-map id="map" :appKey="appKey" :center.sync="center" :level.sync="level" :mapTypeId="mapTypeId" :libraries="libraries" @load="onLoad" @tilesloaded="onMapEvent('titlesloaded', $event)">
@@ -33,6 +37,8 @@ import MapDetail from '@/components/MapDetail/MapDetail.vue';
 import BookmarkList from '@/components/Bookmark/BookmarkList.vue';
 import OptionInput from '@/components/OptionInput.vue';
 import SideMenu from '@/components/SideMenu.vue';
+import Toast from '@/components/Toast.vue';
+
 import axios from 'axios';
 
 // 동코드 JSON 파일 import
@@ -40,7 +46,7 @@ import guCoords from '@/assets/data/gu_coords.json';
 import dongCoords from '@/assets/data/dong_coords.json';
 
 export default {
-   components: { VueDaumMap, MapDetail, OptionInput, SideMenu, BookmarkList },
+   components: { VueDaumMap, MapDetail, OptionInput, SideMenu, BookmarkList, Toast },
    data: () => ({
       appKey: 'b20bb90eb97f8724820808bd2047982e', //restAPI key
       center: { lat: '', lng: '' },
@@ -50,11 +56,15 @@ export default {
       mapObject: null,
 
       detailCompo: false,
-      optionCompo: true,
+      optionCompo: false,
       bookMarkCompo: false,
-      detailCompo: true,
+
+      // 토스트 메뉴를 표시하기 위한
+      toastShow: false,
+      toastDist: null, // 토스트 메뉴에게 건내줄 상권명
 
       // [추천 상권]
+      recommendResult: null,
       markers: [],
       customOverlays: [],
       circles: [],
@@ -69,27 +79,10 @@ export default {
       dong_Boundarys: [], // 선택한 동의 폴리곤
       clusterer: null,
 
-      // 테스트를 위한 샘플 코드
-      sample: [
-         {
-            name: '교대역_1',
-            score: 55,
-            x: '201023', //상권영역.csv
-            y: '443482',
-         },
-         {
-            name: '천호대로129길',
-            score: 81,
-            x: '208103',
-            y: '450391',
-         },
-         {
-            name: '공덕시장',
-            score: 90,
-            x: '195838',
-            y: '449448',
-         },
-      ],
+      dongInnerDistricts: [], // 동을 클릭한 후 나오는 상권들
+      dongInnerOverlays: [], // 위의 상권을 기록하는 커스텀 오버레이
+      dongInnerMarkers: [], // 위의 상권을 기록하는 커스텀 오버레이
+      isExplore: false,
 
       // 동별로 마커를 찍기 위한 json파일 import
       guCoords: guCoords,
@@ -102,21 +95,38 @@ export default {
    watch: {
       level: function() {
          // 조건 만족 시 1회만 생성 -> 성능..
-         if (this.level >= 6 && this.gu_Overlays.length == 0) {
-            console.log('# 레벨 6 이상 => 동 삭제, 구 생성');
-            // 구 생성, 동 삭제
-            this.makeGuBoundary();
-            this.removeDongLayer('total');
-            this.removeDongLayer('polyon');
-         } else if (this.level <= 5 && this.dong_Overlays.length == 0) {
-            console.log('# 레벨 5 아래 => 구 삭제, 동 생성');
-            // 구 삭제, 동 생성
-            this.removeGuLayer();
+         if (this.recommendResult == null) {
+            if (this.level >= 6 && this.gu_Overlays.length == 0) {
+               console.log('# 레벨 6 이상 => 동 삭제, 구 생성');
+               // 구 생성, 동 삭제
+               this.makeGuBoundary();
+               this.removeDongLayer('total');
+               this.removeDongLayer('polygon');
+               this.removeDongLayer('innerDong');
+
+               this.closeExplore();
+            } else if (this.level <= 5 && this.dong_Overlays.length == 0) {
+               console.log('# 레벨 5 아래 => 구 삭제, 동 생성');
+               // 구 삭제, 동 생성
+               this.removeGuLayer();
+            }
+         } else {
+            console.log('# 토스트메뉴 On');
+            // this.makeRecommendMarkerClick();
          }
       },
    },
 
    methods: {
+      // 모달 생성시 블러 적용
+      onDialogChange: function(dialog) {
+         if (dialog === true) {
+            document.querySelector('.container').classList.add('blur-display');
+         } else {
+            document.querySelector('.container').classList.remove('blur-display');
+         }
+      },
+
       // sidemenu의 옵션입력 버튼 눌렀을 때
       onClickInputBt: function() {
          this.optionCompo = !this.optionCompo;
@@ -134,18 +144,85 @@ export default {
       onClickCloseDetail: function() {
          this.detailCompo = false;
       },
-      //추천조건 입력 완료했을 때(상권추천)
-      onInputComplete: function() {
-         this.optionCompo = false;
-         // 추천 결과 요청 추가해야함
 
-         // 검색 결과 조회
-         this.detailCompo = true;
+      //추천조건 입력 완료되어 버튼 클릭시 (상권추천)
+      onInputComplete: function(options) {
+         console.log('## 추천 버튼 클릭');
+
+         this.optionCompo = false;
+         this.detailCompo = false;
+         this.toastShow = false;
+         this.isExplore = false;
+         this.toastDist = '';
+
+         /*
+         options
+         {
+         category: "일식음식점"
+         districts: {
+                        0: "중구"
+                        1: "용산구"
+                        2: "중랑구"
+                     }
+         }
+         */
+
+         // options 데이터를 추천 API 요청 -> 상권명 / 추천 지수 / 상권영역 내 x,y 좌표 받음
+         var result = this.apiRecommend(options);
+         this.recommendResult = JSON.stringify(result);
+         // console.log(result);
+
+         this.removeDongLayer('total');
+         this.removeDongLayer('polygon');
+         this.removeDongLayer('innerDong');
+         this.removeGuLayer();
+         this.removeRcommendLayers();
+
+         this.initCenter();
+
+         // 추천 받은 상권들을 마커로 표시
+         this.setRecommendMarker();
       },
+
+      /* ==========================
+               토스트 메뉴 관련
+         =========================
+      */
+      // 토스트 메뉴에서 추천 결과 삭제
+      closeRecommend() {
+         this.toastShow = false;
+         this.optionCompo = false;
+         this.bookMarkCompo = false;
+         this.detailCompo = false;
+
+         this.initCenter();
+
+         this.removeRcommendLayers();
+
+         this.toastDist = null;
+         this.recommendResult = null;
+      },
+
+      // 토스트 메뉴에서 탐색 결과 삭제
+      closeExplore() {
+         this.optionCompo = false;
+         this.bookMarkCompo = false;
+         this.detailCompo = false;
+
+         this.toastShow = false;
+         this.isExplore = false;
+         this.toastDist = null;
+
+         this.removeDongLayer('polygon');
+         this.removeDongLayer('innerDong');
+         this.removePolygonDistrict();
+      },
+
       goDetail(value) {
          this.detailCompo = value;
          this.bookMarkCompo = false;
       },
+
       // 지도가 로드 완료되면 load 이벤트 발생
       onLoad(map) {
          console.log('# 맵이 로딩됨 => 바로 구 셋팅');
@@ -157,7 +234,7 @@ export default {
       },
 
       initCenter() {
-         console.log('initCenter');
+         // console.log('initCenter');
          // 중심위치 세팅
          this.center.lat = 37.5642135; // 위도
          this.center.lng = 127.0016985; // 경로
@@ -166,13 +243,19 @@ export default {
 
       // 줌 이벤트에 걸면, level값 반영이 즉각으로 안이루어짐
       onMapEvent(event) {
-         // console.log('onMapEvent : ', this.level);
+         // console.log('onMapEvent : ', event);
          var bounds = this.mapObject.getBounds();
 
-         if (this.level <= 5) {
+         // console.log(this.option);
+
+         if (this.recommendResult == null && this.level <= 5) {
             console.log('# 드래그 + 레벨 5 아래 => 범위에 따라 동 랜더링');
             this.removeDongLayer('total');
             this.makeDongMarker(bounds);
+         } else if (this.recommendResult != null) {
+            console.log('# 상권 추천 재랜더링');
+            this.removeRcommendLayers();
+            this.setRecommendMarker();
          }
          // console.log(this.dong_Overlays.length);
       },
@@ -256,7 +339,7 @@ export default {
             strokeOpacity: 0.3, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
             strokeStyle: 'solid', // 선의 스타일입니다
             fillColor: '#fff', // 채우기 색깔입니다
-            fillOpacity: 0.5, // 채우기 불투명도 입니다
+            fillOpacity: 0.3, // 채우기 불투명도 입니다
          });
 
          // 다각형에 mouseover 이벤트를 등록하고 이벤트가 발생하면 폴리곤의 채움색을 변경합니다
@@ -354,7 +437,7 @@ export default {
          });
 
          this.dongCoords.forEach((item) => {
-            var imageSrc = require('/src/assets/image/categories/map/marker/dong_marker2.png'), // 마커이미지의 주소입니다
+            var imageSrc = require('/src/assets/image/map/marker/dong_marker1.png'), // 마커이미지의 주소입니다
                imageSize = new kakao.maps.Size(35, 35), // 마커이미지의 크기입니다
                imageOption = { offset: new kakao.maps.Point(12, -15) }; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
 
@@ -442,11 +525,14 @@ export default {
                      polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
                   }
 
-                  this.removeDongLayer('polyon');
+                  this.removeDongLayer('polygon');
                   this.makeDongPolygon(polygonPath);
 
                   this.mapObject.setCenter(center);
                   this.mapObject.setLevel(4, { animate: true });
+
+                  this.removeDongLayer('innerDong');
+                  this.makeDongInnerMarker(emd_cd);
                }
             })
             .catch((err) => {
@@ -461,16 +547,156 @@ export default {
          var polygon = new kakao.maps.Polygon({
             path: polygonPath, // 그려질 다각형의 좌표 배열입니다
             strokeWeight: 3, // 선의 두께입니다
-            strokeColor: 'rgb(0, 68, 227)', // 선의 색깔입니다
-            strokeOpacity: 0.8, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
-            strokeStyle: 'solid', // 선의 스타일입니다
-            fillColor: '#fff', // 채우기 색깔입니다
-            fillOpacity: 0.5, // 채우기 불투명도 입니다
+            strokeColor: '#000', // 선의 색깔입니다
+            strokeOpacity: 0.7, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+            strokeStyle: 'longdash', // 선의 스타일입니다
+            fillColor: '#ffcc00', // 채우기 색깔입니다
+            fillOpacity: 0.3, // 채우기 불투명도 입니다
          });
 
          // 지도에 구 정보 다각형을 표시합니다
          polygon.setMap(this.mapObject);
          this.dong_Boundarys.push(polygon);
+      },
+
+      // 동-5) 선택한 마커를 기준으로, 해당 동에 포함된 상권을 출력해줌
+      makeDongInnerMarker(emd_cd) {
+         console.log('# 동을 선택한 뒤, 해당 동에 속한 상권들을 마커로 찍음', emd_cd);
+
+         this.dongInnerDistricts = this.apiDongDistrict(emd_cd);
+         this.setDongInnerMarker();
+      },
+
+      // 동-5-1) 동코드를 기준으로 해당 동에 있는 상권들의 결과를 가져옴
+      apiDongDistrict(emd_cd) {
+         // AXIOS 요청 처리
+         console.log('# 동 코드로 요청을 보내서 데이터를 받음');
+         // emd_cd를 서버로 보내서 아래의 데이터를 받아옴
+
+         var result = [
+            {
+               commercialCode: '1000466',
+               divisionCode: 'A',
+               divisionName: '전통시장',
+               commercialName: '공라라라랄랄',
+               x: 195644,
+               y: 449638,
+               score: 90,
+               sigunguCode: '11440',
+               dongCode: '11440660',
+               estimatedPopulationList: null,
+               estimatedSalesList: null,
+               storeRentalPrice: null,
+            },
+            {
+               commercialCode: '1000466',
+               divisionCode: 'A',
+               divisionName: '전통시장',
+               commercialName: '공더더러더럭',
+               x: 195926,
+               y: 449654,
+               score: 90,
+               sigunguCode: '11440',
+               dongCode: '11440660',
+               estimatedPopulationList: null,
+               estimatedSalesList: null,
+               storeRentalPrice: null,
+            },
+            {
+               commercialCode: '1000466',
+               divisionCode: 'A',
+               divisionName: '전통시장',
+               commercialName: '공덕시장',
+               x: 195838,
+               y: 449448,
+               score: 90,
+               sigunguCode: '11440',
+               dongCode: '11440660',
+               estimatedPopulationList: null,
+               estimatedSalesList: null,
+               storeRentalPrice: null,
+            },
+         ];
+
+         return result;
+      },
+
+      // 동-5-2) 상권들의 결과에 마커와 상권명을 찍기
+      setDongInnerMarker() {
+         var imageSrc = require('/src/assets/image/map/marker/marker.png'), // 마커이미지의 주소입니다
+            imageSize = new kakao.maps.Size(40, 40), // 마커이미지의 크기입니다
+            imageOption = { offset: new kakao.maps.Point(19, 40) }; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+
+         // 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다
+         var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+
+         this.dongInnerDistricts.forEach((district) => {
+            var position = new this.coordsChange(district);
+
+            // 커스텀 오버레이에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
+            var content = `<div class="dong inner">
+                                    <i class="fas fa-store"></i> ${district.commercialName}
+                                 </div>`;
+
+            // 커스텀 오버레이를 생성합니다
+            var dongInnerOverlay = new kakao.maps.CustomOverlay({
+               map: this.mapObject,
+               position: position,
+               content: content,
+            });
+
+            this.removePolygonDistrict();
+            this.getPolygonDistrict(position);
+
+            // 마커를 생성합니다
+            var marker = new kakao.maps.Marker({
+               map: this.mapObject,
+               position: position,
+               image: markerImage, // 마커이미지 설정
+               clickable: true,
+            });
+
+            marker.district = district;
+            marker.position = position;
+
+            // 마커가 지도 위에 표시되도록 설정합니다
+            marker.setMap(this.mapObject);
+            this.dongInnerMarkers.push(marker);
+
+            dongInnerOverlay.setMap(this.mapObject);
+            this.dongInnerOverlays.push(dongInnerOverlay);
+         });
+
+         // 추천 상권 마커에 이벤트 등록 (츄파츕스)
+         this.makeDongInnerMarkerClick();
+      },
+
+      // 동-5-3)
+      makeDongInnerMarkerClick() {
+         console.log('# 동 세부 마커별 클릭 이벤트 생성');
+         this.dongInnerMarkers.forEach((item) => {
+            // kakao.maps.event.removeListener(item, 'click', this.setEventRecommendClick);
+            kakao.maps.event.addListener(item, 'click', () => {
+               this.setInnerMarkerClick(item);
+            });
+         });
+      },
+
+      setInnerMarkerClick(item) {
+         // 서버로 해당 상권 코드 보내서, 상권 상세 정보를 받아옴 (일단 공동으로 하기 위해 상권번호만 넘기는 식)
+
+         console.log(item);
+
+         this.mapObject.setLevel(4, { animate: true });
+         this.mapObject.setCenter(item.position);
+
+         // 검색 결과 조회
+         this.detailCompo = true;
+         this.toastShow = true;
+
+         // 토스트 메뉴
+         this.toastDist = item.district.commercialName;
+         this.isExplore = true;
       },
 
       // 동-0) 입력값에 따라 정보를 삭제함
@@ -490,12 +716,20 @@ export default {
 
             this.dong_Overlays = [];
             this.dong_Markers = [];
-         } else if (type == 'polyon') {
+         } else if (type == 'polygon') {
             console.log('[remove] 동 폴리곤 삭제');
             for (const key in this.dong_Boundarys) {
                this.dong_Boundarys[key].setMap(null);
             }
             this.dong_Boundarys = [];
+         } else if (type == 'innerDong') {
+            console.log('[remove] 동 안의 상권 삭제');
+            for (const key in this.dongInnerMarkers) {
+               this.dongInnerMarkers[key].setMap(null);
+               this.dongInnerOverlays[key].setMap(null);
+            }
+            this.dongInnerMarkers = [];
+            this.dongInnerOverlays = [];
          }
       },
 
@@ -504,29 +738,78 @@ export default {
       //  추천 받은 상권들에 대해, 커스텀 마커 + 폴리곤 반환
       // =========================================
 
-      //추천 상권 마커 표시
+      // 추천) 추천 결과 받기
+      apiRecommend(option) {
+         // 테스트를 위한 샘플 코드
+         var sample = [
+            {
+               commercialCode: '1000466',
+               divisionCode: 'A',
+               divisionName: '골목상권',
+               commercialName: '동교로17길',
+               x: 192533,
+               y: 450801,
+               score: 88,
+               sigunguCode: '11440',
+               dongCode: '11440660',
+               estimatedPopulationList: null,
+               estimatedSalesList: null,
+               storeRentalPrice: null,
+            },
+            {
+               commercialCode: '1000466',
+               divisionCode: 'A',
+               divisionName: '전통시장',
+               commercialName: '공덕시장',
+               x: 195838,
+               y: 449448,
+               score: 90,
+               sigunguCode: '11440',
+               dongCode: '11440660',
+               estimatedPopulationList: null,
+               estimatedSalesList: null,
+               storeRentalPrice: null,
+            },
+            {
+               commercialCode: '1000466',
+               divisionCode: 'A',
+               divisionName: '골목상권',
+               commercialName: '천호대로129길',
+               x: 208103,
+               y: 450391,
+               score: 81,
+               sigunguCode: '11440',
+               dongCode: '11440660',
+               estimatedPopulationList: null,
+               estimatedSalesList: null,
+               storeRentalPrice: null,
+            },
+         ];
+
+         return sample;
+      },
+
+      // 추천-1) 추천받은 상권들의 마커 정보 입력
       setRecommendMarker() {
-         var imageSrc = require('/src/assets/image/categories/map/marker/marker.png'), // 마커이미지의 주소입니다
+         var imageSrc = require('/src/assets/image/map/marker/marker.png'), // 마커이미지의 주소입니다
             imageSize = new kakao.maps.Size(40, 40), // 마커이미지의 크기입니다
             imageOption = { offset: new kakao.maps.Point(19, 40) }; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
 
          // 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다
          var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
 
-         // 기존 마커 정보를 삭제
-         this.removeRcommendLayers();
+         // console.log('# 추천 마커를 찍습니다. (JAON)', this.recommendResult);
 
-         // 개별 마커 변수 생성
-         var marker;
+         var recommendObj = JSON.parse(this.recommendResult);
+         // console.log('# 추천 마커를 찍습니다. (obj)', recommendObj);
 
-         for (var idx in this.sample) {
-            var district = this.sample[idx];
+         recommendObj.forEach((district) => {
             var position = new this.coordsChange(district);
 
             // 커스텀 오버레이에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
             var content = `<div class="customoverlay">
                   <span class="markerInfo">
-                     <p class="name"><i class="fas fa-map-marker-alt"></i> ${district.name} <br><br>
+                     <p class="name"><i class="fas fa-map-marker-alt"></i> ${district.commercialName} <br><br>
                         <span class="score">${district.score}</span>점
                      </p>
                   </span>
@@ -546,13 +829,15 @@ export default {
             this.getPolygonDistrict(position);
 
             // 마커를 생성합니다
-            marker = new kakao.maps.Marker({
+            var marker = new kakao.maps.Marker({
                map: this.mapObject,
                position: position,
                image: markerImage, // 마커이미지 설정
-               // clickable: true, // 마커를 클릭했을 때 지도의 클릭 이벤트가 발생하지 않도록 설정합니다
-               // title: apt.no,
+               clickable: true,
             });
+
+            marker.district = district;
+            marker.position = position;
 
             // 마커가 지도 위에 표시되도록 설정합니다
             marker.setMap(this.mapObject);
@@ -560,10 +845,44 @@ export default {
 
             customOverlay.setMap(this.mapObject);
             this.customOverlays.push(customOverlay);
-         }
+         });
+
+         // 추천 상권 마커에 이벤트 등록 (츄파츕스)
+         this.makeRecommendMarkerClick();
       },
 
-      //오픈 API를 통해 폴리곤 정보를 불러옴
+      // 추천-2) 추천 마커 이미지에 클릭 이벤트
+      makeRecommendMarkerClick() {
+         console.log('# 마커별 클릭 이벤트 생성');
+         this.markers.forEach((item) => {
+            // kakao.maps.event.removeListener(item, 'click', this.setEventRecommendClick);
+            kakao.maps.event.addListener(item, 'click', () => {
+               this.setEventRecommendClick(item);
+            });
+         });
+      },
+
+      // 추천-2-1) 추천 상권 클릭 이벤트 발생 시, 순서에 따라 이벤트 처리 및 결과 재표시
+      setEventRecommendClick(item) {
+         // 서버로 해당 상권 코드 보내서, 상권 상세 정보를 받아옴 (일단 공동으로 하기 위해 상권번호만 넘기는 식)
+
+         this.mapObject.setLevel(4, { animate: true });
+         this.mapObject.setCenter(item.position);
+
+         // 검색 결과 조회
+         this.detailCompo = true;
+         this.toastShow = true;
+         this.toastDist = item.district.commercialName;
+         // 토스트 메뉴
+      },
+
+      //서버로 선택한 상권의 상세 정보를 요청함
+      getDistrictDetail(code) {
+         // 선택한 상권에 대한 상세 정보를 요청함
+         return '';
+      },
+
+      // 추천-3) 오픈 API를 통해 폴리곤 정보를 불러옴
       getPolygonDistrict(position) {
          var key = '13C339D4-B453-3C5E-A6A1-CCA6792A2D6B'; // 공간정보 오픈플랫폼
          var domain = 'http://localhost:8080';
@@ -587,10 +906,10 @@ export default {
                      polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
                   }
 
-                  this.setPolygonDistrict(polygonPath);
+                  this.makePolygonDistrict(polygonPath);
                } else {
                   // 상권 영역 없으면, 원형
-                  this.setCircleDistrict(position);
+                  this.makeCircleDistrict(position);
                }
             })
             .catch((err) => {
@@ -598,8 +917,8 @@ export default {
             });
       },
 
-      //상권 영역이 없는 경우, 원형으로 표시
-      setCircleDistrict(position) {
+      // 추천-3-1) 상권 영역이 없는 경우, 원형으로 표시
+      makeCircleDistrict(position) {
          // 지도에 표시할 원을 생성합니다
          var circle = new kakao.maps.Circle({
             center: new kakao.maps.LatLng(position.Ma, position.La), // 원의 중심좌표 입니다
@@ -617,8 +936,8 @@ export default {
          this.circles.push(circle);
       },
 
-      //상권 영역이 존재하는 경우, 폴리곤 생성
-      setPolygonDistrict(polygonPath) {
+      // 추천-3-2) 상권 영역이 존재하는 경우, 폴리곤 생성
+      makePolygonDistrict(polygonPath) {
          // 지도에 표시할 다각형을 생성합니다
          var polygon = new kakao.maps.Polygon({
             path: polygonPath, // 그려질 다각형의 좌표 배열입니다
@@ -635,31 +954,32 @@ export default {
          this.polygons.push(polygon);
       },
 
-      // 모달 생성시 블러 적용
-      onDialogChange: function(dialog) {
-         if (dialog === true) {
-            document.querySelector('.container').classList.add('blur-display');
-         } else {
-            document.querySelector('.container').classList.remove('blur-display');
-         }
-      },
-
-      //레이어(마커, 커스텀오버레이, 폴리곤 등) 삭제
+      // 추천-0) 레이어(마커, 커스텀오버레이, 폴리곤 등) 삭제
       removeRcommendLayers() {
+         console.log('# 추천 마커, 상권, 폴리곤 모두 초기화');
          for (var i = 0; i < this.markers.length; i++) {
             this.markers[i].setMap(null);
             this.customOverlays[i].setMap(null);
          }
 
-         // 원, 폴리곤 초기화. 갯수가 상이하므로, 마커 갯수(총 표시) 만큼 돌리면서, i값이 사이즈별로 판별
-         for (var i = 0; i < this.markers.length; i++) {
-            if (i < this.circles.length) this.circles[i].setMap(null);
-            if (i < this.polygons.length) this.polygons[i].setMap(null);
-         }
+         this.removePolygonDistrict();
 
          // 배열 초기화
          this.markers = [];
          this.customOverlays = [];
+
+         this.circles = [];
+         this.polygons = [];
+      },
+
+      removePolygonDistrict() {
+         // 원, 폴리곤 초기화. 갯수가 상이하므로, 마커 갯수(총 표시) 만큼 돌리면서, i값이 사이즈별로 판별
+         for (var i = 0; i < this.circles.length; i++) {
+            this.circles[i].setMap(null);
+         }
+         for (var i = 0; i < this.polygons.length; i++) {
+            this.polygons[i].setMap(null);
+         }
          this.circles = [];
          this.polygons = [];
       },
@@ -726,7 +1046,7 @@ export default {
    // 좌측에 고정되어 떠다니는 사이드메뉴
    .sidemenu-compo {
       background-color: white;
-      box-shadow: -1px 0px 20px #23232363;;
+      box-shadow: -1px 0px 20px #23232363;
       width: 100px;
       height: 100%;
 
@@ -752,6 +1072,21 @@ export default {
 
       border-radius: 0px 30px 30px 0px;
    }
+
+   .toast-pop-up {
+      background-color: rgb(255, 255, 255);
+
+      width: 380px;
+      height: 40px;
+
+      top: 40px;
+      left: 50%;
+
+      transform: translate(-50%, -50%);
+
+      border-radius: 30px;
+   }
+
    // detail-compo slide in 기능
    .collapse-right-enter-active,
    .collapse-right-leave-active {
@@ -761,8 +1096,19 @@ export default {
    .collapse-right-leave-to {
       transform: translateX(1000px);
    }
+
+   // 토스트 팝업 위에서 떨어지는 기능
+   .slide-down-enter-active,
+   .slide-down-leave-active {
+      transition: all 0.4s ease;
+   }
+
+   .slide-down-enter,
+   .slide-down-leave-to {
+      transform: translateY(-1000px);
+   }
+
    .detail-compo {
-      
       top: 2%;
       right: 1%;
       background-color: white;
