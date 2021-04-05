@@ -33,9 +33,9 @@
 
 <script>
 import DetailGraph from './DetailGraph';
-import PieChart from './PieChart'
-import LineGraph from './LineGraph'
-import { findAllData } from '@/api/mapdetail.js'
+import PieChart from './PieChart';
+import LineGraph from './LineGraph';
+import { findAllData } from '@/api/mapDetail.js';
 
 var mapdata = {
    name: '마포구 서교동',
@@ -53,7 +53,7 @@ export default {
    components: {
       DetailGraph,
       PieChart,
-      LineGraph
+      LineGraph,
    },
    data: function() {
       return {
@@ -109,8 +109,8 @@ export default {
       setLike: function() {
          this.like = !this.like;
       },
-      closeCompo: function () {
-         this.$emit('close-expended')
+      closeCompo: function() {
+         this.$emit('close-expended');
       },
    },
    created: function() {

@@ -1,13 +1,19 @@
-import { instance } from "./index.js";
+import { instance } from './index.js';
 
-// 상권코드로 데이터 조회
+// 상권코드로 상권 세부 정보(Detail) 조회
 function findAllData(commercialCode, success, fail) {
-    instance
-        .get(`commercial/${commercialCode}`)
-        .then(success)
-        .catch(fail);
+   instance
+      .get(`commercial/${commercialCode}`)
+      .then(success)
+      .catch(fail);
 }
 
-export {
-    findAllData,
-};
+// 행정동 코드로 해당 동에 포함된 상권 조회
+function findDongData(emd_cd, success, fail) {
+   instance
+      .get(`commercial/list/${emd_cd}`)
+      .then(success)
+      .catch(fail);
+}
+
+export { findAllData, findDongData };
