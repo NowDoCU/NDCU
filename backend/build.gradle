@@ -28,26 +28,26 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     runtimeOnly 'mysql:mysql-connector-java'
-    // https://mvnrepository.com/artifact/org.apache.spark/spark-core
-    implementation group: 'org.apache.spark', name: 'spark-core_2.12', version: '3.0.1'
-
-    // https://mvnrepository.com/artifact/org.apache.spark/spark-sql
-    implementation group: 'org.apache.spark', name: 'spark-sql_2.12', version: '3.0.1'
-
-    // https://mvnrepository.com/artifact/org.codehaus.janino/janino
-    implementation group: 'org.codehaus.janino', name: 'janino', version: '3.0.8'
-
-    // https://mvnrepository.com/artifact/org.codehaus.janino/commons-compiler
-    implementation group: 'org.codehaus.janino', name: 'commons-compiler', version: '3.0.8'
-
-    // https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-common
-    implementation group: 'org.apache.hadoop', name: 'hadoop-common', version: '2.7.4'
-
-    // https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-mapreduce-client-core
-    implementation group: 'org.apache.hadoop', name: 'hadoop-mapreduce-client-core', version: '2.7.4'
-
-    // https://mvnrepository.com/artifact/org.apache.spark/spark-mllib
-    implementation group: 'org.apache.spark', name: 'spark-mllib_2.12', version: '3.0.1'
+//    // https://mvnrepository.com/artifact/org.apache.spark/spark-core
+//    implementation group: 'org.apache.spark', name: 'spark-core_2.12', version: '3.0.1'
+//
+//    // https://mvnrepository.com/artifact/org.apache.spark/spark-sql
+//    implementation group: 'org.apache.spark', name: 'spark-sql_2.12', version: '3.0.1'
+//
+//    // https://mvnrepository.com/artifact/org.codehaus.janino/janino
+//    implementation group: 'org.codehaus.janino', name: 'janino', version: '3.0.8'
+//
+//    // https://mvnrepository.com/artifact/org.codehaus.janino/commons-compiler
+//    implementation group: 'org.codehaus.janino', name: 'commons-compiler', version: '3.0.8'
+//
+//    // https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-common
+//    implementation group: 'org.apache.hadoop', name: 'hadoop-common', version: '2.7.4'
+//
+//    // https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-mapreduce-client-core
+//    implementation group: 'org.apache.hadoop', name: 'hadoop-mapreduce-client-core', version: '2.7.4'
+//
+//    // https://mvnrepository.com/artifact/org.apache.spark/spark-mllib
+//    implementation group: 'org.apache.spark', name: 'spark-mllib_2.12', version: '3.0.1'
 
     // jwt token
     implementation 'io.jsonwebtoken:jjwt-api:0.10.7'

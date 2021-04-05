@@ -292,21 +292,20 @@ export default {
                email: this.liEmail,
                password: this.liPwd,
             },
-            (res) => {
-               console.log(res);
+            (res) => {               
                if (res.status == 200) {
                   let token = res.data['accessToken'];
                   localStorage.setItem('accessToken', token); // 토큰 로컬스토리지에 저장
                   this.$store.dispatch('getUserInfo'); // 토큰을 이용한 유저정보 가져오기
                   this.controlModal(1, 'close');
                   alert('로그인이 완료되었습니다.')
-               } else {
+               }        
+            },
+            (err) => {
+               if(err.response.status == 401) {
                   alert('아이디 또는 비밀번호가 일치하지 않습니다.');
                   this.isLoginError = true;
                }               
-            },
-            (err) => {
-               console.log(err);
             }
          ) 
       },
