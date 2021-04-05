@@ -1083,6 +1083,7 @@ export default {
       transform: translate(-50%, -50%);
 
       border-radius: 30px;
+      z-index: 30;
    }
 
    // detail-compo slide in 기능
@@ -1098,12 +1099,12 @@ export default {
    // 토스트 팝업 위에서 떨어지는 기능
    .slide-down-enter-active,
    .slide-down-leave-active {
-      transition: all 0.4s ease;
+      transition: all 0.6s ease;
    }
 
    .slide-down-enter,
    .slide-down-leave-to {
-      transform: translateY(-1000px);
+      transform: translate(-50%, -50%) translateY(-100px);
    }
 
    .detail-compo {
