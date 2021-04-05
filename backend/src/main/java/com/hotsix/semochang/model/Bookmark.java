@@ -1,5 +1,6 @@
 package com.hotsix.semochang.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import lombok.experimental.Accessors;
 
@@ -32,6 +33,7 @@ public class Bookmark extends BaseTimeEntity{
      */
     @ManyToOne
     @JoinColumn(name = "founder_id")
+    @JsonIgnore
     private Founder founder;
 
     /***

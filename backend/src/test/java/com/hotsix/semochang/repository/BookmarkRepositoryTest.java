@@ -28,15 +28,15 @@ class BookmarkRepositoryTest {
         founder = founderRepository.findById(1L).orElse(null);
     }
 
-    @Test
-    public void createTest() {
-
-        Founder founder = founderRepository.findById(1L).orElse(null);
-        Commercial commercial = commercialRepository.findByCommercialCode("1000001").orElse(null);
-
-        Bookmark bookmark = Bookmark.builder().founder(founder).commercial(commercial).build();
-        bookmarkRepository.save(bookmark);
-    }
+//    @Test
+//    public void createTest() {
+//
+//        Founder founder = founderRepository.findById(1L).orElse(null);
+//        Commercial commercial = commercialRepository.findByCommercialCode("1000001").orElse(null);
+//
+//        Bookmark bookmark = Bookmark.builder().founder(founder).commercial(commercial).build();
+//        bookmarkRepository.save(bookmark);
+//    }
 
     @Test
     @Transactional
