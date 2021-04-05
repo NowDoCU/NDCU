@@ -15,7 +15,7 @@
          <i @click="aboutDialog = true" class="fas fa-info-circle about"></i><br /><br /><br /><br />
          <!--  login == 1 signup == 2 -->
          <span v-if="!isLogin" @click="controlModal(1, 'open')">로그인</span><br /><br />
-         <span v-if="isLogin" @click="doLogout">{{userInfo.email}}</span><br /><br />
+         <span v-if="isLogin" @click="doLogout">로그아웃</span><br /><br />
          <span @click="controlModal(2, 'open')">회원가입</span>
       </div>
 
