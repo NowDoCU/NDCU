@@ -1,4 +1,4 @@
-package com.hotsix.semochang.model;
+package com.hotsix.semochang.model.network.request;
 
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +10,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class LoginRequestDTO {
+public class LoginApiRequest {
 
     private String email;
 

@@ -1,6 +1,8 @@
 package com.hotsix.semochang.controller;
 
 import com.hotsix.semochang.model.Commercial;
+import com.hotsix.semochang.model.network.response.CommercialApiResponse;
+import com.hotsix.semochang.model.network.response.CommercialListApiResponse;
 import com.hotsix.semochang.service.CommercialService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,18 +25,13 @@ public class CommercialController {
     CommercialService commercialService;
 
     @GetMapping("/{commercialCode}")
-    public ResponseEntity<?> getCommercialInfo(@PathVariable("commercialCode") String commercialCode) {
-
-        Commercial commercial = commercialService.findByCommercialCode(commercialCode);
-
-        return new ResponseEntity<>(commercial, HttpStatus.OK);
+    public ResponseEntity<CommercialApiResponse> getCommercialInfo(@PathVariable("commercialCode") String commercialCode) {
+        return commercialService.findByCommercialCode(commercialCode);
     }
 
     @GetMapping("/list/{dongCode}")
-    public ResponseEntity<?> commercialList(@PathVariable("dongCode") String dongCode) {
+    public ResponseEntity<CommercialListApiResponse> commercialList(@PathVariable("dongCode") String dongCode) {
 
-        List<Commercial> commercialList = commercialService.findByDongCode(dongCode);
-
-        return new ResponseEntity<>(commercialList, HttpStatus.OK);
+        return commercialService.findByDongCode(dongCode);
     }
 }

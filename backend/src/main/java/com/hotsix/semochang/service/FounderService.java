@@ -1,8 +1,12 @@
 package com.hotsix.semochang.service;
 
 import com.hotsix.semochang.model.Founder;
-import com.hotsix.semochang.model.LoginRequestDTO;
+import com.hotsix.semochang.model.network.request.FounderApiRequest;
+import com.hotsix.semochang.model.network.request.LoginApiRequest;
+import com.hotsix.semochang.model.network.response.FounderApiResponse;
+import com.hotsix.semochang.model.network.response.LoginApiResponse;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 
 /**
  * author: pinest94
@@ -14,17 +18,17 @@ public interface FounderService {
     /***
      * founder 생성
      */
-    ResponseEntity<?> create(Founder founder);
+    ResponseEntity<?> create(FounderApiRequest request);
 
     /***
      * founder 가져오기
      */
-    ResponseEntity<?> read(Long id);
+    ResponseEntity<FounderApiResponse> read(Authentication authentication);
 
     /***
      * founder 수정하기
      */
-    ResponseEntity<?> update(Founder founder);
+    ResponseEntity<?> update(FounderApiRequest request, Authentication authentication);
 
     /***
      * founder 삭제하기
@@ -34,5 +38,5 @@ public interface FounderService {
     /***
      * 로그인 인증
      */
-    ResponseEntity<?> authenticate(LoginRequestDTO loginRequestDTO);
+    ResponseEntity<?> authenticate(LoginApiRequest request);
 }

@@ -1,7 +1,7 @@
 package com.hotsix.semochang.controller;
 
-import com.hotsix.semochang.model.LoginRequestDTO;
-import com.hotsix.semochang.model.LoginResponseDTO;
+import com.hotsix.semochang.model.network.request.LoginApiRequest;
+import com.hotsix.semochang.model.network.response.LoginApiResponse;
 import com.hotsix.semochang.service.FounderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +23,8 @@ public class LoginController {
     FounderService founderService;
 
     @PostMapping("")
-    public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginRequestDTO) {
-        log.info("{} - {}", loginRequestDTO.getEmail(), loginRequestDTO.getPassword());
-        return founderService.authenticate(loginRequestDTO);
+    public ResponseEntity<?> login(@RequestBody LoginApiRequest request) {
+        log.info("{} - {}", request.getEmail(), request.getPassword());
+        return founderService.authenticate(request);
     }
 }
