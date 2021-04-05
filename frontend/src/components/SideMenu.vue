@@ -14,7 +14,8 @@
       <div class="bottom-wrapper">
          <i @click="aboutDialog = true" class="fas fa-info-circle about"></i><br /><br /><br /><br />
          <!--  login == 1 signup == 2 -->
-         <span @click="controlModal(1, 'open')">로그인</span><br /><br />
+         <span v-if="!isLogin" @click="controlModal(1, 'open')">로그인</span><br /><br />
+         <span v-if="isLogin" @click="doLogout">{{userInfo.email}}</span><br /><br />
          <span @click="controlModal(2, 'open')">회원가입</span>
       </div>
 
@@ -44,7 +45,7 @@
                </div>
             </div>
             <div class="modal__footer">
-               <button class="login-bt" :class="{ vali: emailVali(suEmail) && pwdVali(suPwd) && pwdConfVali(suPwdConf) }">회원가입</button>
+               <button class="login-bt" :class="{ vali: emailVali(suEmail) && pwdVali(suPwd) && pwdConfVali(suPwdConf) }" @click="doRegister">회원가입</button>
             </div>
             <a class="modal__close">
                <i @click="controlModal(2, 'close')" class="far fa-times-circle"></i>
@@ -83,7 +84,7 @@
                </div>
             </div>
             <div class="modal__footer">
-               <button class="login-bt" :class="{ vali: emailVali(liEmail) && pwdVali(liPwd) }">로그인</button>
+               <button class="login-bt" :class="{ vali: emailVali(liEmail) && pwdVali(liPwd) }" @click="doLogin">로그인</button>
             </div>
             <a class="modal__close">
                <i @click="controlModal(1, 'close')" class="far fa-times-circle"></i>
@@ -130,6 +131,9 @@
 
 <script>
 import * as EmailValidator from 'email-validator';
+import { registerFounder, loginFounder } from '@/api/founder';
+import { mapState, mapActions } from 'vuex';
+//import router from '../router/router';
 
 export default {
    name: 'SideMenu',
@@ -149,6 +153,9 @@ export default {
          liEmail: '',
          liPwd: '',
       };
+   },
+   computed: {
+      ...mapState(['userInfo', 'isLogin']),      
    },
    methods: {
       // css 적용위한 Validation 함수들
@@ -255,6 +262,55 @@ export default {
             }
          }
       },
+
+      // 회원가입 요청처리 메서드
+      doRegister: function() {
+         // 회원가입 요청 보내기         
+         registerFounder(
+            {
+               email: this.suEmail,
+               password: this.suPwd,
+            },
+            () => {
+               // 회원가입에 성공한 경우
+               alert('성공적으로 회원가입되었습니다.')
+               this.controlModal(2, 'close');
+            },
+            (error) => {
+               if(error.response.status == 409) {
+                  alert('이미 가입되어 있는 이메일입니다');
+               }
+            }
+         )          
+      },
+
+      // 로그인 요청처리 메서드
+      doLogin: function() {
+         // 로그인 요청 보내기
+         loginFounder(
+            {
+               email: this.liEmail,
+               password: this.liPwd,
+            },
+            (res) => {
+               console.log(res);
+               if (res.status == 200) {
+                  let token = res.data['accessToken'];
+                  localStorage.setItem('accessToken', token); // 토큰 로컬스토리지에 저장
+                  this.$store.dispatch('getUserInfo'); // 토큰을 이용한 유저정보 가져오기
+                  this.controlModal(1, 'close');
+                  alert('로그인이 완료되었습니다.')
+               } else {
+                  alert('아이디 또는 비밀번호가 일치하지 않습니다.');
+                  this.isLoginError = true;
+               }               
+            },
+            (err) => {
+               console.log(err);
+            }
+         ) 
+      },
+      ...mapActions(["doLogout"])      
    },
 };
 </script>
