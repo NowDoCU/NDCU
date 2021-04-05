@@ -71,35 +71,65 @@ var content = `<div class="customoverlay">
 
  .customoverlay2 {
    position: relative;
-   bottom: 60px;
-   right: 2px;
-   // background-color: rgba(255, 55, 55, 0.6);
-   width: 100%;
-   height: 70px;
+   bottom: 40px;
+   left: 80px;
+   // background-color: rgb(53, 53, 53);
+   width: 150px;
+   height: 100px;
 
-   display: flex;
-   flex-direction: column;
-   justify-content: space-between;
-   align-items: center;
+   // display: flex;
+   // flex-direction: column;
+   // justify-content: space-between;
+   // align-items: center;
 
-   .top{
-      .score{
-         font-size: 36pt;
-         font-weight: 700;
-         color: rgb(59, 191, 107);
-         -webkit-text-stroke: 2px #000
-      }
+   .division{
+      position: absolute;
+      top: -25px;
+      left: -40px;
+      background-color: #ff6633;
+      color: rgb(255, 255, 255);
+      padding: 6px 8px;
+      border-radius: 5px;
+
+      font-size: 9pt;
+      font-weight: 800;
    }
 
    .name{
-      background-color: rgba(0, 0, 0, 0.8);
-      padding: 6px 12px;
-      border-radius: 6px;
-      
-      color: white;
+      position: absolute;
+      bottom: 70px;
+      left: 12px;
+
       font-size: 10pt;
-      font-weight: 600;
+
+      background-color: rgb(255, 162, 0);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
    }
+
+   .circle{
+      width: 120px;
+      height: 120px;
+      background-color: #ff6633cd;
+      border-radius: 50%;
+
+      position: absolute;
+      top: -19px;
+      left: -70px;
+
+      
+      text-align: center;
+      line-height: 130px;
+      font-size: 55px;
+      font-weight: 800;
+      color: #fff;
+
+      span{
+         font-size: 12pt;
+      }
+   }
+
  }
 
  .gu{
@@ -137,13 +167,22 @@ var content = `<div class="customoverlay">
 
    font-size: 9pt;
 
-   &.inner{
-      bottom: 75px !important;
-      right: 40px !important;
-
-      border-color: #ff6633;
-      color: #ff6633;
-
-      text-align: center;
-   }
  }
+
+.dongInner{
+   position: relative;
+   bottom: 60px;
+   height: 10px;
+   padding: 6px 10px;
+   border-radius: 5px;
+   background-color: #fff;
+   border: 1px solid #ff6633;
+   color: #ff6633;
+   text-align: center;
+   opacity: .9;
+
+   font-size: 9pt;
+   z-index: 50;
+
+   // transform: translateX(-50%);
+}

@@ -157,6 +157,15 @@ export default {
          this.isExplore = false;
          this.toastDist = '';
 
+         axios
+            .get(`http://j4a106.p.ssafy.io:8000/recommend/commercial/`)
+            .then((response) => {
+               console.log(response);
+            })
+            .catch((err) => {
+               console.log('ERROR : ' + err);
+            });
+
          /*
          options
          {
@@ -580,7 +589,7 @@ export default {
             strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
             strokeStyle: 'shortdashdot', // 선의 스타일입니다
             fillColor: '#ffcc00', // 채우기 색깔입니다
-            fillOpacity: 0.2, // 채우기 불투명도 입니다
+            fillOpacity: 0.3, // 채우기 불투명도 입니다
          });
 
          // 지도에 구 정보 다각형을 표시합니다
@@ -649,7 +658,7 @@ export default {
             var position = new this.coordsChange(district);
 
             // 커스텀 오버레이에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
-            var content = `<div class="dong inner">
+            var content = `<div class="dongInner">
                                     <i class="fas fa-store"></i> ${district.commercialName}
                                  </div>`;
 
@@ -806,7 +815,7 @@ export default {
 
       // 추천-1) 추천받은 상권들의 마커 정보 입력
       setRecommendMarker() {
-         var imageSrc = require('/src/assets/image/map/marker/marker.png'), // 마커이미지의 주소입니다
+         var imageSrc = require('/src/assets/image/map/marker/tap.png'), // 마커이미지의 주소입니다
             imageSize = new kakao.maps.Size(40, 40), // 마커이미지의 크기입니다
             imageOption = { offset: new kakao.maps.Point(19, 40) }; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
 
@@ -822,12 +831,10 @@ export default {
             var position = new this.coordsChange(district);
 
             // 커스텀 오버레이에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
-            var content = `<div class="customoverlay">
-                  <span class="markerInfo">
-                     <p class="name"><i class="fas fa-map-marker-alt"></i> ${district.commercialName} <br><br>
-                        <span class="score">${district.score}</span>점
-                     </p>
-                  </span>
+            var content = `<div class="customoverlay2">
+                  <div class="circle">${district.score}<span>점</span></div>
+                  <div class="division">${district.divisionName}</div>
+                  <div class="name"><i class="fas fa-map-marker-alt"></i> ${district.commercialName}</div>
                </div>`;
 
             // 커스텀 오버레이를 생성합니다
@@ -960,8 +967,8 @@ export default {
             strokeColor: '#212121', // 선의 색깔입니다
             strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
             strokeStyle: 'longdash', // 선의 스타일입니다
-            fillColor: '#A2FF99', // 채우기 색깔입니다
-            fillOpacity: 0.4, // 채우기 불투명도 입니다
+            fillColor: '#ff6633', // 채우기 색깔입니다
+            fillOpacity: 0.3, // 채우기 불투명도 입니다
          });
 
          // 지도에 다각형을 표시합니다
@@ -1097,14 +1104,17 @@ export default {
    }
 
    // 토스트 팝업 위에서 떨어지는 기능
-   .slide-down-enter-active,
+   .slide-down-enter-active {
+      transition: all 0.7s ease;
+   }
+
    .slide-down-leave-active {
-      transition: all 0.6s ease;
+      transition: all 0.1s;
    }
 
    .slide-down-enter,
    .slide-down-leave-to {
-      transform: translate(-50%, -50%) translateY(-100px);
+      transform: translate(-50%, -50%) translateY(-200px);
    }
 
    .detail-compo {
