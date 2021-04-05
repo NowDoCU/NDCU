@@ -4,7 +4,7 @@
          <i @click="closeCompo" class="fas fa-angle-double-right"></i>
       </div>
       <div class="region-container">
-         <span class="name"> {{ regionName }} </span>
+         <span class="name"> {{ this.detailData.commercialName }} </span>
          <div class="info">
             <div class="score">
                추천지수 <span class="number"> {{ score }} </span> 점
@@ -35,7 +35,6 @@
 import DetailGraph from './DetailGraph';
 import PieChart from './PieChart';
 import LineGraph from './LineGraph';
-import { findAllData } from '@/api/mapDetail.js';
 
 var mapdata = {
    name: '마포구 서교동',
@@ -50,6 +49,9 @@ var mapdata = {
 
 export default {
    name: 'MapDetail',
+   props: {
+      detailData: Object,
+   },
    components: {
       DetailGraph,
       PieChart,
@@ -95,17 +97,6 @@ export default {
          this.ysales.value = mapdata.ysales;
          this.week.value = mapdata.week;
       },
-      getDataAxios: function() {
-         findAllData(
-            '1001182',
-            (res) => {
-               console.log(res);
-            },
-            (error) => {
-               console.log(error);
-            }
-         );
-      },
       setLike: function() {
          this.like = !this.like;
       },
@@ -115,7 +106,6 @@ export default {
    },
    created: function() {
       this.getData();
-      this.getDataAxios();
    },
 };
 </script>

@@ -13,7 +13,7 @@
       </transition>
       <transition name="collapse-right">
          <div v-show="detailCompo" class="detail-compo floating">
-            <map-detail @close-expended="onClickCloseDetail"></map-detail>
+            <map-detail :detailData="detailData" @close-expended="onClickCloseDetail"></map-detail>
          </div>
       </transition>
       <transition name="collapse">
@@ -40,7 +40,7 @@ import SideMenu from '@/components/SideMenu.vue';
 import Toast from '@/components/Toast.vue';
 
 import axios from 'axios';
-import { findDongData } from '@/api/mapDetail.js';
+import { findDongData, findAllData } from '@/api/mapDetail.js';
 import { coordsB2H } from '@/api/kakaoAPI.js';
 
 // 동코드 JSON 파일 import
@@ -57,9 +57,12 @@ export default {
       libraries: [],
       mapObject: null,
 
-      detailCompo: false,
       optionCompo: false,
       bookMarkCompo: false,
+
+      // 상권의 상제 정보를 전달하기 위한 변수들
+      detailData: '',
+      detailCompo: false,
 
       // 토스트 메뉴를 표시하기 위한
       toastShow: false,
@@ -156,15 +159,6 @@ export default {
          this.toastShow = false;
          this.isExplore = false;
          this.toastDist = '';
-
-         axios
-            .get(`http://j4a106.p.ssafy.io:8000/recommend/commercial/`)
-            .then((response) => {
-               console.log(response);
-            })
-            .catch((err) => {
-               console.log('ERROR : ' + err);
-            });
 
          /*
          options
@@ -815,9 +809,9 @@ export default {
 
       // 추천-1) 추천받은 상권들의 마커 정보 입력
       setRecommendMarker() {
-         var imageSrc = require('/src/assets/image/map/marker/tap.png'), // 마커이미지의 주소입니다
-            imageSize = new kakao.maps.Size(40, 40), // 마커이미지의 크기입니다
-            imageOption = { offset: new kakao.maps.Point(19, 40) }; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+         var imageSrc = require('/src/assets/image/map/marker/tap-marker.png'), // 마커이미지의 주소입니다
+            imageSize = new kakao.maps.Size(158, 253), // 마커이미지의 크기입니다
+            imageOption = { offset: new kakao.maps.Point(85, 250) }; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
 
          // 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다
          var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
@@ -887,21 +881,43 @@ export default {
       // 추천-2-1) 추천 상권 클릭 이벤트 발생 시, 순서에 따라 이벤트 처리 및 결과 재표시
       setEventRecommendClick(item) {
          // 서버로 해당 상권 코드 보내서, 상권 상세 정보를 받아옴 (일단 공동으로 하기 위해 상권번호만 넘기는 식)
-
+         console.log('setEventRecommendClick');
          this.mapObject.setLevel(4, { animate: true });
          this.mapObject.setCenter(item.position);
 
          // 검색 결과 조회
+         // this.detailData = 'TTTEX';
+         this.detailData = this.getDistrictDetail(item.district.commercialCode);
          this.detailCompo = true;
+         console.log('#out getDistrictDetail', this.detailData);
+         console.log(typeof this.detailData);
+
+         // 토스트 메뉴
          this.toastShow = true;
          this.toastDist = item.district.commercialName;
-         // 토스트 메뉴
       },
 
       //서버로 선택한 상권의 상세 정보를 요청함
-      getDistrictDetail(code) {
-         // 선택한 상권에 대한 상세 정보를 요청함
-         return '';
+      getDistrictDetail(commercialCode) {
+         var result;
+
+         findAllData(
+            commercialCode,
+            (success) => {
+               console.log('#in getDistrictDetail', success.data);
+               console.log(typeof success.data);
+               result = success.data;
+               // resolve(success.data);
+            },
+            (fail) => {
+               console.log('ERR_findAllData : ', fail);
+            }
+         );
+
+         return result;
+         // return new Promise((resolve, reject) => {
+
+         // });
       },
 
       // 추천-3) 오픈 API를 통해 폴리곤 정보를 불러옴
