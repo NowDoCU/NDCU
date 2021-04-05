@@ -575,12 +575,12 @@ export default {
 
          var polygon = new kakao.maps.Polygon({
             path: polygonPath, // 그려질 다각형의 좌표 배열입니다
-            strokeWeight: 3, // 선의 두께입니다
+            strokeWeight: 1, // 선의 두께입니다
             strokeColor: '#000', // 선의 색깔입니다
-            strokeOpacity: 0.7, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
-            strokeStyle: 'longdash', // 선의 스타일입니다
+            strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+            strokeStyle: 'shortdashdot', // 선의 스타일입니다
             fillColor: '#ffcc00', // 채우기 색깔입니다
-            fillOpacity: 0.3, // 채우기 불투명도 입니다
+            fillOpacity: 0.2, // 채우기 불투명도 입니다
          });
 
          // 지도에 구 정보 다각형을 표시합니다
@@ -937,13 +937,13 @@ export default {
          // 지도에 표시할 원을 생성합니다
          var circle = new kakao.maps.Circle({
             center: new kakao.maps.LatLng(position.Ma, position.La), // 원의 중심좌표 입니다
-            radius: 100, // 미터 단위의 원의 반지름입니다
-            strokeWeight: 3, // 선의 두께입니다
+            radius: 70, // 미터 단위의 원의 반지름입니다
+            strokeWeight: 1, // 선의 두께입니다
             strokeColor: '#212121', // 선의 색깔입니다
-            strokeOpacity: 0.8, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+            strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
             strokeStyle: 'longdash', // 선의 스타일 입니다
-            fillColor: '#CFE7FF', // 채우기 색깔입니다
-            fillOpacity: 0.6, // 채우기 불투명도 입니다
+            fillColor: '#ff6633', // 채우기 색깔입니다
+            fillOpacity: 0.3, // 채우기 불투명도 입니다
          });
 
          // 지도에 원을 표시합니다
@@ -956,12 +956,12 @@ export default {
          // 지도에 표시할 다각형을 생성합니다
          var polygon = new kakao.maps.Polygon({
             path: polygonPath, // 그려질 다각형의 좌표 배열입니다
-            strokeWeight: 3, // 선의 두께입니다
+            strokeWeight: 1, // 선의 두께입니다
             strokeColor: '#212121', // 선의 색깔입니다
-            strokeOpacity: 0.8, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+            strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
             strokeStyle: 'longdash', // 선의 스타일입니다
             fillColor: '#A2FF99', // 채우기 색깔입니다
-            fillOpacity: 0.6, // 채우기 불투명도 입니다
+            fillOpacity: 0.4, // 채우기 불투명도 입니다
          });
 
          // 지도에 다각형을 표시합니다
@@ -1011,23 +1011,6 @@ export default {
          var coords = new kakao.maps.Coords(district.x * 2.5, district.y * 2.5);
          // console.log('WGS84 변환', coords.toLatLng());
          return coords.toLatLng();
-      },
-
-      // 폴리곤을 통해 중심 좌표 구하기(centroid 알고리즘)
-      centroid(polygonPath) {
-         var i, j, len, p1, p2, f, area, x, y;
-
-         area = x = y = 0;
-         for (i = 0, len = point.length, j = len - 1; i < len; j = i++) {
-            p1 = point[i];
-            p2 = point[j];
-            f = p1[1] * p2[0] - p2[1] * p1[0];
-            x += (p1[0] + p2[0]) * f;
-            y += (p1[1] + p2[1]) * f;
-            area += f * 3;
-         }
-
-         return new kakao.maps.LatLng(x / area, y / area);
       },
    },
 };
