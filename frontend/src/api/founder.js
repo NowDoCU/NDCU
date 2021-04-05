@@ -7,9 +7,9 @@ function registerFounder(founder, success, fail) {
     .catch(fail)
 }
 
-function loginFounder(user, success, fail) {
+function loginFounder(loginInfo, success, fail) {
     instance
-        .post(`login`, user)
+        .post(`login`, loginInfo)
         .then(success)
         .catch(fail);
 }

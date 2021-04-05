@@ -8,8 +8,8 @@
          <div class="info">
             <div class="score">
                추천지수 <span class="number"> {{ score }} </span> 점
-               <i v-if="like" class="fas fa-star" @click="setLike"></i>
-               <i v-else class="far fa-star" @click="setLike"></i>
+               <i v-if="isBookmark" class="fas fa-star" @click="bookmark"></i>
+               <i v-else class="far fa-star" @click="bookmark"></i>
             </div>
             <p class="description">* 본 추천지수는 'KNN 알고리즘'을 적용하여 도출된 점수입니다.</p>
             <div class="info-boxes">
@@ -36,6 +36,8 @@ import DetailGraph from './DetailGraph';
 import PieChart from './PieChart';
 import LineGraph from './LineGraph';
 import { findAllData } from '@/api/mapDetail.js';
+import { createBookmark, removeBookmark } from '@/api/bookmark';
+import { mapState } from 'vuex';
 
 var mapdata = {
    name: '마포구 서교동',
@@ -81,8 +83,12 @@ export default {
             category: ['주중', '주말'],
             value: '',
          },
-         like: false,
+         isBookmark: false,
+         commercialCode: '1001182',
       };
+   },
+   computed: {
+      ...mapState(['isLogin']),      
    },
    methods: {
       getData: function() {
@@ -97,7 +103,7 @@ export default {
       },
       getDataAxios: function() {
          findAllData(
-            '1001182',
+            this.commercialCode,
             (res) => {
                console.log(res);
             },
@@ -106,8 +112,35 @@ export default {
             }
          );
       },
-      setLike: function() {
-         this.like = !this.like;
+      bookmark: function() {
+
+         // 로그인되어 있는지 확인
+         if(!this.Login) {
+            alert('로그인이 필요합니다.')
+            return;
+         }
+
+         // 북마크가 안되어 있는 경우 북마크 생성
+         if(!this.isBookmark) {
+            createBookmark(
+               this.commercialCode,
+               () => {},
+               (err) => {
+                  console.log(err);
+               }
+            ) 
+         } else { // 북마크가 되어 있는 경우 북마크 삭제
+            removeBookmark(
+               this.commercialCode,
+               () => {},
+               (err) => {
+                  console.log(err);
+               }
+            )
+         }
+
+
+         this.isBookmark = !this.isBookmark;
       },
       closeCompo: function() {
          this.$emit('close-expended');

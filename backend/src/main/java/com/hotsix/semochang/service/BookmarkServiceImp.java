@@ -3,6 +3,7 @@ package com.hotsix.semochang.service;
 import com.hotsix.semochang.model.Bookmark;
 import com.hotsix.semochang.model.Commercial;
 import com.hotsix.semochang.model.Founder;
+import com.hotsix.semochang.model.network.response.FounderApiResponse;
 import com.hotsix.semochang.repository.BookmarkRepository;
 import com.hotsix.semochang.repository.CommercialRepository;
 import com.hotsix.semochang.repository.FounderRepository;
@@ -15,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -70,5 +72,24 @@ public class BookmarkServiceImp implements BookmarkService{
                     return new ResponseEntity<>(HttpStatus.OK);
                 })
                 .orElseGet(()-> new ResponseEntity<>("No Data", HttpStatus.NO_CONTENT));
+    }
+
+    @Override
+    public ResponseEntity<?> read(Authentication authentication) {
+
+        // authentication으로 id값 가져오기
+        Claims claims = (Claims) authentication.getPrincipal();
+        Long founderId = claims.get("id", Long.class);
+
+        List<Bookmark> bookmarkList = bookmarkRepository.findAllByFounderId(founderId);
+
+        for(Bookmark bookmark : bookmarkList) {
+            bookmark.getCommercial().setEstimatedSalesList(null);
+            bookmark.getCommercial().setEstimatedPopulationList(null);
+            bookmark.getCommercial().setStoreRentalPrice(null);
+        }
+
+        return new ResponseEntity<>(bookmarkList, HttpStatus.OK);
+
     }
 }

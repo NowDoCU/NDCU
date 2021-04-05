@@ -5,57 +5,61 @@
       </div>
       <div class="bookmark-name">📌 즐겨찾기</div>
       <div class="bookmarks">
-        <BookmarkListItem  @delete-bm="onDeleteBm" @goDetail="goDetail" v-for="(bookmark, idx) in bookmarklist" :key="idx" :bookmark="bookmark" :idx="idx"/>
+        <BookmarkListItem  @delete-bm="onDeleteBm(idx, bookmark)" @goDetail="goDetail" v-for="(bookmark, idx) in bookmarkList" :key="idx" :bookmark="bookmark" :idx="idx"/>
       </div>
   </div>
 </template>
 
 <script>
 import BookmarkListItem from './BookmarkListItem'
-var dummyBookmark = [
-    {
-        commercialCode: 1000681,
-        commercialName: '시흥대로 84길',
-        divisionName: '골목상권',
-        dongName: '독산2동'
-    },
-    {
-        commercialCode: 1000681,
-        commercialName: '시흥대로 84길',
-        divisionName: '골목상권',
-        dongName: '독산2동'
-    },
-    {
-        commercialCode: 1000681,
-        commercialName: '시흥대로 84길',
-        divisionName: '골목상권',
-        dongName: '독산2동'
-    },
-    {
-        commercialCode: 1000681,
-        commercialName: '시흥대로 84길',
-        divisionName: '골목상권',
-        dongName: '독산2동'
-    },
-    {
-        commercialCode: 1000681,
-        commercialName: '시흥대로 84길',
-        divisionName: '골목상권',
-        dongName: '독산2동'
-    },
-    {
-        commercialCode: 1000681,
-        commercialName: '시흥대로 84길',
-        divisionName: '골목상권',
-        dongName: '독산2동'
-    },
-    {
-        commercialCode: 1000681,
-        commercialName: '시흥대로 84길',
-        divisionName: '골목상권',
-        dongName: '독산2동'
-    },
-]
+import { mapState } from 'vuex';
+import { getBookmarkList, removeBookmark } from '@/api/bookmark';
+
+
+// var dummyBookmark = [
+//     {
+//         commercialCode: 1000681,
+//         commercialName: '시흥대로 84길',
+//         divisionName: '골목상권',
+//         dongName: '독산2동'
+//     },
+//     {
+//         commercialCode: 1000681,
+//         commercialName: '시흥대로 84길',
+//         divisionName: '골목상권',
+//         dongName: '독산2동'
+//     },
+//     {
+//         commercialCode: 1000681,
+//         commercialName: '시흥대로 84길',
+//         divisionName: '골목상권',
+//         dongName: '독산2동'
+//     },
+//     {
+//         commercialCode: 1000681,
+//         commercialName: '시흥대로 84길',
+//         divisionName: '골목상권',
+//         dongName: '독산2동'
+//     },
+//     {
+//         commercialCode: 1000681,
+//         commercialName: '시흥대로 84길',
+//         divisionName: '골목상권',
+//         dongName: '독산2동'
+//     },
+//     {
+//         commercialCode: 1000681,
+//         commercialName: '시흥대로 84길',
+//         divisionName: '골목상권',
+//         dongName: '독산2동'
+//     },
+//     {
+//         commercialCode: 1000681,
+//         commercialName: '시흥대로 84길',
+//         divisionName: '골목상권',
+//         dongName: '독산2동'
+//     },
+// ]
 
 export default {
     name: 'BookmarkList',
@@ -64,13 +68,25 @@ export default {
     },
     data: function() {
         return {
-            bookmarklist: [],
+            bookmarkList: [],
             goDetailValue: false,
         };
     },
+    computed: {
+      ...mapState(['userInfo']),
+    },
     methods: {
-        getBookmark: function() {
-            this.bookmarklist = dummyBookmark
+
+        /** 북마크 리스트 가져오기 */
+        getBookmark: function() {            
+            getBookmarkList(
+                (res) => {
+                    this.bookmarkList = res.data;
+                }, 
+                (err) => {
+                    console.log(err);
+                }
+            )
         },
         closeCompo: function () {
             this.$emit('close-expended')
@@ -79,8 +95,16 @@ export default {
             this.goDetailValue = value;
             this.$emit('goDetail', this.goDetailValue)
         },
-        onDeleteBm: function (idx) {
-            this.bookmarklist.splice(idx, 1)
+        onDeleteBm: function (idx, bookmark) {
+            removeBookmark(
+                bookmark.id,
+                () => {
+                    this.bookmarkList.splice(idx, 1);
+                },
+                (err) => {
+                    console.log(err);
+                }
+            )            
         }
     },
     created: function() {

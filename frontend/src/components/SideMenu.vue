@@ -183,7 +183,13 @@ export default {
       },
       // 즐겨찾기 탭 열기
       onClickBookmarkBt: function() {
-         this.$emit('open-bookmark');
+
+         // 로그인 여부 확인
+         if(this.isLogin) {
+            this.$emit('open-bookmark');
+         } else {
+            this.controlModal(1, 'open');
+         }         
       },
       // 회원가입,로그인 모달 컨트롤
       controlModal: function(num, con) {

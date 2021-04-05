@@ -1,19 +1,20 @@
 <template>
   <div class="bookmark-wrapper">
       <div @click="goDetail" class="left-wrapper">
-          <span>{{ bookmark.divisionName }}</span>
+          <span>{{ bookmark.commercial.divisionName }}</span>
       </div>
       <div @click="goDetail" class="middle-wrapper">
-          <span class="dong-name">{{ bookmark.dongName }}</span>
-          <span class="commercial-name">{{ bookmark.commercialName }}</span>
+          <span class="dong-name">{{ bookmark.commercial.dongName }}</span>
+          <span class="commercial-name">{{ bookmark.commercial.commercialName }}</span>
       </div>
       <div class="right-wrapper">
-          <i @click="deleteLike" class="fas fa-trash-alt"></i>
+          <i @click="deleteBookmark" class="fas fa-trash-alt"></i>
       </div>
   </div>
 </template>
 
 <script>
+
 export default {
     name: 'BookmarkListItem',
     data: function() {
@@ -26,7 +27,7 @@ export default {
         idx: Number,
     },
     methods: {
-        deleteLike: function() {
+        deleteBookmark: function() {
             this.$emit('delete-bm', this.bookmark)
         },
         goDetail: function() {
