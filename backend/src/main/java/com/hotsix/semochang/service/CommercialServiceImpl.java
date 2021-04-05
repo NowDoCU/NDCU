@@ -3,13 +3,18 @@ package com.hotsix.semochang.service;
 import com.hotsix.semochang.model.Commercial;
 import com.hotsix.semochang.model.EstimatedPopulation;
 import com.hotsix.semochang.model.EstimatedSales;
+import com.hotsix.semochang.model.network.response.CommercialApiResponse;
+import com.hotsix.semochang.model.network.response.CommercialListApiResponse;
 import com.hotsix.semochang.repository.CommercialRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -25,42 +30,40 @@ public class CommercialServiceImpl implements CommercialService{
 
     @Override
     @Transactional
-    public List<Commercial> findByDongCode(String dongCode) {
+    public ResponseEntity<CommercialListApiResponse> findByDongCode(String dongCode) {
         List<Commercial> commercialList = commercialRepository.findByDongCode(dongCode);
 
-        // 상권리스트에 세부정보는 전달할 필요가 없기 때문에 제외시켜준다.
         for(Commercial commercial : commercialList) {
             commercial.setEstimatedPopulationList(null);
             commercial.setEstimatedSalesList(null);
             commercial.setStoreRentalPrice(null);
         }
 
-        return commercialList;
+        CommercialListApiResponse response = CommercialListApiResponse.builder().commercialList(commercialList).build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Override
     @Transactional
-    public Commercial findByCommercialCode(String commercialCode) {
-        Commercial commercial = commercialRepository.findByCommercialCode(commercialCode).orElse(null);
+    public ResponseEntity<CommercialApiResponse> findByCommercialCode(String commercialCode) {
+        Optional<Commercial> optional = commercialRepository.findByCommercialCode(commercialCode);
 
-        // 상권리스트에 세부정보는 전달할 필요가 없기 때문에 제외시켜준다.
-        commercial.setEstimatedPopulationList(
-                commercial.getEstimatedPopulationList()
-                        .stream()
-                        .sorted(Comparator.comparing(EstimatedPopulation::getQuarter))
-                        .sorted(Comparator.comparing(EstimatedPopulation::getYear))
-                        .collect(Collectors.toList())
-        );
+        return optional
+                .map(commercial -> {
+                    CommercialApiResponse response = CommercialApiResponse.builder()
+                            .commercialCode(commercial.getCommercialCode())
+                            .commercialName(commercial.getCommercialCode())
+                            .divisionCode(commercial.getDivisionCode())
+                            .divisionName(commercial.getDivisionName())
+                            .x(commercial.getX())
+                            .y(commercial.getY())
+                            .estimatedPopulationList(commercial.getEstimatedPopulationList())
+                            .estimatedSalesList(commercial.getEstimatedSalesList())
+                            .storeRentalPrice(commercial.getStoreRentalPrice())
+                            .build();
 
-        commercial.setEstimatedSalesList(
-                commercial.getEstimatedSalesList()
-                        .stream()
-                        .sorted(Comparator.comparing(EstimatedSales::getQuarter))
-                        .sorted(Comparator.comparing(EstimatedSales::getYear))
-                        .sorted(Comparator.comparing(EstimatedSales::getIndustryCode))
-                        .collect(Collectors.toList())
-        );
-
-        return commercial;
+                    return new ResponseEntity<>(response, HttpStatus.OK);
+                })
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NO_CONTENT));
     }
 }
