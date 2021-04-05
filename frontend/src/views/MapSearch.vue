@@ -40,6 +40,8 @@ import SideMenu from '@/components/SideMenu.vue';
 import Toast from '@/components/Toast.vue';
 
 import axios from 'axios';
+import { findDongData } from '@/api/mapDetail.js';
+import { coordsB2H } from '@/api/kakaoAPI.js';
 
 // 동코드 JSON 파일 import
 import guCoords from '@/assets/data/gu_coords.json';
@@ -48,7 +50,7 @@ import dongCoords from '@/assets/data/dong_coords.json';
 export default {
    components: { VueDaumMap, MapDetail, OptionInput, SideMenu, BookmarkList, Toast },
    data: () => ({
-      appKey: 'b20bb90eb97f8724820808bd2047982e', //restAPI key
+      appKey: 'b20bb90eb97f8724820808bd2047982e', //JavaScript key
       center: { lat: '', lng: '' },
       level: 6,
       mapTypeId: VueDaumMap.MapTypeId.NORMAL,
@@ -525,14 +527,41 @@ export default {
                      polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
                   }
 
+                  console.log('===========================');
+
                   this.removeDongLayer('polygon');
                   this.makeDongPolygon(polygonPath);
 
+                  console.log(1);
+
                   this.mapObject.setCenter(center);
-                  this.mapObject.setLevel(4, { animate: true });
+                  this.mapObject.setLevel(3, { animate: true });
+
+                  console.log(2);
 
                   this.removeDongLayer('innerDong');
-                  this.makeDongInnerMarker(emd_cd);
+
+                  console.log(3);
+
+                  // 메소드 체이싱
+                  new Promise((resolve) => {
+                     resolve(this.convertCoordsBtoH(center));
+                  })
+                     .then((result) => {
+                        console.log(4);
+                        console.log('Promise result(H_CODE) => ', result);
+                        return this.apiDongDistrict(result);
+                     })
+                     .then((result) => {
+                        console.log(5, result);
+                        this.dongInnerDistricts = result;
+                     })
+                     .then(() => {
+                        console.log(6);
+                        this.setDongInnerMarker();
+                     });
+
+                  // var H_code = this.convertCoordsBtoH(center);
                }
             })
             .catch((err) => {
@@ -559,66 +588,52 @@ export default {
          this.dong_Boundarys.push(polygon);
       },
 
-      // 동-5) 선택한 마커를 기준으로, 해당 동에 포함된 상권을 출력해줌
-      makeDongInnerMarker(emd_cd) {
-         console.log('# 동을 선택한 뒤, 해당 동에 속한 상권들을 마커로 찍음', emd_cd);
+      convertCoordsBtoH(center) {
+         console.log('#### 코드 변환 실행');
 
-         this.dongInnerDistricts = this.apiDongDistrict(emd_cd);
-         this.setDongInnerMarker();
+         var B_code;
+         var H_code;
+
+         return new Promise((resolve, reject) => {
+            coordsB2H(
+               center,
+               (success) => {
+                  console.log('# 법정동 코드 -> 행정동 코드로 변환');
+                  B_code = success.data.documents[0].code.substring(0, 8);
+                  H_code = success.data.documents[1].code.substring(0, 8);
+                  resolve(H_code);
+               },
+               (fail) => {
+                  console.log('ERR_DONG : ', fail);
+               }
+            );
+         });
       },
 
+      // 동-5) 선택한 마커를 기준으로, 해당 동에 포함된 상권을 출력해줌
+      // makeDongInnerMarker(H_code) {
+      //    console.log('# 동을 선택한 뒤, 해당 동에 속한 상권들을 마커로 찍음');
+
+      //    this.dongInnerDistricts = this.apiDongDistrict(H_code);
+      //    // this.setDongInnerMarker();
+      // },
+
       // 동-5-1) 동코드를 기준으로 해당 동에 있는 상권들의 결과를 가져옴
-      apiDongDistrict(emd_cd) {
-         // AXIOS 요청 처리
-         console.log('# 동 코드로 요청을 보내서 데이터를 받음');
-         // emd_cd를 서버로 보내서 아래의 데이터를 받아옴
+      apiDongDistrict(H_code) {
+         console.log('# 행정동 코드로 서버에 데이터 받아오기!', H_code);
 
-         var result = [
-            {
-               commercialCode: '1000466',
-               divisionCode: 'A',
-               divisionName: '전통시장',
-               commercialName: '공라라라랄랄',
-               x: 195644,
-               y: 449638,
-               score: 90,
-               sigunguCode: '11440',
-               dongCode: '11440660',
-               estimatedPopulationList: null,
-               estimatedSalesList: null,
-               storeRentalPrice: null,
-            },
-            {
-               commercialCode: '1000466',
-               divisionCode: 'A',
-               divisionName: '전통시장',
-               commercialName: '공더더러더럭',
-               x: 195926,
-               y: 449654,
-               score: 90,
-               sigunguCode: '11440',
-               dongCode: '11440660',
-               estimatedPopulationList: null,
-               estimatedSalesList: null,
-               storeRentalPrice: null,
-            },
-            {
-               commercialCode: '1000466',
-               divisionCode: 'A',
-               divisionName: '전통시장',
-               commercialName: '공덕시장',
-               x: 195838,
-               y: 449448,
-               score: 90,
-               sigunguCode: '11440',
-               dongCode: '11440660',
-               estimatedPopulationList: null,
-               estimatedSalesList: null,
-               storeRentalPrice: null,
-            },
-         ];
-
-         return result;
+         return new Promise((resolve, reject) => {
+            findDongData(
+               H_code,
+               (success) => {
+                  console.log('findDongData', success.data);
+                  resolve(success.data);
+               },
+               (fail) => {
+                  console.log('ERR_findDongData : ', fail);
+               }
+            );
+         });
       },
 
       // 동-5-2) 상권들의 결과에 마커와 상권명을 찍기
