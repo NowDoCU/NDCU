@@ -61,7 +61,7 @@ export default {
       bookMarkCompo: false,
 
       // 상권의 상제 정보를 전달하기 위한 변수들
-      detailData: '',
+      detailData: new Object(),
       detailCompo: false,
 
       // 토스트 메뉴를 표시하기 위한
@@ -148,6 +148,7 @@ export default {
       },
       onClickCloseDetail: function() {
          this.detailCompo = false;
+         this.detailData = new Object();
       },
 
       //추천조건 입력 완료되어 버튼 클릭시 (상권추천)
@@ -198,7 +199,9 @@ export default {
          this.toastShow = false;
          this.optionCompo = false;
          this.bookMarkCompo = false;
+
          this.detailCompo = false;
+         this.detailData = new Object();
 
          this.initCenter();
 
@@ -212,7 +215,9 @@ export default {
       closeExplore() {
          this.optionCompo = false;
          this.bookMarkCompo = false;
+
          this.detailCompo = false;
+         this.detailData = new Object();
 
          this.toastShow = false;
          this.isExplore = false;
@@ -560,7 +565,7 @@ export default {
                         this.dongInnerDistricts = result;
                      })
                      .then(() => {
-                        console.log(6);
+                        console.log(6, this.dongInnerDistricts);
                         this.setDongInnerMarker();
                      });
 
@@ -648,7 +653,7 @@ export default {
          // 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다
          var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
 
-         this.dongInnerDistricts.forEach((district) => {
+         this.dongInnerDistricts.commercialList.forEach((district) => {
             var position = new this.coordsChange(district);
 
             // 커스텀 오버레이에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
@@ -703,16 +708,20 @@ export default {
       setInnerMarkerClick(item) {
          // 서버로 해당 상권 코드 보내서, 상권 상세 정보를 받아옴 (일단 공동으로 하기 위해 상권번호만 넘기는 식)
 
-         console.log(item);
-
          this.mapObject.setLevel(4, { animate: true });
          this.mapObject.setCenter(item.position);
 
          // 검색 결과 조회
-         this.detailCompo = true;
-         this.toastShow = true;
+         new Promise((resolve) => {
+            resolve(this.getDistrictDetail(item.district.commercialCode));
+         }).then((result) => {
+            this.detailData = result;
+            this.detailCompo = true;
+            console.log('#out getDistrictDetail', this.detailData);
+         });
 
          // 토스트 메뉴
+         this.toastShow = true;
          this.toastDist = item.district.commercialName;
          this.isExplore = true;
       },
@@ -886,11 +895,13 @@ export default {
          this.mapObject.setCenter(item.position);
 
          // 검색 결과 조회
-         // this.detailData = 'TTTEX';
-         this.detailData = this.getDistrictDetail(item.district.commercialCode);
-         this.detailCompo = true;
-         console.log('#out getDistrictDetail', this.detailData);
-         console.log(typeof this.detailData);
+         new Promise((resolve) => {
+            resolve(this.getDistrictDetail(item.district.commercialCode));
+         }).then((result) => {
+            this.detailData = result;
+            this.detailCompo = true;
+            console.log('#out getDistrictDetail', this.detailData);
+         });
 
          // 토스트 메뉴
          this.toastShow = true;
@@ -899,25 +910,18 @@ export default {
 
       //서버로 선택한 상권의 상세 정보를 요청함
       getDistrictDetail(commercialCode) {
-         var result;
-
-         findAllData(
-            commercialCode,
-            (success) => {
-               console.log('#in getDistrictDetail', success.data);
-               console.log(typeof success.data);
-               result = success.data;
-               // resolve(success.data);
-            },
-            (fail) => {
-               console.log('ERR_findAllData : ', fail);
-            }
-         );
-
-         return result;
-         // return new Promise((resolve, reject) => {
-
-         // });
+         return new Promise((resolve, reject) => {
+            findAllData(
+               commercialCode,
+               (success) => {
+                  console.log('#in getDistrictDetail', success.data);
+                  resolve(success.data);
+               },
+               (fail) => {
+                  console.log('ERR_findAllData : ', fail);
+               }
+            );
+         });
       },
 
       // 추천-3) 오픈 API를 통해 폴리곤 정보를 불러옴
