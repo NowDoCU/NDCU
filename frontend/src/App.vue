@@ -38,7 +38,7 @@ export default {
       border-radius: 30px;
    }
    ::-webkit-scrollbar-track {
-      background-color: rgb(225, 225, 225);
+      background-color:transparent;
       border-radius: 20px;
    }
 }

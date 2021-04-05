@@ -50,7 +50,79 @@
          </div>
          <div class="bottom-wrapper">
             <span>📋 추가정보</span>
-            <div class="option-wrapper"></div>
+            <div class="option-wrapper">
+               <div class="deposit-wrapper">
+                  <div class="b-header">
+                     <span class="title">보증금</span>
+                     <span class="won">단위 : 원</span>
+                  </div>
+                  <vue-slide-bar v-model="dSlider.value"
+                     :data="dSlider.data"
+                     :range="dSlider.range"
+                     :processStyle="dSlider.processStyle"
+                     @callbackRange="callbackRange"
+                  >
+                     <template slot="tooltip">
+                        <img class="handler" src="@/assets/image/dollar.png">
+                     </template>
+                  </vue-slide-bar>
+               </div>
+               <div class="rent-wrapper">
+                  <div class="b-header">
+                     <span class="title">월임대료(제곱미터 기준)</span>
+                     <span class="won">단위 : 원</span>
+                  </div>
+                  <vue-slide-bar v-model="rSlider.value"
+                     :data="rSlider.data"
+                     :range="rSlider.range"
+                     :processStyle="rSlider.processStyle"
+                     @callbackRange="callbackRange">
+                     <template slot="tooltip">
+                        <img class="handler" src="@/assets/image/dollar.png">
+                     </template>
+                  </vue-slide-bar>
+               </div>
+               <div class="client-wrapper">
+                  <div class="c-header">대상고객</div>
+                  <div class="bts">
+                     <div class="l-bt" @click="selectClient('직장인')">
+                        직장인
+                     </div>
+                     <div class="r-bt" @click="selectClient('주거인')">
+                        주거인
+                     </div>
+                  </div>
+               </div>
+               <div class="age-wrapper">
+                  <div class="a-header">대상 연령층</div>
+                  <div class="a-checks">
+                     <div class="checks etrans small">
+                        <input type="checkbox" name="age" value="10" v-model="selectedAges" id="10age">
+                        <label for="10age">10대</label>
+                     </div>
+                     <div class="checks etrans small">
+                        <input type="checkbox" name="age" value="20" v-model="selectedAges" id="20age">
+                        <label for="20age">20대</label>
+                     </div>
+                     <div class="checks etrans small">
+                        <input type="checkbox" name="age" value="30" v-model="selectedAges" id="30age">
+                        <label for="30age">30대</label>
+                     </div>
+                     <div class="checks etrans small">
+                        <input type="checkbox" name="age" value="40" v-model="selectedAges" id="40age">
+                        <label for="40age">40대</label>
+                     </div>
+                     <div class="checks etrans small">
+                        <input type="checkbox" name="age" value="50" v-model="selectedAges" id="50age">
+                        <label for="50age">50대</label>
+                     </div>
+                     <div class="checks etrans small">
+                        <input type="checkbox" name="age" value="60" v-model="selectedAges" id="60age">
+                        <label for="60age">60대</label>
+                     </div>
+                  </div>
+               </div>
+            </div>
          </div>
 
       </div>
@@ -60,19 +132,109 @@
    </div>
 </template>
 <script>
+import VueSlideBar from 'vue-slide-bar'
 import Category from '@/components/Categories/Category.vue';
 
 export default {
    name: 'OptionInput',
    components: {
       Category,
+      VueSlideBar
    },
    data: function() {
       return {
          selectedCate: '',
+         selectedClient: '',
          showUl: false,
          query: '', // 지역 검색어
          selectedDs: [], // 선택된 지역
+         selectedAges: [],
+         dSlider: { // 보증금 정보
+            value: 3441,
+            data: [
+               207,
+               750,
+               1300,
+               1800,
+               2400,
+               2900,
+               3441,
+            ],
+            range: [
+               {
+                  label: '207',
+                  isHide: true
+               },
+               {
+                  label: '750'
+               },
+               {
+                  label: '1300',
+                  isHide: true
+               },
+               {
+                  label: '1800'
+               },
+               {
+                  label: '2400',
+                  isHide: true
+               },
+               {
+                  label: '2900'
+               },
+               {
+                  label: '3441',
+                  isHide: true
+               },
+            ],
+            rangeValue: {},
+            processStyle: {
+               backgroundColor: '#ff6633'
+            }
+         },
+          rSlider: { // 임대료 정보
+            value: 52600,
+            data: [
+               14723,
+               20000,
+               25000,
+               30000,
+               35000,
+               40000,
+               52600,
+            ],
+            range: [
+               {
+                  label: '14723',
+                  isHide: true
+               },
+               {
+                  label: '20000'
+               },
+               {
+                  label: '25000',
+                  isHide: true
+               },
+               {
+                  label: '30000'
+               },
+               {
+                  label: '35000',
+                  isHide: true
+               },
+               {
+                  label: '40000'
+               },
+               {
+                  label: '52600',
+                  isHide: true
+               },
+            ],
+            rangeValue: {},
+            processStyle: {
+               backgroundColor: '#ff6633'
+            }
+         },
          districts: [
             '종로구',
             '중구',
@@ -266,13 +428,29 @@ export default {
             alert('필수 조건을 입력해주세요. (업종, 지역)')
          }
       },
+      // slide bar 함수
+      callbackRange: function (val) {
+         this.dSlider.rangeValue = val
+      },
+      // 대상고객 선택
+      selectClient: function (cl) {
+         if (cl==='직장인') {
+            this.selectedClient = cl
+            document.querySelector('.r-bt').classList.remove('sel-cl')
+            document.querySelector('.l-bt').classList.add('sel-cl')
+         } else {
+            this.selectedClient = cl
+            document.querySelector('.l-bt').classList.remove('sel-cl')
+            document.querySelector('.r-bt').classList.add('sel-cl')
+         }
+      }
    },
 };
 </script>
 <style scoped lang="scss">
 .oi-container {
    height: 100%;
-   padding: 0 20px;
+   padding: 0 15px;
    display: flex;
    flex-direction: column;
    justify-content: space-between;
@@ -290,8 +468,13 @@ export default {
          color: #808080;
       }
    }
+   
    .content-wrapper {
-      margin-top: 50px;
+      overflow-y: scroll;
+      overflow-x: hidden;
+      margin-top: 60px;
+      margin-bottom: 30px;
+      padding: 0 15px;
       height: 80%;
       display: flex;
       flex-direction: column;
@@ -309,6 +492,7 @@ export default {
          }
       }
       .middle-wrapper {
+         margin-top: 15px;
          height: 120px;
          width: 100%;
          .md-subtitle {
@@ -334,7 +518,7 @@ export default {
                display: flex;
                justify-content: space-around;
                align-items: center;
-               background-color: rgb(57, 104, 235);
+               background-color: #ff6633;
                margin: 0 5px;
                height: 10px;
                padding: 10px 12px;
@@ -404,7 +588,7 @@ export default {
                   padding: 10px 5px;
                   text-align: center;
                   border-radius: 20px;
-                  color: white;
+                  // color: white;
                   width: 58px;
                   height: 10px;
                }
@@ -412,17 +596,20 @@ export default {
                   outline: none;
                }
                .unsel {
-                  background-color: rgb(57, 104, 235);
+                  background-color: #e7e7e7;
                }
                .unsel:hover {
                   cursor: pointer;
-                  background-color: rgb(45, 83, 186);
+                  background-color: #ff6633;
+                  color:white
                }
                .sel {
-                  background-color: rgb(45, 83, 186);
+                  background-color: #ff6633;
+                  color:white
                }
                .sele {
-                  background-color: gray;
+                  background-color: #ff6633;
+                  color:white
                }
             }
             .ds-list:focus {
@@ -437,7 +624,6 @@ export default {
          }
       }
       .bottom-wrapper {
-         z-index: -10;
          height: 250px;
          width: 100%;
          display: flex;
@@ -449,15 +635,206 @@ export default {
             margin: 0 10px;
          }
          .option-wrapper {
-            border-radius: 20px;
             margin-top: 20px;
-            background-color: rgba(222, 184, 135, 0.415);
             width: 100%;
-            height: 90%;
+            height: 100%;
+            .deposit-wrapper {
+               padding: 0 15px;
+               .b-header {
+                  display: flex;
+                  justify-content: space-between;
+                  font-weight: 600;
+                  .title {
+                     font-size: 12pt
+                  }
+                  .won {
+                     font-size: 8pt
+                  }
+               }
+            }
+            .rent-wrapper {
+               padding: 0 15px;
+               .b-header {
+                  display: flex;
+                  justify-content: space-between;
+                  font-weight: 600;
+                  .title {
+                     font-size: 12pt
+                  }
+                  .won {
+                     font-size: 8pt
+                  }
+               }
+            }
+            .client-wrapper {
+               padding: 0 20px;
+               .c-header {
+                  font-weight: 600;
+                  font-size: 12pt;
+               }
+               .bts {
+                  margin-top: 20px;
+                  display: flex;
+                  justify-content: space-around;
+                  align-items: center;
+                  .l-bt {
+                     cursor: pointer;
+                     border-radius: 20px;
+                     width: 150px;
+                     background-color: #e7e7e7;
+                     // color: white;
+                     height: 70px;
+                     display: flex;
+                     justify-content: center;
+                     align-items: center;
+                     box-shadow: 4px 4px 4px #56565629;
+                  }
+                  .r-bt {
+                     cursor: pointer;
+                     border-radius: 20px;
+                     width: 150px;
+                     background-color: #e7e7e7;
+                     // color: white;
+                     height: 70px;
+                     display: flex;
+                     justify-content: center;
+                     align-items: center;
+                     box-shadow: 4px 4px 4px #56565629
+                  }
+                  .sel-cl {
+                     background-color: #ffcc00;
+                  }
+
+               }
+            }
+            .age-wrapper {
+               padding: 20px 20px;
+               .a-header {
+                  font-weight: 600;
+                  font-size: 12pt;
+               }
+               .a-checks {
+                  margin-top: 20px;
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  // checkbox styling
+                  .checks {position: relative;}
+
+                  .checks input[type="checkbox"] {  /* 실제 체크박스는 화면에서 숨김 */
+                     position: absolute;
+                     width: 1px;
+                     height: 1px;
+                     padding: 0;
+                     margin: -1px;
+                     overflow: hidden;
+                     clip:rect(0,0,0,0);
+                     border: 0
+                  }
+                  .checks input[type="checkbox"] + label {
+                     display: inline-block;
+                     position: relative;
+                     cursor: pointer;
+                     -webkit-user-select: none;
+                     -moz-user-select: none;
+                     -ms-user-select: none;
+                  }
+                  .checks input[type="checkbox"] + label:before {  /* 가짜 체크박스 */
+                     content: ' ';
+                     display: inline-block;
+                     width: 21px;  /* 체크박스의 너비를 지정 */
+                     height: 21px;  /* 체크박스의 높이를 지정 */
+                     line-height: 21px; /* 세로정렬을 위해 높이값과 일치 */
+                     margin: -2px 8 0 0;
+                     text-align: center; 
+                     vertical-align: middle;
+                     background: #fafafa;
+                     border: 1px solid #cacece;
+                     border-radius : 3px;
+                     box-shadow: 0px 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05);
+                  }
+                  .checks input[type="checkbox"] + label:active:before,
+                  .checks input[type="checkbox"]:checked + label:active:before {
+                     box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px 1px 3px rgba(0,0,0,0.1);
+                  }
+
+                  .checks input[type="checkbox"]:checked + label:before {  /* 체크박스를 체크했을때 */ 
+                     content: '\2714';  /* 체크표시 유니코드 사용 */
+                     color: #99a1a7;
+                     text-shadow: 1px 1px #fff;
+                     background: #e9ecee;
+                     border-color: #adb8c0;
+                     box-shadow: 0px 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05), inset 15px 10px -12px rgba(255,255,255,0.1);
+                  }
+
+                  .checks.small input[type="checkbox"] + label {
+                     font-size: 15px;
+                  }
+
+                  .checks.small input[type="checkbox"] + label:before {
+                     width: 15px;
+                     height: 15px;
+                     line-height: 15px;
+                     font-size: 11px;
+                  }
+
+                  .checks.etrans input[type="checkbox"] + label {
+                     padding-left: 23px;
+                  }
+                  .checks.etrans input[type="checkbox"] + label:before {
+                     position: absolute;
+                     left: 0;
+                     top: 0;
+                     margin-top: 0;
+                     opacity: .6;
+                     box-shadow: none;
+                     border-color: #ff6633;
+                     -webkit-transition: all .12s, border-color .08s;
+                     transition: all .12s, border-color .08s;
+                  }
+
+                  .checks.etrans input[type="checkbox"]:checked + label:before {
+                     position: absolute;
+                     content: "";
+                     width: 10px;
+                     top: -5px;
+                     left: 5px;
+                     border-radius: 0;
+                     opacity:1; 
+                     background: transparent;
+                     border-color:transparent #ff6633 #ff6633 transparent;
+                     border-top-color:transparent;
+                     border-left-color:transparent;
+                     -ms-transform:rotate(45deg);
+                     -webkit-transform:rotate(45deg);
+                     transform:rotate(45deg);
+                  }
+
+                  .no-csstransforms .checks.etrans input[type="checkbox"]:checked + label:before {
+                  /*content:"\2713";*/
+                     content: "\2714";
+                     top: 0;
+                     left: 0;
+                     width: 21px;
+                     line-height: 21px;
+                     color: #ff6633;
+                     text-align: center;
+                     border: 1px solid #ff6633;
+                  }
+               }
+            }
          }
       }
 
    }
+   // .content-wrapper::-webkit-scrollbar-track-piece:end {
+   //    background: transparent;
+   //    margin-bottom: 10px;
+   // }
+   // .content-wrapper::-webkit-scrollbar-track-piece:start {
+   //    background: transparent;
+   //    margin-top: 10px;
+   // }
    .footer {
       height: 10%;
       margin-bottom: 25px;
@@ -485,5 +862,9 @@ export default {
          outline: none;
       }
    }
+}
+.handler {
+   width: 30px;
+   height: 30px;
 }
 </style>
