@@ -24,6 +24,16 @@ public class BookmarkController {
     @Autowired
     BookmarkService bookmarkService;
 
+    @GetMapping("")
+    public ResponseEntity<?> read(Authentication authentication) {
+        // 유효하지 않은 토큰인 경우
+        if (isInValidAuthentication(authentication)) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        return bookmarkService.read(authentication);
+    }
+
     @PostMapping("")
     public ResponseEntity<?> create(@RequestBody Map<String, String> request,
                                     Authentication authentication) {
