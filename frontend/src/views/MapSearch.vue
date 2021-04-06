@@ -1147,6 +1147,7 @@ export default {
       height: 96%;
 
       border-radius: 15px;
+      overflow: hidden;
    }
 
    // 메인 지도
