@@ -1,32 +1,60 @@
 <template lang="">
    <div class="md-container">
       <div class="header">
-         <i @click="closeCompo" class="fas fa-angle-double-right"></i>
+         <div class="name"><i class="fas fa-store"></i> {{ this.detailData.commercialName }}</div>
+         <div class="btnLike">
+            <i v-if="like" class="fas fa-star" @click="setLike"></i>
+            <i v-else class="far fa-star" @click="setLike"></i>
+         </div>
+         <i @click="closeCompo" class="fas fa-times btn-close"></i>
       </div>
-      <div class="region-container">
-         <span class="name"> {{ this.detailData.commercialName }} </span>
-         <div class="info">
-            <div class="score">
-               추천지수 <span class="number"> {{ score }} </span> 점
-               <i v-if="like" class="fas fa-star" @click="setLike"></i>
-               <i v-else class="far fa-star" @click="setLike"></i>
+      <!-- <div class="content-recommend">
+         <div class="score">
+            추천지수 <span class="number"> {{ score }} </span> 점
+         </div>
+         <p class="description">* 본 추천지수는 'KNN 알고리즘'을 적용하여 도출된 점수입니다.</p>
+      </div> -->
+      <div class="content-common">
+         <div class="info-basic">
+            <span class="title">
+               상권코드<span class="value">{{ this.detailData.commercialCode }}</span>
+            </span>
+            <span class="title">
+               상권구분<span class="value">{{ this.detailData.divisionName }}</span>
+            </span>
+         </div>
+         <div class="info-special">
+            <div class="box recommend">
+               <div class="title">추천지수</div>
+               <div class="value">97</div>
             </div>
-            <p class="description">* 본 추천지수는 'KNN 알고리즘'을 적용하여 도출된 점수입니다.</p>
-            <div class="info-boxes">
-               <div class="info-box">
-                  <p>평균 매출</p>
-                  <span> {{ sales }} </span>
-               </div>
-               <div class="info-box">
-                  <p>월 임대료</p>
-                  <span> {{ rent }} </span>
-               </div>
+            <div class="box rent">
+               <div class="title">추정 매출</div>
+               <div class="value">2000</div>
+            </div>
+            <div class="box sales">
+               <div class="title">평균 임대료</div>
+               <div class="value">4000</div>
             </div>
          </div>
-         <DetailGraph :dataset="type" class="graph" />
-         <DetailGraph :dataset="age" class="graph" />
-         <LineGraph :dataset="ysales" class="graph" />
-         <PieChart :dataset="week" class="graph" />
+      </div>
+      <div class="content-detail">
+         <div class="section">
+            <p class="title">업종별 매출 추이</p>
+            <DetailGraph :dataset="type" class="graph" />
+         </div>
+         <div class="section">
+            <p class="title">업종별 어쩌구 추이</p>
+            <DetailGraph :dataset="age" class="graph" />
+         </div>
+         <div class="section">
+            <p class="title">어쩌구 저쩌구</p>
+            <LineGraph :dataset="ysales" class="graph" />
+         </div>
+         <div class="section">
+            <p class="title">성별 선호도</p>
+            <PieChart :dataset="week" class="graph" />
+         </div>
       </div>
    </div>
 </template>
@@ -110,83 +138,145 @@ export default {
 };
 </script>
 <style scoped lang="scss">
+* {
+   /* border: 1px dashed green; */
+   box-sizing: border-box;
+}
+
 .md-container {
    width: 100%;
    height: 100%;
    display: flex;
+   flex-direction: column;
+   padding: 25px 25px;
 
    .header {
-      position: absolute;
-      left: 20px;
-      top: 20px;
-      i {
-         font-size: 24pt;
-         color: rgb(148, 148, 148);
+      /* background-color: red; */
+      height: 50px;
+
+      .name {
+         display: inline-block;
+         font-size: 22pt;
+         font-weight: 600;
+
+         i {
+            font-size: 14pt;
+         }
       }
-      i:hover {
+
+      .btnLike {
+         display: inline-block;
+         margin-left: 5px;
+         color: rgb(236, 201, 3);
+         font-size: 18px;
+      }
+
+      .btn-close {
+         float: right;
+
+         font-size: 18pt;
+         color: rgb(148, 148, 148);
          cursor: pointer;
-         color: #808080;
+
+         &:hover {
+            color: #ff6633;
+         }
       }
    }
 
-   .region-container {
-      margin: 30px;
-      padding: 20px;
-      width: 80%;
-      height: 90%;
+   .content-common {
+      display: flex;
+      flex-direction: column;
+      margin-top: 15px;
+
+      .info-basic {
+         width: 100%;
+         height: 40px;
+
+         font-size: 10pt;
+         color: rgb(63, 63, 63);
+         /* text-align: center; */
+         padding: 0px 20px;
+         line-height: 40px;
+
+         background-color: rgb(230, 230, 230);
+         border: 1px solid rgb(203, 203, 203);
+
+         .title {
+            margin-right: 10px;
+            font-weight: 600;
+         }
+
+         .value {
+            margin-left: 3px;
+            color: #ff6633;
+         }
+      }
+
+      .info-special {
+         margin: 15px 0px;
+         display: flex;
+
+         /* 공통 속성 */
+         .box {
+            $radiusVal: 15px;
+
+            width: 100%;
+            height: 100px;
+            border-radius: $radiusVal;
+            background-color: rgb(255, 244, 226);
+            /* box-shadow: 0px 3px 8px rgb(0 0 0 / 46%); */
+            margin: 0px 10px;
+
+            .title {
+               height: 30px;
+               background-color: rgba(29, 29, 29, 0.119);
+               border-radius: $radiusVal $radiusVal 0px 0px;
+
+               font-size: 11pt;
+               font-weight: 600;
+               text-align: center;
+               line-height: 30px;
+            }
+
+            .value {
+               font-size: 26pt;
+               font-weight: 600;
+               text-align: center;
+               line-height: 60px;
+            }
+         }
+
+         .recommend {
+            background-color: #ffcc00;
+         }
+      }
+   }
+
+   .content-detail {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      width: 100%;
+      height: 100%;
       overflow-y: auto;
 
-      .name {
-         font-size: 20pt;
-         margin: 20px;
-      }
+      .section {
+         margin-top: 20px;
+         width: 100%;
 
-      .info {
-         border: 1px solid grey;
-         border-radius: 15px;
-         padding: 15px;
-         margin-top: 10px;
-
-         .score {
-            justify-content: flex;
-            font-size: 15pt;
-            margin-bottom: 10px;
-
-            .number {
-               background-color: black;
-               color: greenyellow;
-               font-size: 16pt;
-               border-radius: 15px;
-               padding: 4px 8px 4px 8px;
-            }
-
-            i {
-               color: rgb(236, 201, 3);
-            }
+         p.title {
+            font-size: 16pt;
+            font-weight: 500;
          }
 
-         .description {
-            font-size: 8pt;
-            color: grey;
+         .graph {
+            height: 300px;
+            width: 300px;
+            margin: 0 auto;
+            margin-top: 20px;
          }
-
-         .info-box {
-            margin: 10px 25px 0 25px;
-            padding: 15px;
-            background-color: rgba(255, 251, 31, 0.473);
-            border-radius: 15px;
-            display: inline-block;
-
-            p {
-               font-size: 10pt;
-            }
-         }
-      }
-
-      .graph {
-         width: 300px;
-         height: 300px;
-         margin: 10px;
       }
    }
 }
