@@ -49,9 +49,11 @@ export default {
             this.goDetailValue = value;
             this.$emit('goDetail', this.goDetailValue)
         },
+
+        /** 북마크 삭제하기 */
         onDeleteBm: function (idx, bookmark) {
             removeBookmark(
-                bookmark.id,
+                bookmark.commercial.commercialCode,
                 () => {
                     this.bookmarkList.splice(idx, 1);
                 },

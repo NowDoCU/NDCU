@@ -19,7 +19,7 @@
       <transition name="collapse">
          <div v-show="optionCompo || bookMarkCompo" class="menu-expand-compo floating">
             <option-input v-show="optionCompo" @close-expended="onClickClose" @input-complete="onInputComplete"></option-input>
-            <bookmark-list v-show="bookMarkCompo" @close-expended="onClickClose" @goDetail="goDetail"></bookmark-list>
+            <bookmark-list v-if="bookMarkCompo" @close-expended="onClickClose" @goDetail="goDetail"></bookmark-list>
          </div>
       </transition>
       <div class="sidemenu-compo floating">
@@ -253,11 +253,7 @@ export default {
 
       // 줌 이벤트에 걸면, level값 반영이 즉각으로 안이루어짐
       onMapEvent(event) {
-
-         if(event == 'zoom_changed') {
-            alert(this.level)
-         }
-
+         
          // console.log('onMapEvent : ', event);
          var bounds = this.mapObject.getBounds();
 

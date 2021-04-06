@@ -3,7 +3,7 @@ import { instance } from './index.js'
 function createBookmark(commercialCode, success, fail) {
     let token = window.localStorage.getItem('accessToken');
     const config = { headers: { Authorization: `Bearer ${token}` } };
-
+    
     instance
         .post(`bookmark`, commercialCode, config)
         .then(success)
@@ -20,9 +20,12 @@ function getBookmarkList(success, fail) {
         .catch(fail);
 }
 
-function removeBookmark(id, success, fail) {
+function removeBookmark(commercialCode, success, fail) {
+    let token = window.localStorage.getItem('accessToken');
+    const config = { headers: { Authorization: `Bearer ${token}` } };
+
     instance
-    .delete(`bookmark/${id}`)
+    .delete(`bookmark/${commercialCode}`, config)
     .then(success)
     .catch(fail);
 }

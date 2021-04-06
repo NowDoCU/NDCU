@@ -122,9 +122,13 @@ export default {
 
          // 북마크가 안되어 있는 경우 북마크 생성
          if(!this.isBookmark) {
+
+            let commercial = {commercialCode: this.commercialCode}
             createBookmark(
-               this.commercialCode,
-               () => {},
+               commercial,
+               () => {
+                  alert('북마크 추가')
+               },
                (err) => {
                   console.log(err);
                }
