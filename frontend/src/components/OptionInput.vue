@@ -56,7 +56,8 @@
                      <span class="title">보증금</span>
                      <span class="won">단위 : 원</span>
                   </div>
-                  <vue-slide-bar v-model="dSlider.value"
+                  <vue-slide-bar 
+                     v-model="deposit"
                      :data="dSlider.data"
                      :range="dSlider.range"
                      :processStyle="dSlider.processStyle"
@@ -72,7 +73,8 @@
                      <span class="title">월임대료(제곱미터 기준)</span>
                      <span class="won">단위 : 원</span>
                   </div>
-                  <vue-slide-bar v-model="rSlider.value"
+                  <!-- <vue-slide-bar 
+                     v-model="rent"
                      :data="rSlider.data"
                      :range="rSlider.range"
                      :processStyle="rSlider.processStyle"
@@ -80,7 +82,14 @@
                      <template slot="tooltip">
                         <img class="handler" src="@/assets/image/dollar.png">
                      </template>
-                  </vue-slide-bar>
+                  </vue-slide-bar> -->
+                  <div class="rent-bts">
+                     <div class="rent-bt">2.3만원 미만</div>
+                     <div class="rent-bt">2.3만원<br>~<br>3.0만원</div>
+                     <div class="rent-bt">3.0만원<br>~<br> 37000원</div>
+                     <div class="rent-bt">37000원 <br>~<br> 44000원</div>
+                     <div class="rent-bt">44000원 이상</div>
+                  </div>
                </div>
                <div class="client-wrapper">
                   <div class="c-header">대상고객</div>
@@ -143,14 +152,16 @@ export default {
    },
    data: function() {
       return {
+         test: false,
          selectedCate: '',
          selectedClient: '',
          showUl: false,
+         deposit: 3441,
+         rent: 53000,
          query: '', // 지역 검색어
          selectedDs: [], // 선택된 지역
          selectedAges: [],
          dSlider: { // 보증금 정보
-            value: 0,
             data: [
                207,
                750,
@@ -193,7 +204,6 @@ export default {
             }
          },
           rSlider: { // 임대료 정보
-            value: 52600,
             data: [
                14723,
                20000,
@@ -666,6 +676,26 @@ export default {
                   }
                   .won {
                      font-size: 8pt
+                  }
+               }
+               .rent-bts {
+                  padding: 20px 0;
+                  display: flex;
+                  justify-content: space-between;
+                  .rent-bt {
+                     width: 13%;
+                     font-size: 9pt;
+                     font-weight: 700;
+                     color: #ff6633;
+                     background-color: white;
+                     border:  2px solid #ff6633;
+                     border-radius: 10px;
+                     padding: 10px;
+                     display: flex;
+                     justify-content: center;
+                     align-items: center;
+                     text-align: center;
+                     box-shadow: 4px 4px 4px #56565629;
                   }
                }
             }

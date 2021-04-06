@@ -196,7 +196,7 @@ export default {
       },
       nameVali: function(str) {
          const reg_name = /[~!@#$%^&*()_+|<>?:{}]/ // 특수문자 test
-         if (str === '' || !reg_name.test(str)) {
+         if (this.name === '' || reg_name.test(str)) {
             return false;
          } else return true
       },

@@ -105,6 +105,7 @@ export default {
       // 동별로 마커를 찍기 위한 json파일 import
       guCoords: guCoords,
       dongCoords: dongCoords,
+      test: false,
    }),
    created() {
       console.log('에러잡기', 1);
@@ -149,6 +150,7 @@ export default {
       // sidemenu의 옵션입력 버튼 눌렀을 때
       onClickInputBt: function() {
          this.optionCompo = !this.optionCompo;
+         this.test = true
          this.bookMarkCompo = false;
       },
       onClickBookmarkBt: function() {
