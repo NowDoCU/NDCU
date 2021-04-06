@@ -31,6 +31,7 @@
 </template>
 
 <script type="text/javascript" src="http://dapi.kakao.com/v2/maps/sdk.js?appkey=5cc03bac0d3510a482068b50dd6e3612&libraries=services,clusterer"></script>
+
 <script>
 import VueDaumMap from 'vue-daum-map';
 import MapDetail from '@/components/MapDetail/MapDetail.vue';
@@ -42,6 +43,8 @@ import Toast from '@/components/Toast.vue';
 import axios from 'axios';
 import { findDongData, findAllData } from '@/api/mapDetail.js';
 import { coordsB2H } from '@/api/kakaoAPI.js';
+
+import { jsonp } from 'vue-jsonp';
 
 // 동코드 JSON 파일 import
 import guCoords from '@/assets/data/gu_coords.json';
@@ -94,13 +97,14 @@ export default {
       dongCoords: dongCoords,
    }),
    created() {
+      console.log('에러잡기', 1);
       this.initCenter();
    },
 
    watch: {
       level: function() {
          // 조건 만족 시 1회만 생성 -> 성능..
-         if (this.recommendResult == null) {
+         if (this.mapObject != null && this.recommendResult == null) {
             if (this.level >= 6 && this.gu_Overlays.length == 0) {
                console.log('# 레벨 6 이상 => 동 삭제, 구 생성');
                // 구 생성, 동 삭제
@@ -244,7 +248,7 @@ export default {
       },
 
       initCenter() {
-         // console.log('initCenter');
+         console.log('initCenter');
          // 중심위치 세팅
          this.center.lat = 37.5642135; // 위도
          this.center.lng = 127.0016985; // 경로
@@ -316,25 +320,42 @@ export default {
          var geo = `BOX(${bounds.ha},${bounds.qa},${bounds.oa},${bounds.pa})`; //minx, miny, maxx, maxy로 검색 범위 설정
          var filter = `sig_cd:like:${sig_cd}`; // 해당되는 동 정보 1개만 반환하기 위함
 
-         axios
-            .get(`http://api.vworld.kr/req/data?request=GetFeature&data=${data}&key=${key}&format=json&domain=${domain}&crs=${crs}&attrFilter=${filter}&size=1&geomFilter=${geo}`)
-            .then((response) => {
-               var local = response.data.response.result.featureCollection.features;
+         jsonp(`http://api.vworld.kr/req/data?request=GetFeature&data=${data}&key=${key}&format=json&domain=${domain}&crs=${crs}&attrFilter=${filter}&size=1&geomFilter=${geo}`).then((response) => {
+            var local = response.response.result.featureCollection.features;
 
-               var polygonArr = local[0].geometry.coordinates[0][0];
-               var polygonPath = [];
-               var korName = local[0].properties.sig_kor_nm;
+            var polygonArr = local[0].geometry.coordinates[0][0];
+            var polygonPath = [];
+            var korName = local[0].properties.sig_kor_nm;
 
-               // 해당 데이터를 polygonPath에서 원하는 방식으로 맵핑
-               for (let i = 0; i < polygonArr.length; i++) {
-                  polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
-               }
+            // 해당 데이터를 polygonPath에서 원하는 방식으로 맵핑
+            for (let i = 0; i < polygonArr.length; i++) {
+               polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
+            }
 
-               this.makeGuPolygon(polygonPath, korName, center);
-            })
-            .catch((err) => {
-               console.log('ERROR : ' + err);
-            });
+            this.makeGuPolygon(polygonPath, korName, center);
+         });
+
+         // axios
+         //    .get(`http://api.vworld.kr/req/data?request=GetFeature&data=${data}&key=${key}&format=json&domain=${domain}&crs=${crs}&attrFilter=${filter}&size=1&geomFilter=${geo}`, {
+         //       dataType: 'jsonp',
+         //    })
+         //    .then((response) => {
+         //       var local = response.data.response.result.featureCollection.features;
+
+         //       var polygonArr = local[0].geometry.coordinates[0][0];
+         //       var polygonPath = [];
+         //       var korName = local[0].properties.sig_kor_nm;
+
+         //       // 해당 데이터를 polygonPath에서 원하는 방식으로 맵핑
+         //       for (let i = 0; i < polygonArr.length; i++) {
+         //          polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
+         //       }
+
+         //       this.makeGuPolygon(polygonPath, korName, center);
+         //    })
+         //    .catch((err) => {
+         //       console.log('ERROR : ' + err);
+         //    });
       },
 
       // 구-3) API에서 받은 폴리곤 데이터로 실제 구별 폴리곤 생성
@@ -520,61 +541,112 @@ export default {
          var geo = '';
          var filter = `emd_cd:=:${emd_cd}`;
 
-         axios
-            .get(`http://api.vworld.kr/req/data?request=GetFeature&data=${data}&key=${key}&format=json&domain=${domain}&crs=${crs}&attrFilter=${filter}&size=100&geomFilter=${geo}`)
-            .then((response) => {
-               var local = response.data.response.result.featureCollection.features;
+         jsonp(`http://api.vworld.kr/req/data?request=GetFeature&data=${data}&key=${key}&format=json&domain=${domain}&crs=${crs}&attrFilter=${filter}&size=100&geomFilter=${geo}`).then((response) => {
+            var local = response.response.result.featureCollection.features;
 
-               for (const key in local) {
-                  var polygonArr = local[key].geometry.coordinates[0][0];
-                  var polygonPath = [];
-                  var korName = local[key].properties.sig_kor_nm;
+            for (const key in local) {
+               var polygonArr = local[key].geometry.coordinates[0][0];
+               var polygonPath = [];
+               var korName = local[key].properties.sig_kor_nm;
 
-                  // 해당 데이터를 polygonPath에서 원하는 방식으로 맵핑
-                  for (let i = 0; i < polygonArr.length; i++) {
-                     polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
-                  }
-
-                  console.log('===========================');
-
-                  this.removeDongLayer('polygon');
-                  this.makeDongPolygon(polygonPath);
-
-                  console.log(1);
-
-                  this.mapObject.setCenter(center);
-                  this.mapObject.setLevel(3, { animate: true });
-
-                  console.log(2);
-
-                  this.removeDongLayer('innerDong');
-
-                  console.log(3);
-
-                  // 메소드 체이싱
-                  new Promise((resolve) => {
-                     resolve(this.convertCoordsBtoH(center));
-                  })
-                     .then((result) => {
-                        console.log(4);
-                        console.log('Promise result(H_CODE) => ', result);
-                        return this.apiDongDistrict(result);
-                     })
-                     .then((result) => {
-                        console.log(5, result);
-                        this.dongInnerDistricts = result;
-                     })
-                     .then(() => {
-                        console.log(6, this.dongInnerDistricts);
-                        this.setDongInnerMarker();
-                     });
-
-                  // var H_code = this.convertCoordsBtoH(center);
+               // 해당 데이터를 polygonPath에서 원하는 방식으로 맵핑
+               for (let i = 0; i < polygonArr.length; i++) {
+                  polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
                }
-            })
-            .catch((err) => {
-               console.log('ERROR : ' + err);
-            });
+
+               console.log('===========================');
+
+               this.removeDongLayer('polygon');
+               this.makeDongPolygon(polygonPath);
+
+               console.log(1);
+
+               this.mapObject.setCenter(center);
+               this.mapObject.setLevel(3, { animate: true });
+
+               console.log(2);
+
+               this.removeDongLayer('innerDong');
+
+               console.log(3);
+
+               // 메소드 체이싱
+               new Promise((resolve) => {
+                  resolve(this.convertCoordsBtoH(center));
+               })
+                  .then((result) => {
+                     console.log(4);
+                     console.log('Promise result(H_CODE) => ', result);
+                     return this.apiDongDistrict(result);
+                  })
+                  .then((result) => {
+                     console.log(5, result);
+                     this.dongInnerDistricts = result;
+                  })
+                  .then(() => {
+                     console.log(6, this.dongInnerDistricts);
+                     this.setDongInnerMarker();
+                  });
+
+               // var H_code = this.convertCoordsBtoH(center);
+            }
+         });
+
+         // axios
+         //    .get(`http://api.vworld.kr/req/data?request=GetFeature&data=${data}&key=${key}&format=json&domain=${domain}&crs=${crs}&attrFilter=${filter}&size=100&geomFilter=${geo}`)
+         //    .then((response) => {
+         //       var local = response.data.response.result.featureCollection.features;
+
+         //       for (const key in local) {
+         //          var polygonArr = local[key].geometry.coordinates[0][0];
+         //          var polygonPath = [];
+         //          var korName = local[key].properties.sig_kor_nm;
+
+         //          // 해당 데이터를 polygonPath에서 원하는 방식으로 맵핑
+         //          for (let i = 0; i < polygonArr.length; i++) {
+         //             polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
+         //          }
+
+         //          console.log('===========================');
+
+         //          this.removeDongLayer('polygon');
+         //          this.makeDongPolygon(polygonPath);
+
+         //          console.log(1);
+
+         //          this.mapObject.setCenter(center);
+         //          this.mapObject.setLevel(3, { animate: true });
+
+         //          console.log(2);
+
+         //          this.removeDongLayer('innerDong');
+
+         //          console.log(3);
+
+         //          // 메소드 체이싱
+         //          new Promise((resolve) => {
+         //             resolve(this.convertCoordsBtoH(center));
+         //          })
+         //             .then((result) => {
+         //                console.log(4);
+         //                console.log('Promise result(H_CODE) => ', result);
+         //                return this.apiDongDistrict(result);
+         //             })
+         //             .then((result) => {
+         //                console.log(5, result);
+         //                this.dongInnerDistricts = result;
+         //             })
+         //             .then(() => {
+         //                console.log(6, this.dongInnerDistricts);
+         //                this.setDongInnerMarker();
+         //             });
+
+         //          // var H_code = this.convertCoordsBtoH(center);
+         //       }
+         //    })
+         //    .catch((err) => {
+         //       console.log('ERROR : ' + err);
+         //    });
       },
 
       // 동-4) API에서 받은 동 폴리곤을 생성
@@ -933,30 +1005,49 @@ export default {
          var data = 'LT_C_DGMAINBIZ'; // 상권 폴리곤 출력
          // console.log(position.La, position.Ma);
 
-         axios
-            .get(`http://api.vworld.kr/req/data?request=GetFeature&data=${data}&key=${key}&format=json&domain=${domain}&crs=${crs}&geomFilter=${geo}`)
-            .then((response) => {
-               // console.log(response.data.response);
-               if (response.data.response.status == 'OK') {
-                  // 상권 영역이 있으면, 폴리곤 생성
-                  // 응답 데이터에서 polygon 정보 찾기
-                  var polygonArr = response.data.response.result.featureCollection.features[0].geometry.coordinates[0][0];
-                  var polygonPath = [];
+         jsonp(`http://api.vworld.kr/req/data?request=GetFeature&data=${data}&key=${key}&format=json&domain=${domain}&crs=${crs}&geomFilter=${geo}`).then((response) => {
+            if (response.response.status == 'OK') {
+               // 상권 영역이 있으면, 폴리곤 생성
+               // 응답 데이터에서 polygon 정보 찾기
+               var polygonArr = response.response.result.featureCollection.features[0].geometry.coordinates[0][0];
+               var polygonPath = [];
 
-                  // 해당 데이터를 polygonPath에서 원하는 방식으로 맵핑
-                  for (let i = 0; i < polygonArr.length; i++) {
-                     polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
-                  }
-
-                  this.makePolygonDistrict(polygonPath);
-               } else {
-                  // 상권 영역 없으면, 원형
-                  this.makeCircleDistrict(position);
+               // 해당 데이터를 polygonPath에서 원하는 방식으로 맵핑
+               for (let i = 0; i < polygonArr.length; i++) {
+                  polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
                }
-            })
-            .catch((err) => {
-               console.log('ERROR : ' + err);
-            });
+
+               this.makePolygonDistrict(polygonPath);
+            } else {
+               // 상권 영역 없으면, 원형
+               this.makeCircleDistrict(position);
+            }
+         });
+
+         // axios
+         //    .get(`http://api.vworld.kr/req/data?request=GetFeature&data=${data}&key=${key}&format=json&domain=${domain}&crs=${crs}&geomFilter=${geo}`)
+         //    .then((response) => {
+         //       // console.log(response.data.response);
+         //       if (response.data.response.status == 'OK') {
+         //          // 상권 영역이 있으면, 폴리곤 생성
+         //          // 응답 데이터에서 polygon 정보 찾기
+         //          var polygonArr = response.data.response.result.featureCollection.features[0].geometry.coordinates[0][0];
+         //          var polygonPath = [];
+
+         //          // 해당 데이터를 polygonPath에서 원하는 방식으로 맵핑
+         //          for (let i = 0; i < polygonArr.length; i++) {
+         //             polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
+         //          }
+
+         //          this.makePolygonDistrict(polygonPath);
+         //       } else {
+         //          // 상권 영역 없으면, 원형
+         //          this.makeCircleDistrict(position);
+         //       }
+         //    })
+         //    .catch((err) => {
+         //       console.log('ERROR : ' + err);
+         //    });
       },
 
       // 추천-3-1) 상권 영역이 없는 경우, 원형으로 표시
