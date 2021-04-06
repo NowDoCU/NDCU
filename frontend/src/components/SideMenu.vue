@@ -45,7 +45,7 @@
                   </div>
                   <div class="ad-input-wrapper">
                      <div class="input-wrapper">
-                        <input @keypress.enter="doRegister" v-model="name" id="name-ip" maxlength="10" type="text" placeholder="별명" @focus="onFocused('name')" @blur="onBlured('name')" autocomplete="off"/>
+                        <input @keypress.enter="doRegister" v-model.trim="name" id="name-ip" maxlength="10" type="text" placeholder="별명" @focus="onFocused('name')" @blur="onBlured('name')" autocomplete="off"/>
                         <div id="name-dv" class="divider"></div>
                         <span id="name-tip" v-if="!nameVal" class="tip">필수항목(특수문자 제외)</span>
                      </div>
@@ -195,7 +195,8 @@ export default {
          return false;
       },
       nameVali: function(str) {
-         if (str === '') {
+         const reg_name = /[~!@#$%^&*()_+|<>?:{}]/ // 특수문자 test
+         if (str === '' || !reg_name.test(str)) {
             return false;
          } else return true
       },
@@ -205,11 +206,11 @@ export default {
       },
       // 즐겨찾기 탭 열기
       onClickBookmarkBt: function() {
-
          // 로그인 여부 확인
          if(this.isLogin) {
             this.$emit('open-bookmark');
          } else {
+            alert('로그인이 필요한 서비스입니다.')
             this.controlModal(1, 'open');
          }         
       },
@@ -260,16 +261,16 @@ export default {
          targetInput.classList.remove('unval');
          targetInput.classList.add('divider');
          targetInput.classList.add('focused');
-         if (type === 'tel') {
+         if (type === 'tel') { // tel 적는 곳은 포커스 됐을 때만 hint보여주기
             this.telFocused = true
          }
       },
       onBlured: function(type) {
          // 인풋창에서 포키스아웃됐을 때 css 컨트롤위해
-         const targetInput = document.getElementById(`${type}-ip`).value;
-         const targetDiv = document.getElementById(`${type}-dv`);
-         const reg_pwd = /^.*(?=.{6,20})(?=.*[0-9])(?=.*[a-zA-Z]).*$/;
-         const reg_name = /[~!@#$%^&*()_+|<>?:{}]/
+         const targetInput = document.getElementById(`${type}-ip`).value; // 회원가입과 로그인이 모달을 공유하기 때문에 데이터 충돌 방지하기 위해..
+         const targetDiv = document.getElementById(`${type}-dv`); // divider 
+         const reg_pwd = /^.*(?=.{6,10})(?=.*[0-9])(?=.*[a-zA-Z]).*$/; // 영문,숫자 포함 6 - 10자
+         const reg_name = /[~!@#$%^&*()_+|<>?:{}]/ // 별명 특수문자 포함되어있는지
          targetDiv.classList.remove('focused');
          targetDiv.classList.remove('divder'); // 기존에 적용된 css제거
          if (type === 'email') {
