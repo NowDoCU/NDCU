@@ -52,7 +52,7 @@ public class CommercialServiceImpl implements CommercialService{
                 .map(commercial -> {
                     CommercialApiResponse response = CommercialApiResponse.builder()
                             .commercialCode(commercial.getCommercialCode())
-                            .commercialName(commercial.getCommercialCode())
+                            .commercialName(commercial.getCommercialName())
                             .divisionCode(commercial.getDivisionCode())
                             .divisionName(commercial.getDivisionName())
                             .x(commercial.getX())
