@@ -55,8 +55,19 @@ export default {
          font-weight: 600;
 
          .opt {
+            position: relative;
+            top: 4px;
+            padding: 1px;
+            display: inline-block;
+            /* padding-top: 30px; */
+            /* height: 24px; */
+            max-width: 130px;
+            /* background-color: red; */
             color: rgb(232, 57, 44);
             font-weight: 800;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
          }
       }
 
