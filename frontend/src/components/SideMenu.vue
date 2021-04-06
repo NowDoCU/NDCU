@@ -195,8 +195,8 @@ export default {
          return false;
       },
       nameVali: function(str) {
-         const reg_name = /[~!@#$%^&*()_+|<>?:{}]/ // 특수문자 test
-         if (str === '' || !reg_name.test(str)) {
+         const reg_name = /[~!@#$%^&*()_+|<>?:;{}]/ // 특수문자 test
+         if (str === '' || reg_name.test(str)) {
             return false;
          } else return true
       },
@@ -247,6 +247,7 @@ export default {
                this.emailVal = true;
                this.pwdVal1 = true;
                this.pwdVal2 = true;
+               this.nameVal = true;
                this.suEmail = '';
                this.suPwd = '';
                this.suPwdConf = ''
@@ -270,7 +271,7 @@ export default {
          const targetInput = document.getElementById(`${type}-ip`).value; // 회원가입과 로그인이 모달을 공유하기 때문에 데이터 충돌 방지하기 위해..
          const targetDiv = document.getElementById(`${type}-dv`); // divider 
          const reg_pwd = /^.*(?=.{6,10})(?=.*[0-9])(?=.*[a-zA-Z]).*$/; // 영문,숫자 포함 6 - 10자
-         const reg_name = /[~!@#$%^&*()_+|<>?:{}]/ // 별명 특수문자 포함되어있는지
+         const reg_name = /[~!@#$%^&*()_+|<>?:;{}]/ // 별명 특수문자 포함되어있는지
          targetDiv.classList.remove('focused');
          targetDiv.classList.remove('divder'); // 기존에 적용된 css제거
          if (type === 'email') {
@@ -289,7 +290,7 @@ export default {
                this.pwdVal1 = true;
             }
          } else if (type === 'pwdc') {
-            if ((!reg_pwd.test(targetInput) && this.suPwd !== targetInput) || (!reg_pwd.test(targetInput) && !targetInput)) {
+            if ((!reg_pwd.test(targetInput) && this.suPwd !== this.suPwdConf) || (!reg_pwd.test(targetInput) && !targetInput)) {
                targetDiv.classList.add('unval');
                this.pwdVal2 = false;
             } else {
