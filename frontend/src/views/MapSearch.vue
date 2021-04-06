@@ -12,8 +12,8 @@
          ></toast>
       </transition>
       <transition name="collapse-right">
-         <div v-show="detailCompo" class="detail-compo floating">
-            <map-detail :detailData="detailData" @close-expended="onClickCloseDetail"></map-detail>
+         <div v-if="detailCompo" class="detail-compo floating">
+            <map-detail v-if="detailCompo" :isBookmark="isBookmark" :detailData="detailData" @close-expended="onClickCloseDetail"></map-detail>
          </div>
       </transition>
       <transition name="collapse">
@@ -50,8 +50,9 @@ import OptionInput from '@/components/OptionInput.vue';
 import SideMenu from '@/components/SideMenu.vue';
 import Toast from '@/components/Toast.vue';
 
-import axios from 'axios';
+import { mapState } from 'vuex';
 import { findDongData, findAllData } from '@/api/mapDetail.js';
+import { getBookmarkList } from '@/api/bookmark';
 import { coordsB2H } from '@/api/kakaoAPI.js';
 
 import { jsonp } from 'vue-jsonp';
@@ -75,6 +76,7 @@ export default {
 
       // 상권의 상제 정보를 전달하기 위한 변수들
       detailData: new Object(),
+      isBookmark: false,
       detailCompo: false,
 
       // 토스트 메뉴를 표시하기 위한
@@ -105,6 +107,7 @@ export default {
       // 동별로 마커를 찍기 위한 json파일 import
       guCoords: guCoords,
       dongCoords: dongCoords,
+      bookmarkList: [],
    }),
    created() {
       console.log('에러잡기', 1);
@@ -797,6 +800,7 @@ export default {
          }).then((result) => {
             this.detailData = result;
             this.detailCompo = true;
+            this.setIsBookmark();
             console.log('#out getDistrictDetail', this.detailData);
          });
 
@@ -804,6 +808,28 @@ export default {
          this.toastShow = true;
          this.toastDist = item.district.commercialName;
          this.isExplore = true;
+      },
+
+      // 해당 회원이 북마크한 상권인지 아닌 지 확인
+      setIsBookmark() {
+         if(!this.isLogin) { return; }
+
+         /** 북마크 리스트 가져오기 */
+         getBookmarkList(
+               (res) => {
+                  this.bookmarkList = res.data;
+                  this.isBookmark = false;
+                  for(var i=0; i<this.bookmarkList.length; ++i) {           
+                     if(this.bookmarkList[i].commercial.commercialCode == this.detailData.commercialCode) {
+                        this.isBookmark = true;
+                        break;
+                     }
+                  }
+               }, 
+               (err) => {
+                  console.log(err);
+               }
+         )
       },
 
       // 동-0) 입력값에 따라 정보를 삭제함
@@ -980,6 +1006,7 @@ export default {
          }).then((result) => {
             this.detailData = result;
             this.detailCompo = true;
+            this.setIsBookmark();
             console.log('#out getDistrictDetail', this.detailData);
          });
 
@@ -1138,6 +1165,9 @@ export default {
          // console.log('WGS84 변환', coords.toLatLng());
          return coords.toLatLng();
       },
+   },
+   computed: {
+      ...mapState(['isLogin']),
    },
 };
 </script>

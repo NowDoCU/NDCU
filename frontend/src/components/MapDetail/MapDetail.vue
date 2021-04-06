@@ -81,6 +81,7 @@ export default {
    name: 'MapDetail',
    props: {
       detailData: Object,
+      isBookmark: Boolean,
    },
    components: {
       DetailGraph,
@@ -113,8 +114,6 @@ export default {
             category: ['주중', '주말'],
             value: '',
          },
-         isBookmark: false,
-         commercialCode: '1001182',
       };
    },
    computed: {
@@ -141,7 +140,7 @@ export default {
 
          // 북마크가 안되어 있는 경우 북마크 생성
          if (!this.isBookmark) {
-            let commercial = { commercialCode: this.commercialCode };
+            let commercial = { commercialCode: this.detailData.commercialCode };
             createBookmark(
                commercial,
                () => {
@@ -154,7 +153,7 @@ export default {
          } else {
             // 북마크가 되어 있는 경우 북마크 삭제
             removeBookmark(
-               this.commercialCode,
+               this.detailData.commercialCode,
                () => {},
                (err) => {
                   console.log(err);
