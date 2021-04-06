@@ -25,7 +25,15 @@
       <div class="sidemenu-compo floating">
          <side-menu @open-input-form="onClickInputBt" @open-bookmark="onClickBookmarkBt" @dialog-change="onDialogChange"></side-menu>
       </div>
-      <vue-daum-map id="map" :appKey="appKey" :center.sync="center" :level.sync="level" :mapTypeId="mapTypeId" :libraries="libraries" @load="onLoad" @tilesloaded="onMapEvent('titlesloaded', $event)">
+      <vue-daum-map id="map" 
+         :appKey="appKey" 
+         :center.sync="center" 
+         :level.sync="level" 
+         :mapTypeId="mapTypeId" 
+         :libraries="libraries" 
+         @load="onLoad" 
+         @tilesloaded="onMapEvent('titlesloaded', $event)"
+         @zoom_changed="onMapEvent('zoom_changed', $event)">
       </vue-daum-map>
    </div>
 </template>
@@ -130,11 +138,11 @@ export default {
       },
 
       // sidemenu의 옵션입력 버튼 눌렀을 때
-      onClickInputBt: function() {
+      onClickInputBt: function() {         
          this.optionCompo = !this.optionCompo;
          this.bookMarkCompo = false;
       },
-      onClickBookmarkBt: function() {
+      onClickBookmarkBt: function() {         
          this.bookMarkCompo = !this.bookMarkCompo;
          this.optionCompo = false;
       },
@@ -236,7 +244,7 @@ export default {
       },
 
       initCenter() {
-         // console.log('initCenter');
+         console.log('initCenter');
          // 중심위치 세팅
          this.center.lat = 37.5642135; // 위도
          this.center.lng = 127.0016985; // 경로
@@ -245,6 +253,11 @@ export default {
 
       // 줌 이벤트에 걸면, level값 반영이 즉각으로 안이루어짐
       onMapEvent(event) {
+
+         if(event == 'zoom_changed') {
+            alert(this.level)
+         }
+
          // console.log('onMapEvent : ', event);
          var bounds = this.mapObject.getBounds();
 
@@ -331,8 +344,6 @@ export default {
 
       // 구-3) API에서 받은 폴리곤 데이터로 실제 구별 폴리곤 생성
       makeGuPolygon(polygonPath, name, center) {
-         var cnt = 0;
-         console.log(++cnt);
          var polygon = new kakao.maps.Polygon({
             map: this.mapObject, // 마커들을 클러스터로 관리하고 표시할 지도 객체
             path: polygonPath, // 그려질 다각형의 좌표 배열입니다
@@ -511,6 +522,8 @@ export default {
          var data = 'LT_C_ADEMD_INFO'; // 읍면동 조회
          var geo = '';
          var filter = `emd_cd:=:${emd_cd}`;
+
+         axios.defaults.headers.post['Content-Type'] = 'application/json;charset=utf-8';
 
          axios
             .get(`http://api.vworld.kr/req/data?request=GetFeature&data=${data}&key=${key}&format=json&domain=${domain}&crs=${crs}&attrFilter=${filter}&size=100&geomFilter=${geo}`)

@@ -115,7 +115,7 @@ export default {
       bookmark: function() {
 
          // 로그인되어 있는지 확인
-         if(!this.Login) {
+         if(!this.isLogin) {
             alert('로그인이 필요합니다.')
             return;
          }

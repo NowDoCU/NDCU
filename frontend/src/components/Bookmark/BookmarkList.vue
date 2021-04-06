@@ -15,52 +15,6 @@ import BookmarkListItem from './BookmarkListItem'
 import { mapState } from 'vuex';
 import { getBookmarkList, removeBookmark } from '@/api/bookmark';
 
-
-// var dummyBookmark = [
-//     {
-//         commercialCode: 1000681,
-//         commercialName: '시흥대로 84길',
-//         divisionName: '골목상권',
-//         dongName: '독산2동'
-//     },
-//     {
-//         commercialCode: 1000681,
-//         commercialName: '시흥대로 84길',
-//         divisionName: '골목상권',
-//         dongName: '독산2동'
-//     },
-//     {
-//         commercialCode: 1000681,
-//         commercialName: '시흥대로 84길',
-//         divisionName: '골목상권',
-//         dongName: '독산2동'
-//     },
-//     {
-//         commercialCode: 1000681,
-//         commercialName: '시흥대로 84길',
-//         divisionName: '골목상권',
-//         dongName: '독산2동'
-//     },
-//     {
-//         commercialCode: 1000681,
-//         commercialName: '시흥대로 84길',
-//         divisionName: '골목상권',
-//         dongName: '독산2동'
-//     },
-//     {
-//         commercialCode: 1000681,
-//         commercialName: '시흥대로 84길',
-//         divisionName: '골목상권',
-//         dongName: '독산2동'
-//     },
-//     {
-//         commercialCode: 1000681,
-//         commercialName: '시흥대로 84길',
-//         divisionName: '골목상권',
-//         dongName: '독산2동'
-//     },
-// ]
-
 export default {
     name: 'BookmarkList',
     components: {
