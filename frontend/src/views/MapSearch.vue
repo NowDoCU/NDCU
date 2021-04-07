@@ -51,7 +51,7 @@ import SideMenu from '@/components/SideMenu.vue';
 import Toast from '@/components/Toast.vue';
 
 import { mapState } from 'vuex';
-import { findDongData, findAllData } from '@/api/mapDetail.js';
+import { findDongData, findAllData, findAllGu } from '@/api/mapDetail.js';
 import { getBookmarkList } from '@/api/bookmark';
 import { coordsB2H } from '@/api/kakaoAPI.js';
 
@@ -297,79 +297,39 @@ export default {
       // 구-1) 구별 폴리곤 이름을 만듦
       makeGuBoundary() {
          console.log('[make] 구 전체 폴리곤, 이름 생성');
-         var totalBounds = {
-            // 서울시 전체 범위로 조회
-            ha: 126.72845050681946,
-            qa: 37.437210868999315,
-            oa: 127.17018320519693,
-            pa: 37.7014997773775,
-         };
 
-         for (var idx in this.guCoords) {
-            var position = new kakao.maps.LatLng(this.guCoords[idx].lat, this.guCoords[idx].lng);
+         findAllGu(
+            (success) => {
+               success.data.forEach((item) => {
+                  var position = new kakao.maps.LatLng(item.lat, item.lng);
 
-            var content = `<div class="gu">
-                              ${this.guCoords[idx].sig_kor_nm}
+                  var content = `<div class="gu">
+                              ${item.sig_kor_nm}
                            </div>`;
 
-            // 커스텀 오버레이를 생성합니다
-            var guOverlay = new kakao.maps.CustomOverlay({
-               map: this.mapObject,
-               position: position,
-               content: content,
-            });
+                  // 커스텀 오버레이를 생성합니다
+                  var guOverlay = new kakao.maps.CustomOverlay({
+                     map: this.mapObject,
+                     position: position,
+                     content: content,
+                  });
 
-            this.gu_Overlays.push(guOverlay);
+                  this.gu_Overlays.push(guOverlay);
 
-            this.apiGuPolygon(totalBounds, guCoords[idx].sig_cd, position);
-         }
-      },
+                  var polygonPath = [];
 
-      // 구-2) API에 현재 동의 폴리곤을 받아서 생성함
-      apiGuPolygon(bounds, sig_cd, center) {
-         var key = '13C339D4-B453-3C5E-A6A1-CCA6792A2D6B'; // 공간정보 오픈플랫폼
-         var domain = 'http://localhost:8080';
-         var crs = 'EPSG:4326'; // 반환되는 좌표(WGS84)
-         var data = 'LT_C_ADSIGG_INFO'; // 시군구 조회
-         var geo = `BOX(${bounds.ha},${bounds.qa},${bounds.oa},${bounds.pa})`; //minx, miny, maxx, maxy로 검색 범위 설정
-         var filter = `sig_cd:like:${sig_cd}`; // 해당되는 동 정보 1개만 반환하기 위함
+                  // 해당 데이터를 polygonPath에서 원하는 방식으로 맵핑
+                  for (let i = 0; i < item.coordinates.length; i++) {
+                     polygonPath.push(new kakao.maps.LatLng(item.coordinates[i][1], item.coordinates[i][0]));
+                  }
 
-         jsonp(`http://api.vworld.kr/req/data?request=GetFeature&data=${data}&key=${key}&format=json&domain=${domain}&crs=${crs}&attrFilter=${filter}&size=1&geomFilter=${geo}`).then((response) => {
-            var local = response.response.result.featureCollection.features;
-
-            var polygonArr = local[0].geometry.coordinates[0][0];
-            var polygonPath = [];
-            var korName = local[0].properties.sig_kor_nm;
-
-            // 해당 데이터를 polygonPath에서 원하는 방식으로 맵핑
-            for (let i = 0; i < polygonArr.length; i++) {
-               polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
+                  this.makeGuPolygon(polygonPath, item.sig_kor_nm, position);
+               });
+            },
+            (fail) => {
+               console.log('ERR_findAllGu : ', fail);
             }
-
-            this.makeGuPolygon(polygonPath, korName, center);
-         });
-
-         // axios
-         //    .get(`http://api.vworld.kr/req/data?request=GetFeature&data=${data}&key=${key}&format=json&domain=${domain}&crs=${crs}&attrFilter=${filter}&size=1&geomFilter=${geo}`, {
-         //       dataType: 'jsonp',
-         //    })
-         //    .then((response) => {
-         //       var local = response.data.response.result.featureCollection.features;
-
-         //       var polygonArr = local[0].geometry.coordinates[0][0];
-         //       var polygonPath = [];
-         //       var korName = local[0].properties.sig_kor_nm;
-
-         //       // 해당 데이터를 polygonPath에서 원하는 방식으로 맵핑
-         //       for (let i = 0; i < polygonArr.length; i++) {
-         //          polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
-         //       }
-
-         //       this.makeGuPolygon(polygonPath, korName, center);
-         //    })
-         //    .catch((err) => {
-         //       console.log('ERROR : ' + err);
-         //    });
+         );
       },
 
       // 구-3) API에서 받은 폴리곤 데이터로 실제 구별 폴리곤 생성
@@ -378,11 +338,11 @@ export default {
             map: this.mapObject, // 마커들을 클러스터로 관리하고 표시할 지도 객체
             path: polygonPath, // 그려질 다각형의 좌표 배열입니다
             strokeWeight: 2, // 선의 두께입니다
-            strokeColor: '#212121', // 선의 색깔입니다
-            strokeOpacity: 0.3, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+            strokeColor: 'rgb(14, 122, 255)', // 선의 색깔입니다
+            strokeOpacity: 0.8, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
             strokeStyle: 'solid', // 선의 스타일입니다
             fillColor: '#fff', // 채우기 색깔입니다
-            fillOpacity: 0.3, // 채우기 불투명도 입니다
+            fillOpacity: 0.7, // 채우기 불투명도 입니다
          });
 
          // 다각형에 mouseover 이벤트를 등록하고 이벤트가 발생하면 폴리곤의 채움색을 변경합니다
@@ -813,24 +773,26 @@ export default {
 
       // 해당 회원이 북마크한 상권인지 아닌 지 확인
       setIsBookmark() {
-         if(!this.isLogin) { return; }
+         if (!this.isLogin) {
+            return;
+         }
 
          /** 북마크 리스트 가져오기 */
          getBookmarkList(
-               (res) => {
-                  this.bookmarkList = res.data;
-                  this.isBookmark = false;
-                  for(var i=0; i<this.bookmarkList.length; ++i) {           
-                     if(this.bookmarkList[i].commercial.commercialCode == this.detailData.commercialCode) {
-                        this.isBookmark = true;
-                        break;
-                     }
+            (res) => {
+               this.bookmarkList = res.data;
+               this.isBookmark = false;
+               for (var i = 0; i < this.bookmarkList.length; ++i) {
+                  if (this.bookmarkList[i].commercial.commercialCode == this.detailData.commercialCode) {
+                     this.isBookmark = true;
+                     break;
                   }
-               }, 
-               (err) => {
-                  console.log(err);
                }
-         )
+            },
+            (err) => {
+               console.log(err);
+            }
+         );
       },
 
       // 동-0) 입력값에 따라 정보를 삭제함
