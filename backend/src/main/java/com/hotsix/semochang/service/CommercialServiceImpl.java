@@ -1,8 +1,6 @@
 package com.hotsix.semochang.service;
 
 import com.hotsix.semochang.model.Commercial;
-import com.hotsix.semochang.model.EstimatedPopulation;
-import com.hotsix.semochang.model.EstimatedSales;
 import com.hotsix.semochang.model.network.response.CommercialApiResponse;
 import com.hotsix.semochang.model.network.response.CommercialListApiResponse;
 import com.hotsix.semochang.repository.CommercialRepository;
@@ -12,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -37,6 +34,7 @@ public class CommercialServiceImpl implements CommercialService{
             commercial.setEstimatedPopulationList(null);
             commercial.setEstimatedSalesList(null);
             commercial.setStoreRentalPrice(null);
+            commercial.setFacilities(null);
         }
 
         CommercialListApiResponse response = CommercialListApiResponse.builder().commercialList(commercialList).build();
@@ -58,8 +56,13 @@ public class CommercialServiceImpl implements CommercialService{
                             .x(commercial.getX())
                             .y(commercial.getY())
                             .estimatedPopulationList(commercial.getEstimatedPopulationList())
-                            .estimatedSalesList(commercial.getEstimatedSalesList())
+                            .estimatedSalesList(commercial.getEstimatedSalesList()
+                                    .stream()
+                                    .filter(x -> x.getYear().equals("2020"))
+                                    .filter(x -> x.getQuarter().equals("4"))
+                                    .collect(Collectors.toList()))
                             .storeRentalPrice(commercial.getStoreRentalPrice())
+                            .facilities(commercial.getFacilities())
                             .build();
 
                     return new ResponseEntity<>(response, HttpStatus.OK);

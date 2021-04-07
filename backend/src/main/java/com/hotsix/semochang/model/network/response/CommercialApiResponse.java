@@ -2,6 +2,7 @@ package com.hotsix.semochang.model.network.response;
 
 import com.hotsix.semochang.model.EstimatedPopulation;
 import com.hotsix.semochang.model.EstimatedSales;
+import com.hotsix.semochang.model.Facilities;
 import com.hotsix.semochang.model.StoreRentalPrice;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -66,4 +67,9 @@ public class CommercialApiResponse {
      * 상권 임대료 시세 정보
      */
     private StoreRentalPrice storeRentalPrice;
+
+    /***
+     * 상권 집객시설 정보
+     */
+    private Facilities facilities;
 }

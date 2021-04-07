@@ -51,6 +51,11 @@ public class EstimatedSales {
     private Long salesMonth;
 
     /***
+     * 점포수
+     */
+    private int storesCount;
+
+    /***
      * 해당 상권정보
      */
     @ManyToOne
