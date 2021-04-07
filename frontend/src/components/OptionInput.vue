@@ -82,11 +82,28 @@
                <div class="client-wrapper">
                   <div class="c-header">대상고객</div>
                   <div class="bts">
-                     <div class="l-bt" @click="selectClient('직장인')">
-                        직장인
+                     <div class="l-bt" @click="selectClient('직장인')" :class="{'sel-cl': officeSel}">
+                        <i class="fas fa-building"></i>
+                        <span>직장인</span>
                      </div>
-                     <div class="r-bt" @click="selectClient('주거인')">
-                        주거인
+                     <div class="r-bt" @click="selectClient('주거인')" :class="{'sel-cl': resiSel}">
+                        <i class="fas fa-home"></i>
+                        <span>주거인</span>
+                     </div>
+                  </div>
+               </div>
+               <div class="gender-wrapper">
+                  <div class="g-header">
+                     대상 성별
+                  </div>
+                  <div class="g-bts">
+                     <div class="f-bt" :class="{'sel-cl': feSel}" @click="selectGender('female')">
+                        <i class="fas fa-venus"></i>
+                        <span>여성</span>
+                     </div>
+                     <div class="m-bt" :class="{'sel-cl': maSel}" @click="selectGender('male')">
+                        <i class="fas fa-mars"></i>
+                        <span>남성</span>
                      </div>
                   </div>
                </div>
@@ -119,11 +136,7 @@
                      </div>
                   </div>
                </div>
-               <div class="gender-wrapper">
-                  <div class="g-header">
-                     대상 성별
-                  </div>
-               </div>
+               
             </div>
          </div>
 
@@ -143,15 +156,19 @@ export default {
    },
    data: function() {
       return {
-         test: false,
          selectedCate: '',
-         selectedClient: '',
-         showUl: false,
+         selectedDs: [], // 선택된 지역
+         selectedClient: [],
          deposit: 3441,
          rent: 55000,
-         query: '', // 지역 검색어
-         selectedDs: [], // 선택된 지역
          selectedAges: [],
+         selectedGender: [],
+         showUl: false,
+         officeSel: false,
+         resiSel: false,
+         feSel: false,
+         maSel: false,
+         query: '', // 지역 검색어
          districts: [
             '종로구',
             '중구',
@@ -339,6 +356,11 @@ export default {
             const options = {
                category: this.selectedCate,
                districts: this.selectedDs,
+               deposit: this.deposit,
+               rent: this.rent,
+               client: this.selectedClient,
+               age: this.selectedAges,
+               gender: this.selectedGender
             };
             this.$emit('input-complete', options);
          } else {
@@ -355,13 +377,37 @@ export default {
       // 대상고객 선택
       selectClient: function (cl) {
          if (cl==='직장인') {
-            this.selectedClient = cl
-            document.querySelector('.r-bt').classList.remove('sel-cl')
-            document.querySelector('.l-bt').classList.add('sel-cl')
+            this.officeSel = !this.officeSel
+            if (this.officeSel) {
+               this.selectedClient.push(cl)
+            } else {
+               this.selectedClient.splice(this.selectedClient.indexOf(cl), 1)
+            }
          } else {
-            this.selectedClient = cl
-            document.querySelector('.l-bt').classList.remove('sel-cl')
-            document.querySelector('.r-bt').classList.add('sel-cl')
+            this.resiSel = !this.resiSel
+            if (this.resiSel) {
+               this.selectedClient.push(cl)
+            } else {
+               this.selectedClient.splice(this.selectedClient.indexOf(cl), 1)
+            }
+         }
+      },
+      // 대상성별 선택
+      selectGender: function (ge) {
+         if (ge==='female') {
+            this.feSel = !this.feSel
+            if (this.feSel) {
+               this.selectedGender.push(ge)
+            } else {
+               this.selectedGender.splice(this.selectedGender.indexOf(ge), 1)
+            }
+         } else {
+            this.maSel = !this.maSel
+            if (this.maSel) {
+               this.selectedGender.push(ge)
+            } else {
+               this.selectedGender.splice(this.selectedGender.indexOf(ge), 1)
+            }
          }
       }
    },
@@ -688,38 +734,32 @@ export default {
                   display: flex;
                   justify-content: space-around;
                   align-items: center;
-                  .l-bt {
+                  .l-bt, .r-bt {
                      cursor: pointer;
-                     border-radius: 20px;
-                     width: 150px;
-                     background-color: #e7e7e7;
+                     border-radius: 30px;
+                     width: 90px;
                      // color: white;
-                     height: 70px;
+                     height: 90px;
                      display: flex;
+                     flex-direction: column;
                      justify-content: center;
                      align-items: center;
-                     box-shadow: 4px 4px 4px #56565629;
-                  }
-                  .r-bt {
-                     cursor: pointer;
-                     border-radius: 20px;
-                     width: 150px;
-                     background-color: #e7e7e7;
-                     // color: white;
-                     height: 70px;
-                     display: flex;
-                     justify-content: center;
-                     align-items: center;
-                     box-shadow: 4px 4px 4px #56565629
+                     color: gray;
+                     i {
+                        font-size: 25pt;
+                     }
+                     span {
+                        margin-top: 10px;
+                     }
                   }
                   .sel-cl {
-                     background-color: #ffcc00;
+                     color: #ffcc00;
                   }
 
                }
             }
             .age-wrapper {
-               padding: 20px 20px;
+               padding: 20px;
                .a-header {
                   font-weight: 600;
                   font-size: 12pt;
@@ -834,18 +874,38 @@ export default {
                   }
                }
             }
+            .gender-wrapper {
+               padding: 20px;
+               .g-header {
+                  font-weight: 600;
+                  font-size: 12pt;
+               }
+               .g-bts {
+                  margin-top: 20px;
+                  display: flex;
+                  justify-content: space-around;
+                  .f-bt, .m-bt {
+                     cursor: pointer;
+                     display: flex;
+                     flex-direction: column;
+                     align-items: center;
+                     color: gray;
+                     i {
+                        font-size: 25pt;
+                     }
+                     span {
+                        margin-top: 10px;
+                     }
+                  }
+                  .sel-cl {
+                     color: #ffcc00;
+                  }
+               }
+            }
          }
       }
 
    }
-   // .content-wrapper::-webkit-scrollbar-track-piece:end {
-   //    background: transparent;
-   //    margin-bottom: 10px;
-   // }
-   // .content-wrapper::-webkit-scrollbar-track-piece:start {
-   //    background: transparent;
-   //    margin-top: 10px;
-   // }
    .footer {
       height: 10%;
       margin-bottom: 25px;
