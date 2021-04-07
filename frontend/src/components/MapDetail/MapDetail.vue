@@ -1,66 +1,76 @@
 <template lang="">
    <div class="md-container">
-      <div class="header">
-         <div class="name"><i class="fas fa-store"></i> {{ this.detailData.commercialName }}</div>
-         <div class="btnLike">
-            <i v-if="isBookmark" class="fas fa-star" @click="bookmark"></i>
-            <i v-else class="far fa-star" @click="bookmark"></i>
+      <div class="top-wrapper">
+         <div class="header">
+            <div class="name"><i class="fas fa-store"></i> {{ this.detailData.commercialName }}</div>
+            <div class="btnLike">
+               <i v-if="isBookmark" class="fas fa-star" @click="bookmark"></i>
+               <i v-else class="far fa-star" @click="bookmark"></i>
+            </div>
+            <i @click="closeCompo" class="fas fa-times btn-close"></i>
          </div>
-         <i @click="closeCompo" class="fas fa-times btn-close"></i>
-      </div>
-      <!-- <div class="content-recommend">
+         <!-- <div class="content-recommend">
          <div class="score">
             추천지수 <span class="number"> {{ score }} </span> 점
          </div>
          <p class="description">* 본 추천지수는 'KNN 알고리즘'을 적용하여 도출된 점수입니다.</p>
       </div> -->
-      <div class="content-common">
-         <div class="info-basic">
-            <span class="title">
-               상권코드<span class="value">{{ this.detailData.commercialCode }}</span>
-            </span>
-            <span class="title">
-               상권구분<span class="value">{{ this.detailData.divisionName }}</span>
-            </span>
-         </div>
-         <div class="info-special">
-            <div class="box recommend">
-               <div class="title">추천지수</div>
-               <div class="value">97</div>
+         <div class="content-common">
+            <div class="info-basic">
+               <span class="title">
+                  상권코드<span class="value">{{ this.detailData.commercialCode }}</span>
+               </span>
+               <span class="title">
+                  상권구분<span class="value">{{ this.detailData.divisionName }}</span>
+               </span>
             </div>
-            <div class="box rent">
-               <div class="title">추정 매출</div>
-               <div class="value">2000</div>
-            </div>
-            <div class="box sales">
-               <div class="title">평균 임대료</div>
-               <div class="value">4000</div>
+            <div class="info-special">
+               <div class="box recommend">
+                  <div class="title">추천지수</div>
+                  <div class="value">97</div>
+               </div>
+               <div class="box rent">
+                  <div class="title">추정 매출</div>
+                  <div class="value">2000</div>
+               </div>
+               <div class="box sales">
+                  <div class="title">평균 임대료</div>
+                  <div class="value">4000</div>
+               </div>
             </div>
          </div>
       </div>
-      <div class="content-detail">
-         <div class="section">
-            <p class="title">업종별 매출 추이</p>
-            <DetailGraph :dataset="type" class="graph" />
-         </div>
-         <div class="section">
-            <p class="title">업종별 어쩌구 추이</p>
-            <DetailGraph :dataset="age" class="graph" />
-         </div>
-         <div class="section">
-            <p class="title">어쩌구 저쩌구</p>
-            <LineGraph :dataset="ysales" class="graph" />
-         </div>
-         <div class="section">
-            <p class="title">성별 선호도</p>
-            <PieChart :dataset="week" class="graph" />
+      <div class="bottom-wrapper">
+         <div class="content-detail">
+            <div class="section">
+               <p class="title">유동인구 변화추이</p>
+               <LineGraph :isLoad="isLoad" :dataset="population" class="graph" />
+            </div>
+            <div class="section">
+               <p class="title">연령대 분포</p>
+               <span class="notes">(updated 2020-4분기)</span>
+               <BarGraph :isLoad="isLoad" :dataset="age" class="graph" />
+            </div>
+            <div class="section">
+               <p class="title">요일별 유동인구</p>
+               <span class="notes">(updated 2020-4분기)</span>
+               <BarGraph :isLoad="isLoad" :dataset="weekPop" class="graph" />
+            </div>
+            <div class="section">
+               <p class="title">요일별 유동인구</p>
+               <PieChart :dataset="week" class="graph" />
+            </div>
+            <div class="section">
+               <p class="title">어쩌구 저쩌구</p>
+               <!-- <LineGraph :dataset="type" class="graph" /> -->
+            </div>
          </div>
       </div>
    </div>
 </template>
 
 <script>
-import DetailGraph from './DetailGraph';
+import BarGraph from './BarGraph';
 import PieChart from './PieChart';
 import LineGraph from './LineGraph';
 import { createBookmark, removeBookmark } from '@/api/bookmark';
@@ -82,9 +92,10 @@ export default {
    props: {
       detailData: Object,
       isBookmark: Boolean,
+      loadStatus: Number,
    },
    components: {
-      DetailGraph,
+      BarGraph,
       PieChart,
       LineGraph,
    },
@@ -94,30 +105,38 @@ export default {
          score: '',
          sales: '',
          rent: '',
-         type: {
-            name: '업종별 비율',
-            category: ['한식음식점', '양식음식점', '일식음식점', '분식전문점', '패스트푸드점', '호프/간이주점', '커피/음료', '베이커리'],
-            value: '',
-         },
-         age: {
-            name: '연령대별 비율',
-            category: ['10대', '20대', '30대', '40대', '50대', '60대 이상'],
-            value: '',
-         },
-         ysales: {
-            name: '연도별 매출',
-            category: ['2018년', '2019년', '2020년'],
-            value: '',
-         },
-         week: {
-            name: '주중/주말 매출',
-            category: ['주중', '주말'],
-            value: '',
-         },
+
+         isLoad: false,
+
+         // 하단 그래프에 내리는 데이터셋
+         population: {}, // 유동인구 변화 추이
+         age: {}, // 연령대 분포
+         weekPop: {}, // 요일별 유동인구
+         type: {},
+         week: {},
       };
+   },
+   watch: {
+      loadStatus: function() {
+         if (this.loadStatus == 0) {
+            // 초기화
+            console.log('- 데이터베이스와 로드값을 초기화합니다');
+            this.isLoad = false; // 로드 상태 0으로 초기화
+            this.initDataset(); // 데이터셋 초기화
+         }
+      },
+      detailData: function() {
+         if (this.detailData.commercialName !== undefined) {
+            // 전달 받은 값 있을 경우
+            this.convertData2Graph();
+         }
+      },
    },
    computed: {
       ...mapState(['isLogin']),
+   },
+   created() {
+      this.initDataset();
    },
    methods: {
       getData: function() {
@@ -129,6 +148,73 @@ export default {
          this.age.value = mapdata.age;
          this.ysales.value = mapdata.ysales;
          this.week.value = mapdata.week;
+      },
+
+      initDataset() {
+         this.population = {
+            name: '유동 인구 수',
+            category: ['19-1분기', '19-2분기', '19-3분기', '19-4분기', '20-1분기', '20-2분기', '20-3분기', '20-4분기'],
+            value: [0, 0, 0, 0, 0, 0, 0, 0],
+         };
+         this.age = {
+            name: '유동 인구 수',
+            category: ['10대', '20대', '30대', '40대', '50대', '60대 이상'],
+            value: [0, 0, 0, 0, 0, 0],
+         };
+         this.weekPop = {
+            name: '유동 인구 수',
+            category: ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'],
+            value: [0, 0, 0, 0, 0, 0, 0],
+         };
+         this.type = {
+            name: '업종별 비율',
+            category: ['한식음식점', '양식음식점', '일식음식점', '분식전문점', '패스트푸드점', '호프/간이주점', '커피/음료', '베이커리'],
+            value: [22, 30, 11, 27, 4, 3, 2, 1],
+         };
+         this.week = {
+            name: '주중/주말 매출',
+            category: ['주중', '주말'],
+            value: [45, 55],
+         };
+      },
+
+      // detailData를 하단 그래프에 전달하도록 값을 변환함
+      convertData2Graph() {
+         this.makePopulation(); // 유동인구 변화추이
+         this.makeAge(); // 연령대 분포
+         this.makeWeekPop();
+
+         // 데이터 로드 완료시 true 변경
+         this.isLoad = true;
+      },
+
+      // 유동인구 변화 추이 그래프 생성
+      makePopulation() {
+         var result = [];
+         var target = this.detailData.estimatedPopulationList;
+
+         if (target && target.length > 0) {
+            for (let idx = 0; idx < this.population.category.length; idx++) {
+               result.push(target[idx].allPopulation);
+            }
+         }
+         this.population.value = result;
+      },
+
+      // 연령대 분포
+      makeAge() {
+         var target = this.detailData.estimatedPopulationList[0];
+         var result = [target.age10, target.age20, target.age30, target.age40, target.age50, target.age60];
+
+         this.age.value = result;
+      },
+
+      // 연령대 분포
+      makeWeekPop() {
+         var target = this.detailData.estimatedPopulationList[0];
+         var result = [target.monPopulation, target.tuePopulation, target.wedPopulation, target.thuPopulation, target.friPopulation, target.satPopulation, target.sunPopulation];
+
+         this.weekPop.value = result;
       },
 
       bookmark: function() {
@@ -163,12 +249,13 @@ export default {
 
          this.isBookmark = !this.isBookmark;
       },
+
       closeCompo: function() {
+         this.isLoad = false;
+         this.initDataset();
+
          this.$emit('close-expended');
       },
-   },
-   created: function() {
-      this.getData();
    },
 };
 </script>
@@ -183,134 +270,149 @@ export default {
    height: 100%;
    display: flex;
    flex-direction: column;
-   padding: 25px 25px;
 
-   .header {
-      /* background-color: red; */
-      height: 50px;
+   .top-wrapper {
+      height: 400px;
+      box-shadow: 9px 9px 20px #56565629;
+      border-radius: 0px 0px 20px 20px;
+      padding: 25px;
 
-      .name {
-         display: inline-block;
-         font-size: 22pt;
-         font-weight: 600;
+      .header {
+         /* background-color: red; */
+         height: 50px;
 
-         i {
-            font-size: 14pt;
-         }
-      }
-
-      .btnLike {
-         display: inline-block;
-         margin-left: 5px;
-         color: rgb(236, 201, 3);
-         font-size: 18px;
-      }
-
-      .btn-close {
-         float: right;
-
-         font-size: 18pt;
-         color: rgb(148, 148, 148);
-         cursor: pointer;
-
-         &:hover {
-            color: #ff6633;
-         }
-      }
-   }
-
-   .content-common {
-      display: flex;
-      flex-direction: column;
-      margin-top: 15px;
-
-      .info-basic {
-         width: 100%;
-         height: 40px;
-
-         font-size: 10pt;
-         color: rgb(63, 63, 63);
-         /* text-align: center; */
-         padding: 0px 20px;
-         line-height: 40px;
-
-         background-color: rgb(230, 230, 230);
-         border: 1px solid rgb(203, 203, 203);
-
-         .title {
-            margin-right: 10px;
+         .name {
+            display: inline-block;
+            font-size: 22pt;
             font-weight: 600;
+
+            i {
+               font-size: 14pt;
+            }
          }
 
-         .value {
-            margin-left: 3px;
-            color: #ff6633;
+         .btnLike {
+            display: inline-block;
+            margin-left: 5px;
+            color: rgb(236, 201, 3);
+            font-size: 18px;
+         }
+
+         .btn-close {
+            float: right;
+
+            font-size: 18pt;
+            color: rgb(148, 148, 148);
+            cursor: pointer;
+
+            &:hover {
+               color: #ff6633;
+            }
          }
       }
 
-      .info-special {
-         margin: 15px 0px;
+      .content-common {
          display: flex;
+         flex-direction: column;
+         margin-top: 15px;
 
-         /* 공통 속성 */
-         .box {
-            $radiusVal: 15px;
-
+         .info-basic {
             width: 100%;
-            height: 100px;
-            border-radius: $radiusVal;
-            background-color: rgb(255, 244, 226);
-            /* box-shadow: 0px 3px 8px rgb(0 0 0 / 46%); */
-            margin: 0px 10px;
+            height: 40px;
+
+            font-size: 10pt;
+            color: rgb(63, 63, 63);
+            /* text-align: center; */
+            padding: 0px 20px;
+            line-height: 40px;
+
+            background-color: rgb(230, 230, 230);
+            border: 1px solid rgb(203, 203, 203);
 
             .title {
-               height: 30px;
-               background-color: rgba(29, 29, 29, 0.119);
-               border-radius: $radiusVal $radiusVal 0px 0px;
-
-               font-size: 11pt;
+               margin-right: 10px;
                font-weight: 600;
-               text-align: center;
-               line-height: 30px;
             }
 
             .value {
-               font-size: 26pt;
-               font-weight: 600;
-               text-align: center;
-               line-height: 60px;
+               margin-left: 3px;
+               color: #ff6633;
             }
          }
 
-         .recommend {
-            background-color: #ffcc00;
+         .info-special {
+            margin: 15px 0px;
+            display: flex;
+
+            /* 공통 속성 */
+            .box {
+               $radiusVal: 15px;
+
+               width: 100%;
+               height: 100px;
+               border-radius: $radiusVal;
+               background-color: rgb(255, 244, 226);
+               /* box-shadow: 0px 3px 8px rgb(0 0 0 / 46%); */
+               margin: 0px 10px;
+
+               .title {
+                  height: 30px;
+                  background-color: rgba(29, 29, 29, 0.119);
+                  border-radius: $radiusVal $radiusVal 0px 0px;
+
+                  font-size: 11pt;
+                  font-weight: 600;
+                  text-align: center;
+                  line-height: 30px;
+               }
+
+               .value {
+                  font-size: 26pt;
+                  font-weight: 600;
+                  text-align: center;
+                  line-height: 60px;
+               }
+            }
+
+            .recommend {
+               background-color: #ffcc00;
+            }
          }
       }
    }
-
-   .content-detail {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-
+   .bottom-wrapper {
       width: 100%;
       height: 100%;
       overflow-y: auto;
+      padding: 25px;
 
-      .section {
-         margin-top: 20px;
-         width: 100%;
+      .content-detail {
+         display: flex;
+         flex-direction: column;
+         align-items: center;
 
-         p.title {
-            font-size: 16pt;
-            font-weight: 500;
-         }
+         .section {
+            margin-top: 40px;
+            width: 100%;
 
-         .graph {
-            height: 300px;
-            width: 300px;
-            margin: 0 auto;
-            margin-top: 20px;
+            p.title {
+               /* display: inline-block; */
+               font-size: 16pt;
+               font-weight: 500;
+            }
+
+            span.notes {
+               /* float: right; */
+               font-size: 9pt;
+               color: gray;
+            }
+
+            .graph {
+               height: 380px;
+               width: 380px;
+               margin: 0 auto;
+               margin-top: 25px;
+            }
          }
       }
    }
