@@ -337,11 +337,11 @@ export default {
             map: this.mapObject, // 마커들을 클러스터로 관리하고 표시할 지도 객체
             path: polygonPath, // 그려질 다각형의 좌표 배열입니다
             strokeWeight: 2, // 선의 두께입니다
-            strokeColor: '#212121', // 선의 색깔입니다
-            strokeOpacity: 0.3, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+            strokeColor: 'rgb(14, 122, 255)', // 선의 색깔입니다
+            strokeOpacity: 0.8, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
             strokeStyle: 'solid', // 선의 스타일입니다
             fillColor: '#fff', // 채우기 색깔입니다
-            fillOpacity: 0.3, // 채우기 불투명도 입니다
+            fillOpacity: 0.7, // 채우기 불투명도 입니다
          });
 
          // 다각형에 mouseover 이벤트를 등록하고 이벤트가 발생하면 폴리곤의 채움색을 변경합니다
