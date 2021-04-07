@@ -3,7 +3,7 @@
       <div class="wrapper">
          <div class="content">
             현재 <span class="opt">{{ this.toastDist }}</span
-            >을(를) 보고 있어요 <span style="font-size: 18pt">👀</span>
+            >을(를) 보고 있어요 <span style="font-size: 16pt">👀</span>
          </div>
          <div v-show="!isExplore" class="feature">
             <span @click="initRecommend"><i class="fas fa-sync-alt"></i></span>
@@ -51,12 +51,23 @@ export default {
 
       .content {
          color: rgb(46, 46, 46);
-         font-size: 14pt;
+         font-size: 12pt;
          font-weight: 600;
 
          .opt {
+            position: relative;
+            top: 4px;
+            padding: 1px;
+            display: inline-block;
+            /* padding-top: 30px; */
+            /* height: 24px; */
+            max-width: 130px;
+            /* background-color: red; */
             color: rgb(232, 57, 44);
             font-weight: 800;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
          }
       }
 

@@ -13,24 +13,35 @@
       </transition>
       <transition name="collapse-right">
          <div v-show="detailCompo" class="detail-compo floating">
-            <map-detail @close-expended="onClickCloseDetail"></map-detail>
+            <map-detail v-show="detailCompo" :isBookmark="isBookmark" :detailData="detailData" :loadStatus="loadStatus" @close-expended="onClickCloseDetail"></map-detail>
          </div>
       </transition>
       <transition name="collapse">
          <div v-show="optionCompo || bookMarkCompo" class="menu-expand-compo floating">
             <option-input v-show="optionCompo" @close-expended="onClickClose" @input-complete="onInputComplete"></option-input>
-            <bookmark-list v-show="bookMarkCompo" @close-expended="onClickClose" @goDetail="goDetail"></bookmark-list>
+            <bookmark-list v-if="bookMarkCompo" @close-expended="onClickClose" @goDetail="goDetail"></bookmark-list>
          </div>
       </transition>
       <div class="sidemenu-compo floating">
          <side-menu @open-input-form="onClickInputBt" @open-bookmark="onClickBookmarkBt" @dialog-change="onDialogChange"></side-menu>
       </div>
-      <vue-daum-map id="map" :appKey="appKey" :center.sync="center" :level.sync="level" :mapTypeId="mapTypeId" :libraries="libraries" @load="onLoad" @tilesloaded="onMapEvent('titlesloaded', $event)">
+      <vue-daum-map
+         id="map"
+         :appKey="appKey"
+         :center.sync="center"
+         :level.sync="level"
+         :mapTypeId="mapTypeId"
+         :libraries="libraries"
+         @load="onLoad"
+         @tilesloaded="onMapEvent('titlesloaded', $event)"
+         @zoom_changed="onMapEvent('zoom_changed', $event)"
+      >
       </vue-daum-map>
    </div>
 </template>
 
 <script type="text/javascript" src="http://dapi.kakao.com/v2/maps/sdk.js?appkey=5cc03bac0d3510a482068b50dd6e3612&libraries=services,clusterer"></script>
+
 <script>
 import VueDaumMap from 'vue-daum-map';
 import MapDetail from '@/components/MapDetail/MapDetail.vue';
@@ -39,9 +50,12 @@ import OptionInput from '@/components/OptionInput.vue';
 import SideMenu from '@/components/SideMenu.vue';
 import Toast from '@/components/Toast.vue';
 
-import axios from 'axios';
-import { findDongData } from '@/api/mapDetail.js';
+import { mapState } from 'vuex';
+import { findDongData, findAllData, findAllGu } from '@/api/mapDetail.js';
+import { getBookmarkList } from '@/api/bookmark';
 import { coordsB2H } from '@/api/kakaoAPI.js';
+
+import { jsonp } from 'vue-jsonp';
 
 // 동코드 JSON 파일 import
 import guCoords from '@/assets/data/gu_coords.json';
@@ -57,9 +71,14 @@ export default {
       libraries: [],
       mapObject: null,
 
-      detailCompo: false,
       optionCompo: false,
       bookMarkCompo: false,
+
+      // 상권의 상제 정보를 전달하기 위한 변수들
+      detailData: new Object(),
+      loadStatus: 0, //Detail 컴포넌트의 상태 관리
+      isBookmark: false,
+      detailCompo: false,
 
       // 토스트 메뉴를 표시하기 위한
       toastShow: false,
@@ -89,15 +108,17 @@ export default {
       // 동별로 마커를 찍기 위한 json파일 import
       guCoords: guCoords,
       dongCoords: dongCoords,
+      bookmarkList: [],
    }),
    created() {
+      console.log('에러잡기', 1);
       this.initCenter();
    },
 
    watch: {
       level: function() {
          // 조건 만족 시 1회만 생성 -> 성능..
-         if (this.recommendResult == null) {
+         if (this.mapObject != null && this.recommendResult == null) {
             if (this.level >= 6 && this.gu_Overlays.length == 0) {
                console.log('# 레벨 6 이상 => 동 삭제, 구 생성');
                // 구 생성, 동 삭제
@@ -132,6 +153,7 @@ export default {
       // sidemenu의 옵션입력 버튼 눌렀을 때
       onClickInputBt: function() {
          this.optionCompo = !this.optionCompo;
+         this.test = true
          this.bookMarkCompo = false;
       },
       onClickBookmarkBt: function() {
@@ -145,6 +167,7 @@ export default {
       },
       onClickCloseDetail: function() {
          this.detailCompo = false;
+         this.detailData = new Object();
       },
 
       //추천조건 입력 완료되어 버튼 클릭시 (상권추천)
@@ -195,7 +218,10 @@ export default {
          this.toastShow = false;
          this.optionCompo = false;
          this.bookMarkCompo = false;
+
          this.detailCompo = false;
+         this.loadStatus = 0;
+         this.detailData = new Object();
 
          this.initCenter();
 
@@ -209,7 +235,10 @@ export default {
       closeExplore() {
          this.optionCompo = false;
          this.bookMarkCompo = false;
+
          this.detailCompo = false;
+         this.loadStatus = 0;
+         this.detailData = new Object();
 
          this.toastShow = false;
          this.isExplore = false;
@@ -221,7 +250,7 @@ export default {
       },
 
       goDetail(value) {
-         this.detailCompo = value;
+         this.detailCompo = true;
          this.bookMarkCompo = false;
       },
 
@@ -236,7 +265,7 @@ export default {
       },
 
       initCenter() {
-         // console.log('initCenter');
+         console.log('initCenter');
          // 중심위치 세팅
          this.center.lat = 37.5642135; // 위도
          this.center.lng = 127.0016985; // 경로
@@ -271,77 +300,52 @@ export default {
       // 구-1) 구별 폴리곤 이름을 만듦
       makeGuBoundary() {
          console.log('[make] 구 전체 폴리곤, 이름 생성');
-         var totalBounds = {
-            // 서울시 전체 범위로 조회
-            ha: 126.72845050681946,
-            qa: 37.437210868999315,
-            oa: 127.17018320519693,
-            pa: 37.7014997773775,
-         };
 
-         for (var idx in this.guCoords) {
-            var position = new kakao.maps.LatLng(this.guCoords[idx].lat, this.guCoords[idx].lng);
+         findAllGu(
+            (success) => {
+               success.data.forEach((item) => {
+                  var position = new kakao.maps.LatLng(item.lat, item.lng);
 
-            var content = `<div class="gu">
-                              ${this.guCoords[idx].sig_kor_nm}
+                  var content = `<div class="gu">
+                              ${item.sig_kor_nm}
                            </div>`;
 
-            // 커스텀 오버레이를 생성합니다
-            var guOverlay = new kakao.maps.CustomOverlay({
-               map: this.mapObject,
-               position: position,
-               content: content,
-            });
+                  // 커스텀 오버레이를 생성합니다
+                  var guOverlay = new kakao.maps.CustomOverlay({
+                     map: this.mapObject,
+                     position: position,
+                     content: content,
+                  });
 
-            this.gu_Overlays.push(guOverlay);
+                  this.gu_Overlays.push(guOverlay);
 
-            this.apiGuPolygon(totalBounds, guCoords[idx].sig_cd, position);
-         }
-      },
+                  var polygonPath = [];
 
-      // 구-2) API에 현재 동의 폴리곤을 받아서 생성함
-      apiGuPolygon(bounds, sig_cd, center) {
-         var key = '13C339D4-B453-3C5E-A6A1-CCA6792A2D6B'; // 공간정보 오픈플랫폼
-         var domain = 'http://localhost:8080';
-         var crs = 'EPSG:4326'; // 반환되는 좌표(WGS84)
-         var data = 'LT_C_ADSIGG_INFO'; // 시군구 조회
-         var geo = `BOX(${bounds.ha},${bounds.qa},${bounds.oa},${bounds.pa})`; //minx, miny, maxx, maxy로 검색 범위 설정
-         var filter = `sig_cd:like:${sig_cd}`; // 해당되는 동 정보 1개만 반환하기 위함
+                  // 해당 데이터를 polygonPath에서 원하는 방식으로 맵핑
+                  for (let i = 0; i < item.coordinates.length; i++) {
+                     polygonPath.push(new kakao.maps.LatLng(item.coordinates[i][1], item.coordinates[i][0]));
+                  }
 
-         axios
-            .get(`http://api.vworld.kr/req/data?request=GetFeature&data=${data}&key=${key}&format=json&domain=${domain}&crs=${crs}&attrFilter=${filter}&size=1&geomFilter=${geo}`)
-            .then((response) => {
-               var local = response.data.response.result.featureCollection.features;
-
-               var polygonArr = local[0].geometry.coordinates[0][0];
-               var polygonPath = [];
-               var korName = local[0].properties.sig_kor_nm;
-
-               // 해당 데이터를 polygonPath에서 원하는 방식으로 맵핑
-               for (let i = 0; i < polygonArr.length; i++) {
-                  polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
-               }
-
-               this.makeGuPolygon(polygonPath, korName, center);
-            })
-            .catch((err) => {
-               console.log('ERROR : ' + err);
-            });
+                  this.makeGuPolygon(polygonPath, item.sig_kor_nm, position);
+               });
+            },
+            (fail) => {
+               console.log('ERR_findAllGu : ', fail);
+            }
+         );
       },
 
       // 구-3) API에서 받은 폴리곤 데이터로 실제 구별 폴리곤 생성
       makeGuPolygon(polygonPath, name, center) {
-         var cnt = 0;
-         console.log(++cnt);
          var polygon = new kakao.maps.Polygon({
             map: this.mapObject, // 마커들을 클러스터로 관리하고 표시할 지도 객체
             path: polygonPath, // 그려질 다각형의 좌표 배열입니다
             strokeWeight: 2, // 선의 두께입니다
-            strokeColor: '#212121', // 선의 색깔입니다
-            strokeOpacity: 0.3, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+            strokeColor: 'rgb(14, 122, 255)', // 선의 색깔입니다
+            strokeOpacity: 0.8, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
             strokeStyle: 'solid', // 선의 스타일입니다
             fillColor: '#fff', // 채우기 색깔입니다
-            fillOpacity: 0.3, // 채우기 불투명도 입니다
+            fillOpacity: 0.7, // 채우기 불투명도 입니다
          });
 
          // 다각형에 mouseover 이벤트를 등록하고 이벤트가 발생하면 폴리곤의 채움색을 변경합니다
@@ -512,61 +516,104 @@ export default {
          var geo = '';
          var filter = `emd_cd:=:${emd_cd}`;
 
-         axios
-            .get(`http://api.vworld.kr/req/data?request=GetFeature&data=${data}&key=${key}&format=json&domain=${domain}&crs=${crs}&attrFilter=${filter}&size=100&geomFilter=${geo}`)
-            .then((response) => {
-               var local = response.data.response.result.featureCollection.features;
+         jsonp(`http://api.vworld.kr/req/data?request=GetFeature&data=${data}&key=${key}&format=json&domain=${domain}&crs=${crs}&attrFilter=${filter}&size=100&geomFilter=${geo}`).then((response) => {
+            var local = response.response.result.featureCollection.features;
 
-               for (const key in local) {
-                  var polygonArr = local[key].geometry.coordinates[0][0];
-                  var polygonPath = [];
-                  var korName = local[key].properties.sig_kor_nm;
+            for (const key in local) {
+               var polygonArr = local[key].geometry.coordinates[0][0];
+               var polygonPath = [];
+               var korName = local[key].properties.sig_kor_nm;
 
-                  // 해당 데이터를 polygonPath에서 원하는 방식으로 맵핑
-                  for (let i = 0; i < polygonArr.length; i++) {
-                     polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
-                  }
-
-                  console.log('===========================');
-
-                  this.removeDongLayer('polygon');
-                  this.makeDongPolygon(polygonPath);
-
-                  console.log(1);
-
-                  this.mapObject.setCenter(center);
-                  this.mapObject.setLevel(3, { animate: true });
-
-                  console.log(2);
-
-                  this.removeDongLayer('innerDong');
-
-                  console.log(3);
-
-                  // 메소드 체이싱
-                  new Promise((resolve) => {
-                     resolve(this.convertCoordsBtoH(center));
-                  })
-                     .then((result) => {
-                        console.log(4);
-                        console.log('Promise result(H_CODE) => ', result);
-                        return this.apiDongDistrict(result);
-                     })
-                     .then((result) => {
-                        console.log(5, result);
-                        this.dongInnerDistricts = result;
-                     })
-                     .then(() => {
-                        console.log(6);
-                        this.setDongInnerMarker();
-                     });
-
-                  // var H_code = this.convertCoordsBtoH(center);
+               // 해당 데이터를 polygonPath에서 원하는 방식으로 맵핑
+               for (let i = 0; i < polygonArr.length; i++) {
+                  polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
                }
-            })
-            .catch((err) => {
-               console.log('ERROR : ' + err);
-            });
+
+               this.removeDongLayer('polygon');
+               this.makeDongPolygon(polygonPath);
+
+               this.mapObject.setCenter(center);
+               this.mapObject.setLevel(3, { animate: true });
+
+               this.removeDongLayer('innerDong');
+
+               // 메소드 체이싱
+               new Promise((resolve) => {
+                  resolve(this.convertCoordsBtoH(center));
+               })
+                  .then((result) => {
+                     // console.log(4);
+                     // console.log('Promise result(H_CODE) => ', result);
+                     return this.apiDongDistrict(result);
+                  })
+                  .then((result) => {
+                     // console.log(5, result);
+                     this.dongInnerDistricts = result;
+                  })
+                  .then(() => {
+                     // console.log(6, this.dongInnerDistricts);
+                     this.setDongInnerMarker();
+                  });
+
+               // var H_code = this.convertCoordsBtoH(center);
+            }
+         });
+
+         // axios
+         //    .get(`http://api.vworld.kr/req/data?request=GetFeature&data=${data}&key=${key}&format=json&domain=${domain}&crs=${crs}&attrFilter=${filter}&size=100&geomFilter=${geo}`)
+         //    .then((response) => {
+         //       var local = response.data.response.result.featureCollection.features;
+
+         //       for (const key in local) {
+         //          var polygonArr = local[key].geometry.coordinates[0][0];
+         //          var polygonPath = [];
+         //          var korName = local[key].properties.sig_kor_nm;
+
+         //          // 해당 데이터를 polygonPath에서 원하는 방식으로 맵핑
+         //          for (let i = 0; i < polygonArr.length; i++) {
+         //             polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
+         //          }
+
+         //          console.log('===========================');
+
+         //          this.removeDongLayer('polygon');
+         //          this.makeDongPolygon(polygonPath);
+
+         //          console.log(1);
+
+         //          this.mapObject.setCenter(center);
+         //          this.mapObject.setLevel(3, { animate: true });
+
+         //          console.log(2);
+
+         //          this.removeDongLayer('innerDong');
+
+         //          console.log(3);
+
+         //          // 메소드 체이싱
+         //          new Promise((resolve) => {
+         //             resolve(this.convertCoordsBtoH(center));
+         //          })
+         //             .then((result) => {
+         //                console.log(4);
+         //                console.log('Promise result(H_CODE) => ', result);
+         //                return this.apiDongDistrict(result);
+         //             })
+         //             .then((result) => {
+         //                console.log(5, result);
+         //                this.dongInnerDistricts = result;
+         //             })
+         //             .then(() => {
+         //                console.log(6, this.dongInnerDistricts);
+         //                this.setDongInnerMarker();
+         //             });
+
+         //          // var H_code = this.convertCoordsBtoH(center);
+         //       }
+         //    })
+         //    .catch((err) => {
+         //       console.log('ERROR : ' + err);
+         //    });
       },
 
       // 동-4) API에서 받은 동 폴리곤을 생성
@@ -575,10 +622,10 @@ export default {
 
          var polygon = new kakao.maps.Polygon({
             path: polygonPath, // 그려질 다각형의 좌표 배열입니다
-            strokeWeight: 3, // 선의 두께입니다
+            strokeWeight: 1, // 선의 두께입니다
             strokeColor: '#000', // 선의 색깔입니다
-            strokeOpacity: 0.7, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
-            strokeStyle: 'longdash', // 선의 스타일입니다
+            strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+            strokeStyle: 'shortdashdot', // 선의 스타일입니다
             fillColor: '#ffcc00', // 채우기 색깔입니다
             fillOpacity: 0.3, // 채우기 불투명도 입니다
          });
@@ -645,11 +692,11 @@ export default {
          // 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다
          var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
 
-         this.dongInnerDistricts.forEach((district) => {
+         this.dongInnerDistricts.commercialList.forEach((district) => {
             var position = new this.coordsChange(district);
 
             // 커스텀 오버레이에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
-            var content = `<div class="dong inner">
+            var content = `<div class="dongInner">
                                     <i class="fas fa-store"></i> ${district.commercialName}
                                  </div>`;
 
@@ -700,18 +747,53 @@ export default {
       setInnerMarkerClick(item) {
          // 서버로 해당 상권 코드 보내서, 상권 상세 정보를 받아옴 (일단 공동으로 하기 위해 상권번호만 넘기는 식)
 
-         console.log(item);
-
          this.mapObject.setLevel(4, { animate: true });
          this.mapObject.setCenter(item.position);
 
+         // console.log('=====================================');
+
          // 검색 결과 조회
-         this.detailCompo = true;
-         this.toastShow = true;
+         new Promise((resolve) => {
+            // 초기 값 셋팅
+            this.loadStatus = 0; // 디테일 컴포넌트 로드가 안된 초기 상태로 셋팅
+            this.detailData = new Object(); // 디테일 컴포넌트에 새로운 결과값을 주기위해 초기 값 셋팅
+            resolve(this.getDistrictDetail(item.district.commercialCode));
+         }).then((result) => {
+            this.loadStatus = 1;
+            this.detailCompo = true;
+            this.detailData = result;
+            this.setIsBookmark();
+            // console.log('#out getDistrictDetail', typeof this.detailData);
+         });
 
          // 토스트 메뉴
+         this.toastShow = true;
          this.toastDist = item.district.commercialName;
          this.isExplore = true;
+      },
+
+      // 해당 회원이 북마크한 상권인지 아닌 지 확인
+      setIsBookmark() {
+         if (!this.isLogin) {
+            return;
+         }
+
+         /** 북마크 리스트 가져오기 */
+         getBookmarkList(
+            (res) => {
+               this.bookmarkList = res.data;
+               this.isBookmark = false;
+               for (var i = 0; i < this.bookmarkList.length; ++i) {
+                  if (this.bookmarkList[i].commercial.commercialCode == this.detailData.commercialCode) {
+                     this.isBookmark = true;
+                     break;
+                  }
+               }
+            },
+            (err) => {
+               console.log(err);
+            }
+         );
       },
 
       // 동-0) 입력값에 따라 정보를 삭제함
@@ -806,9 +888,9 @@ export default {
 
       // 추천-1) 추천받은 상권들의 마커 정보 입력
       setRecommendMarker() {
-         var imageSrc = require('/src/assets/image/map/marker/marker.png'), // 마커이미지의 주소입니다
-            imageSize = new kakao.maps.Size(40, 40), // 마커이미지의 크기입니다
-            imageOption = { offset: new kakao.maps.Point(19, 40) }; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
+         var imageSrc = require('/src/assets/image/map/marker/tap-marker.png'), // 마커이미지의 주소입니다
+            imageSize = new kakao.maps.Size(158, 253), // 마커이미지의 크기입니다
+            imageOption = { offset: new kakao.maps.Point(85, 250) }; // 마커이미지의 옵션입니다. 마커의 좌표와 일치시킬 이미지 안에서의 좌표를 설정합니다.
 
          // 마커의 이미지정보를 가지고 있는 마커이미지를 생성합니다
          var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
@@ -822,12 +904,10 @@ export default {
             var position = new this.coordsChange(district);
 
             // 커스텀 오버레이에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
-            var content = `<div class="customoverlay">
-                  <span class="markerInfo">
-                     <p class="name"><i class="fas fa-map-marker-alt"></i> ${district.commercialName} <br><br>
-                        <span class="score">${district.score}</span>점
-                     </p>
-                  </span>
+            var content = `<div class="customoverlay2">
+                  <div class="circle">${district.score}<span>점</span></div>
+                  <div class="division">${district.divisionName}</div>
+                  <div class="name"><i class="fas fa-map-marker-alt"></i> ${district.commercialName}</div>
                </div>`;
 
             // 커스텀 오버레이를 생성합니다
@@ -880,21 +960,43 @@ export default {
       // 추천-2-1) 추천 상권 클릭 이벤트 발생 시, 순서에 따라 이벤트 처리 및 결과 재표시
       setEventRecommendClick(item) {
          // 서버로 해당 상권 코드 보내서, 상권 상세 정보를 받아옴 (일단 공동으로 하기 위해 상권번호만 넘기는 식)
-
+         console.log('setEventRecommendClick');
          this.mapObject.setLevel(4, { animate: true });
          this.mapObject.setCenter(item.position);
 
          // 검색 결과 조회
-         this.detailCompo = true;
+         new Promise((resolve) => {
+            // 초기 값 셋팅
+            this.loadStatus = 0; // 디테일 컴포넌트 로드가 안된 초기 상태로 셋팅
+            this.detailData = new Object(); // 디테일 컴포넌트에 새로운 결과값을 주기위해 초기 값 셋팅
+            resolve(this.getDistrictDetail(item.district.commercialCode));
+         }).then((result) => {
+            this.loadStatus = 1;
+            this.detailData = result;
+            this.detailCompo = true;
+            this.setIsBookmark();
+            console.log('#out getDistrictDetail', this.detailData);
+         });
+
+         // 토스트 메뉴
          this.toastShow = true;
          this.toastDist = item.district.commercialName;
-         // 토스트 메뉴
       },
 
       //서버로 선택한 상권의 상세 정보를 요청함
-      getDistrictDetail(code) {
-         // 선택한 상권에 대한 상세 정보를 요청함
-         return '';
+      getDistrictDetail(commercialCode) {
+         return new Promise((resolve, reject) => {
+            findAllData(
+               commercialCode,
+               (success) => {
+                  // console.log('#in getDistrictDetail', success.data);
+                  resolve(success.data);
+               },
+               (fail) => {
+                  console.log('ERR_findAllData : ', fail);
+               }
+            );
+         });
       },
 
       // 추천-3) 오픈 API를 통해 폴리곤 정보를 불러옴
@@ -906,30 +1008,49 @@ export default {
          var data = 'LT_C_DGMAINBIZ'; // 상권 폴리곤 출력
          // console.log(position.La, position.Ma);
 
-         axios
-            .get(`http://api.vworld.kr/req/data?request=GetFeature&data=${data}&key=${key}&format=json&domain=${domain}&crs=${crs}&geomFilter=${geo}`)
-            .then((response) => {
-               // console.log(response.data.response);
-               if (response.data.response.status == 'OK') {
-                  // 상권 영역이 있으면, 폴리곤 생성
-                  // 응답 데이터에서 polygon 정보 찾기
-                  var polygonArr = response.data.response.result.featureCollection.features[0].geometry.coordinates[0][0];
-                  var polygonPath = [];
+         jsonp(`http://api.vworld.kr/req/data?request=GetFeature&data=${data}&key=${key}&format=json&domain=${domain}&crs=${crs}&geomFilter=${geo}`).then((response) => {
+            if (response.response.status == 'OK') {
+               // 상권 영역이 있으면, 폴리곤 생성
+               // 응답 데이터에서 polygon 정보 찾기
+               var polygonArr = response.response.result.featureCollection.features[0].geometry.coordinates[0][0];
+               var polygonPath = [];
 
-                  // 해당 데이터를 polygonPath에서 원하는 방식으로 맵핑
-                  for (let i = 0; i < polygonArr.length; i++) {
-                     polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
-                  }
-
-                  this.makePolygonDistrict(polygonPath);
-               } else {
-                  // 상권 영역 없으면, 원형
-                  this.makeCircleDistrict(position);
+               // 해당 데이터를 polygonPath에서 원하는 방식으로 맵핑
+               for (let i = 0; i < polygonArr.length; i++) {
+                  polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
                }
-            })
-            .catch((err) => {
-               console.log('ERROR : ' + err);
-            });
+
+               this.makePolygonDistrict(polygonPath);
+            } else {
+               // 상권 영역 없으면, 원형
+               this.makeCircleDistrict(position);
+            }
+         });
+
+         // axios
+         //    .get(`http://api.vworld.kr/req/data?request=GetFeature&data=${data}&key=${key}&format=json&domain=${domain}&crs=${crs}&geomFilter=${geo}`)
+         //    .then((response) => {
+         //       // console.log(response.data.response);
+         //       if (response.data.response.status == 'OK') {
+         //          // 상권 영역이 있으면, 폴리곤 생성
+         //          // 응답 데이터에서 polygon 정보 찾기
+         //          var polygonArr = response.data.response.result.featureCollection.features[0].geometry.coordinates[0][0];
+         //          var polygonPath = [];
+
+         //          // 해당 데이터를 polygonPath에서 원하는 방식으로 맵핑
+         //          for (let i = 0; i < polygonArr.length; i++) {
+         //             polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
+         //          }
+
+         //          this.makePolygonDistrict(polygonPath);
+         //       } else {
+         //          // 상권 영역 없으면, 원형
+         //          this.makeCircleDistrict(position);
+         //       }
+         //    })
+         //    .catch((err) => {
+         //       console.log('ERROR : ' + err);
+         //    });
       },
 
       // 추천-3-1) 상권 영역이 없는 경우, 원형으로 표시
@@ -937,13 +1058,13 @@ export default {
          // 지도에 표시할 원을 생성합니다
          var circle = new kakao.maps.Circle({
             center: new kakao.maps.LatLng(position.Ma, position.La), // 원의 중심좌표 입니다
-            radius: 100, // 미터 단위의 원의 반지름입니다
-            strokeWeight: 3, // 선의 두께입니다
+            radius: 70, // 미터 단위의 원의 반지름입니다
+            strokeWeight: 1, // 선의 두께입니다
             strokeColor: '#212121', // 선의 색깔입니다
-            strokeOpacity: 0.8, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+            strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
             strokeStyle: 'longdash', // 선의 스타일 입니다
-            fillColor: '#CFE7FF', // 채우기 색깔입니다
-            fillOpacity: 0.6, // 채우기 불투명도 입니다
+            fillColor: '#ff6633', // 채우기 색깔입니다
+            fillOpacity: 0.3, // 채우기 불투명도 입니다
          });
 
          // 지도에 원을 표시합니다
@@ -956,12 +1077,12 @@ export default {
          // 지도에 표시할 다각형을 생성합니다
          var polygon = new kakao.maps.Polygon({
             path: polygonPath, // 그려질 다각형의 좌표 배열입니다
-            strokeWeight: 3, // 선의 두께입니다
+            strokeWeight: 1, // 선의 두께입니다
             strokeColor: '#212121', // 선의 색깔입니다
-            strokeOpacity: 0.8, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
+            strokeOpacity: 1, // 선의 불투명도 입니다 1에서 0 사이의 값이며 0에 가까울수록 투명합니다
             strokeStyle: 'longdash', // 선의 스타일입니다
-            fillColor: '#A2FF99', // 채우기 색깔입니다
-            fillOpacity: 0.6, // 채우기 불투명도 입니다
+            fillColor: '#ff6633', // 채우기 색깔입니다
+            fillOpacity: 0.3, // 채우기 불투명도 입니다
          });
 
          // 지도에 다각형을 표시합니다
@@ -1012,23 +1133,9 @@ export default {
          // console.log('WGS84 변환', coords.toLatLng());
          return coords.toLatLng();
       },
-
-      // 폴리곤을 통해 중심 좌표 구하기(centroid 알고리즘)
-      centroid(polygonPath) {
-         var i, j, len, p1, p2, f, area, x, y;
-
-         area = x = y = 0;
-         for (i = 0, len = point.length, j = len - 1; i < len; j = i++) {
-            p1 = point[i];
-            p2 = point[j];
-            f = p1[1] * p2[0] - p2[1] * p1[0];
-            x += (p1[0] + p2[0]) * f;
-            y += (p1[1] + p2[1]) * f;
-            area += f * 3;
-         }
-
-         return new kakao.maps.LatLng(x / area, y / area);
-      },
+   },
+   computed: {
+      ...mapState(['isLogin']),
    },
 };
 </script>
@@ -1097,9 +1204,11 @@ export default {
       top: 40px;
       left: 50%;
 
-      transform: translate(-50%, -50%);
+      transform: translateX(-400px);
+      /* transform: translate(-50%, -50%);  원본 위치 */
 
       border-radius: 30px;
+      z-index: 30;
    }
 
    // detail-compo slide in 기능
@@ -1113,14 +1222,17 @@ export default {
    }
 
    // 토스트 팝업 위에서 떨어지는 기능
-   .slide-down-enter-active,
+   .slide-down-enter-active {
+      transition: all 0.7s ease;
+   }
+
    .slide-down-leave-active {
-      transition: all 0.4s ease;
+      transition: all 0.1s;
    }
 
    .slide-down-enter,
    .slide-down-leave-to {
-      transform: translateY(-1000px);
+      transform: translateX(-400px) translateY(-200px);
    }
 
    .detail-compo {
@@ -1133,6 +1245,7 @@ export default {
       height: 96%;
 
       border-radius: 15px;
+      overflow: hidden;
    }
 
    // 메인 지도

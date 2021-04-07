@@ -63,15 +63,14 @@ public class BookmarkServiceImp implements BookmarkService{
     }
 
     @Override
-    public ResponseEntity<?> delete(Long id) {
-        Optional<Bookmark> optional = bookmarkRepository.findById(id);
+    @Transactional
+    public ResponseEntity<?> delete(String commercialCode, Authentication authentication) {
 
-        return optional
-                .map(bookmark -> {
-                    bookmarkRepository.delete(bookmark);
-                    return new ResponseEntity<>(HttpStatus.OK);
-                })
-                .orElseGet(()-> new ResponseEntity<>("No Data", HttpStatus.NO_CONTENT));
+        Claims claims = (Claims) authentication.getPrincipal();
+        Long founderId = claims.get("id", Long.class);
+
+        bookmarkRepository.deleteByCommercial_CommercialCodeAndFounder_Id(commercialCode, founderId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @Override

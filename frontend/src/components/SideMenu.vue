@@ -14,38 +14,51 @@
       <div class="bottom-wrapper">
          <i @click="aboutDialog = true" class="fas fa-info-circle about"></i><br /><br /><br /><br />
          <!--  login == 1 signup == 2 -->
+         <span v-if="isLogin">{{ userInfo.name }}님</span><br><br>
          <span v-if="!isLogin" @click="controlModal(1, 'open')">로그인</span><br /><br />
          <span v-if="isLogin" @click="doLogout">로그아웃</span><br /><br />
-         <span @click="controlModal(2, 'open')">회원가입</span>
+         <span v-if="!isLogin" @click="controlModal(2, 'open')">회원가입</span>
       </div>
 
       <!-- 회원가입모달 -->
       <transition name="slide-to-middle">
          <div v-if="dialog" class="modal">
             <div class="modal__header">
-               로고
+               <img src="@/assets/image/NDCU_logo_eng.png" alt="">
             </div>
             <div class="modal__content">
                <div class="form-wrapper form-su">
                   <div class="input-wrapper">
-                     <input v-model="suEmail" id="email-ip" type="email" placeholder="이메일" @focus="onFocused('email')" @blur="onBlured('email')" />
+                     <input @keypress.enter="doRegister" v-model="suEmail" id="email-ip" type="email" placeholder="이메일" @focus="onFocused('email')" @blur="onBlured('email')" />
                      <div id="email-dv" class="divider"></div>
                      <span v-if="!emailVal" class="tip">이메일 형식이 아닙니다.</span>
                   </div>
                   <div class="input-wrapper">
-                     <input v-model="suPwd" id="pwd-ip" type="password" placeholder="비밀번호" @focus="onFocused('pwd')" @blur="onBlured('pwd')" />
+                     <input @keypress.enter="doRegister" v-model="suPwd" id="pwd-ip" maxlength="10" type="password" placeholder="비밀번호" @focus="onFocused('pwd')" @blur="onBlured('pwd')" />
                      <div id="pwd-dv" class="divider"></div>
-                     <span v-if="!pwdVal1" class="tip">영문, 숫자 포함 6-20자 이내여야 합니다.</span>
+                     <span v-if="!pwdVal1" class="tip">영문, 숫자 포함 6-10자 이내여야 합니다.</span>
                   </div>
                   <div class="input-wrapper">
-                     <input v-model="suPwdConf" id="pwdc-ip" type="password" placeholder="비밀번호 확인" @focus="onFocused('pwdc')" @blur="onBlured('pwdc')" />
+                     <input @keypress.enter="doRegister" v-model="suPwdConf" id="pwdc-ip" maxlength="10" type="password" placeholder="비밀번호 확인" @focus="onFocused('pwdc')" @blur="onBlured('pwdc')" />
                      <div id="pwdc-dv" class="divider"></div>
                      <span v-if="!pwdVal2" class="tip">비밀번호가 일치하지 않습니다.</span>
+                  </div>
+                  <div class="ad-input-wrapper">
+                     <div class="input-wrapper">
+                        <input @keypress.enter="doRegister" v-model.trim="name" id="name-ip" maxlength="10" type="text" placeholder="별명" @focus="onFocused('name')" @blur="onBlured('name')" autocomplete="off"/>
+                        <div id="name-dv" class="divider"></div>
+                        <span id="name-tip" v-if="!nameVal" class="tip">필수항목(특수문자 제외)</span>
+                     </div>
+                     <div class="input-wrapper">
+                        <input @keypress.enter="doRegister" v-model="tel" id="tel-ip" maxlength="11" type="tel" placeholder="휴대전화(선택)" @focus="onFocused('tel')" @blur="onBlured('tel')" autocomplete="off"/>
+                        <div id="tel-dv" class="divider"></div>
+                        <span v-if="telFocused" class="tel-tip">ex) 01012345678</span>
+                     </div>
                   </div>
                </div>
             </div>
             <div class="modal__footer">
-               <button class="login-bt" :class="{ vali: emailVali(suEmail) && pwdVali(suPwd) && pwdConfVali(suPwdConf) }" @click="doRegister">회원가입</button>
+               <button class="login-bt" :class="{ vali: emailVali(suEmail) && pwdVali(suPwd) && pwdConfVali(suPwdConf) && nameVali(name) }" @click="doRegister">회원가입</button>
             </div>
             <a class="modal__close">
                <i @click="controlModal(2, 'close')" class="far fa-times-circle"></i>
@@ -56,19 +69,19 @@
       <transition name="slide-to-middle">
          <div v-if="dialog2" class="modal">
             <div class="modal__header">
-               로고
+               <img src="@/assets/image/NDCU_logo_eng.png" alt="">
             </div>
             <div class="modal__content">
                <div class="form-wrapper form-li">
                   <div class="input-wrapper">
-                     <input v-model="liEmail" id="email-ip" type="email" placeholder="이메일" @focus="onFocused('email')" @blur="onBlured('email')" />
+                     <input v-model="liEmail" id="email-ip" type="email" placeholder="이메일" @focus="onFocused('email')" @blur="onBlured('email')" @keypress.enter="doLogin"/>
                      <div id="email-dv" class="divider"></div>
                      <span v-if="!emailVal" class="tip">이메일 형식이 아닙니다.</span>
                   </div>
                   <div class="input-wrapper">
-                     <input v-model="liPwd" id="pwd-ip" type="password" placeholder="비밀번호" @focus="onFocused('pwd')" @blur="onBlured('pwd')" />
+                     <input v-model="liPwd" maxlength="10" id="pwd-ip" type="password" placeholder="비밀번호" @focus="onFocused('pwd')" @blur="onBlured('pwd')" @keypress.enter="doLogin"/>
                      <div id="pwd-dv" class="divider"></div>
-                     <span v-if="!pwdVal1" class="tip">영문, 숫자 포함 6-20자 이내여야 합니다.</span>
+                     <span v-if="!pwdVal1" class="tip">영문, 숫자 포함 6-10자 이내여야 합니다.</span>
                   </div>
                </div>
                <div class="account-wrapper">
@@ -145,10 +158,14 @@ export default {
          emailVal: true,
          pwdVal1: true,
          pwdVal2: true,
+         nameVal: true,
+         telFocused: false,
          //signup value
          suEmail: '',
          suPwd: '',
          suPwdConf: '',
+         name: '',
+         tel: '',
          // login value
          liEmail: '',
          liPwd: '',
@@ -160,7 +177,7 @@ export default {
    methods: {
       // css 적용위한 Validation 함수들
       pwdVali: function(str) {
-         const reg_pwd = /^.*(?=.{6,20})(?=.*[0-9])(?=.*[a-zA-Z]).*$/;
+         const reg_pwd = /^.*(?=.{6,10})(?=.*[0-9])(?=.*[a-zA-Z]).*$/;
          if (reg_pwd.test(str)) {
             return true;
          }
@@ -177,17 +194,23 @@ export default {
          }
          return false;
       },
+      nameVali: function(str) {
+         const reg_name = /[~!@#$%^&*()_+|<>?:;{}]/ // 특수문자 test
+         if (str === '' || reg_name.test(str)) {
+            return false;
+         } else return true
+      },
       // 추천 조건 입력 창 열기
       onClickInputBt: function() {
          this.$emit('open-input-form');
       },
       // 즐겨찾기 탭 열기
       onClickBookmarkBt: function() {
-
          // 로그인 여부 확인
          if(this.isLogin) {
             this.$emit('open-bookmark');
          } else {
+            alert('로그인이 필요한 서비스입니다.')
             this.controlModal(1, 'open');
          }         
       },
@@ -224,9 +247,12 @@ export default {
                this.emailVal = true;
                this.pwdVal1 = true;
                this.pwdVal2 = true;
+               this.nameVal = true;
                this.suEmail = '';
                this.suPwd = '';
-               this.suPwdConf = '';
+               this.suPwdConf = ''
+               this.name = ''
+               this.tel = '';
             }
          }
       },
@@ -236,12 +262,16 @@ export default {
          targetInput.classList.remove('unval');
          targetInput.classList.add('divider');
          targetInput.classList.add('focused');
+         if (type === 'tel') { // tel 적는 곳은 포커스 됐을 때만 hint보여주기
+            this.telFocused = true
+         }
       },
       onBlured: function(type) {
          // 인풋창에서 포키스아웃됐을 때 css 컨트롤위해
-         const targetInput = document.getElementById(`${type}-ip`).value;
-         const targetDiv = document.getElementById(`${type}-dv`);
-         const reg_pwd = /^.*(?=.{6,20})(?=.*[0-9])(?=.*[a-zA-Z]).*$/;
+         const targetInput = document.getElementById(`${type}-ip`).value; // 회원가입과 로그인이 모달을 공유하기 때문에 데이터 충돌 방지하기 위해..
+         const targetDiv = document.getElementById(`${type}-dv`); // divider 
+         const reg_pwd = /^.*(?=.{6,10})(?=.*[0-9])(?=.*[a-zA-Z]).*$/; // 영문,숫자 포함 6 - 10자
+         const reg_name = /[~!@#$%^&*()_+|<>?:;{}]/ // 별명 특수문자 포함되어있는지
          targetDiv.classList.remove('focused');
          targetDiv.classList.remove('divder'); // 기존에 적용된 css제거
          if (type === 'email') {
@@ -259,64 +289,85 @@ export default {
             } else {
                this.pwdVal1 = true;
             }
-         } else {
-            if ((!reg_pwd.test(targetInput) && this.suPwd !== targetInput) || (!reg_pwd.test(targetInput) && !targetInput)) {
+         } else if (type === 'pwdc') {
+            if ((!reg_pwd.test(targetInput) && this.suPwd !== this.suPwdConf) || (!reg_pwd.test(targetInput) && !targetInput)) {
                targetDiv.classList.add('unval');
                this.pwdVal2 = false;
             } else {
                this.pwdVal2 = true;
             }
+         } else if (type === 'name') {
+            if (!this.name || reg_name.test(this.name)) {
+               targetDiv.classList.add('unval')
+               this.nameVal = false
+            } else {
+               this.nameVal = true
+            }
+         } else {
+            this.telFocused = false
          }
       },
 
       // 회원가입 요청처리 메서드
       doRegister: function() {
-         // 회원가입 요청 보내기         
+         // 회원가입 요청 보내기
+         if (this.emailVali(this.suEmail) && this.pwdVali(this.suPwd) && this.pwdConfVali(this.suPwdConf) && this.nameVali(this.name))
          registerFounder(
             {
                email: this.suEmail,
                password: this.suPwd,
+               name: this.name,
+               phonenumber: this.tel
             },
             () => {
                // 회원가입에 성공한 경우
                alert('성공적으로 회원가입되었습니다.')
                this.controlModal(2, 'close');
+               this.controlModal(1, 'open');
             },
             (error) => {
                if(error.response.status == 409) {
                   alert('이미 가입되어 있는 이메일입니다');
                }
             }
-         )          
+         )       
       },
 
       // 로그인 요청처리 메서드
       doLogin: function() {
          // 로그인 요청 보내기
-         loginFounder(
-            {
-               email: this.liEmail,
-               password: this.liPwd,
-            },
-            (res) => {               
-               if (res.status == 200) {
-                  let token = res.data['accessToken'];
-                  localStorage.setItem('accessToken', token); // 토큰 로컬스토리지에 저장
-                  this.$store.dispatch('getUserInfo'); // 토큰을 이용한 유저정보 가져오기
-                  this.controlModal(1, 'close');
-                  alert('로그인이 완료되었습니다.')
-               }        
-            },
-            (err) => {
-               if(err.response.status == 401) {
-                  alert('아이디 또는 비밀번호가 일치하지 않습니다.');
-                  this.isLoginError = true;
-               }               
-            }
-         ) 
+         if (this.emailVali(this.liEmail) && this.pwdVali(this.liPwd)) {
+            loginFounder(
+               {
+                  email: this.liEmail,
+                  password: this.liPwd,
+               },
+               (res) => {               
+                  if (res.status == 200) {
+                     let token = res.data['accessToken'];
+                     localStorage.setItem('accessToken', token); // 토큰 로컬스토리지에 저장
+                     this.$store.dispatch('getUserInfo'); // 토큰을 이용한 유저정보 가져오기
+                     this.controlModal(1, 'close');
+                     alert('로그인이 완료되었습니다.')
+                  }        
+               },
+               (err) => {
+                  if(err.response.status == 401) {
+                     alert('아이디 또는 비밀번호가 일치하지 않습니다.');
+                     this.isLoginError = true;
+                  }               
+               }
+            ) 
+         }
       },
       ...mapActions(["doLogout"])      
    },
+   filters: {
+      extractId: function (value) {
+         const targetIdx = value.indexOf('@')
+         return value.slice(0, targetIdx)
+      }
+   }
 };
 </script>
 <style scoped lang="scss">
@@ -487,9 +538,11 @@ export default {
    opacity: 0;
 }
 .modal {
+   box-shadow: 9px 9px 20px #56565629;
+   border-radius: 20px;
    background-color: white;
    width: 450px;
-   height: 500px;
+   height: 600px;
    display: flex;
    padding: 20px;
    flex-direction: column;
@@ -500,14 +553,17 @@ export default {
    left: 50%;
    transform: translate(-50%, -50%);
    .modal__header {
-      height: 30%;
-      width: 300px;
-      background: rgb(57, 104, 235);
+      height: 50%;
+      width: 200px;
+      img {
+         width: 100%;
+         height: 100%;
+      }
    }
    .modal__content {
       height: 60%;
       width: 70%;
-      padding: 20px;
+      padding: 0 20px 20px 20px;
       .form-li {
          height: 75%;
       }
@@ -519,6 +575,55 @@ export default {
          flex-direction: column;
          align-items: center;
          justify-content: space-around;
+         .ad-input-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            .input-wrapper {
+               width: 45%;
+               input {
+                  width: 100%;
+                  height: 50px;
+                  border: none;
+               }
+               input:focus {
+                  outline: none;
+               }
+               .focused {
+                  border-bottom: 2px rgb(57, 104, 235) solid;
+                  border-radius: 5px;
+                  animation: 0.2s ease-out 0s 1 focused;
+                  @keyframes focused {
+                     0% {
+                        width: 0;
+                     }
+                     100% {
+                        width: 100%;
+                     }
+                  }
+               }
+               .divider {
+                  height: 1px;
+                  width: 100%;
+                  background-color: gray;
+               }
+               .tip {
+                  margin-top: 5px;
+                  font-size: 9pt;
+                  color: rgb(221, 94, 94);
+               }
+               .tel-tip {
+                  margin-top: 5px;
+                  font-size: 9pt;
+                  color: gray;
+               }
+               .unval {
+                  height: 2px;
+                  width: 100%;
+                  background-color: rgb(221, 94, 94);
+               }
+            }
+         }
          .input-wrapper {
             width: 100%;
             input {
@@ -549,7 +654,7 @@ export default {
             }
             .tip {
                margin-top: 5px;
-               font-size: 10pt;
+               font-size: 9pt;
                color: rgb(221, 94, 94);
             }
             .unval {

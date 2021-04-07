@@ -15,4 +15,6 @@ public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
      * @return
      */
     List<Bookmark> findAllByFounderId(Long founderId);
+
+    void deleteByCommercial_CommercialCodeAndFounder_Id(String commercialCode, Long founderId);
 }

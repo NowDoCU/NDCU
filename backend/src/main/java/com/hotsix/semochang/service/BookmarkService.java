@@ -15,10 +15,11 @@ public interface BookmarkService {
 
     /***
      * 북마크 삭제
-     * @param id
+     * @param commercialCode
+     * @param authentication
      * @return
      */
-    ResponseEntity<?> delete(Long id);
+    ResponseEntity<?> delete(String commercialCode, Authentication authentication);
 
     /***
      * 북마크 리스트 생성

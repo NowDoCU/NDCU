@@ -46,8 +46,14 @@ public class BookmarkController {
         return bookmarkService.create(commercialCode, authentication);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
-        return bookmarkService.delete(id);
+    @DeleteMapping("/{commercialCode}")
+    public ResponseEntity<?> delete(@PathVariable String commercialCode,
+                                    Authentication authentication) {
+
+        // 유효하지 않은 토큰인 경우
+        if (isInValidAuthentication(authentication)) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        return bookmarkService.delete(commercialCode, authentication);
     }
 }

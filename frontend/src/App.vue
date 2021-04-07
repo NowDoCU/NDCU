@@ -24,11 +24,12 @@ export default {
    background-color: wheat;
    width: 100%;
    height: 100vh;
-   -ms-user-select: none; 
-   -moz-user-select: -moz-none; 
-   -webkit-user-select: none; 
-   -khtml-user-select: none; 
-   user-select:none;
+   -ms-user-select: none;
+   -moz-user-select: -moz-none;
+   -webkit-user-select: none;
+   -khtml-user-select: none;
+   user-select: none;
+
    // 스크롤바
    ::-webkit-scrollbar {
       width: 6px;
@@ -38,7 +39,7 @@ export default {
       border-radius: 30px;
    }
    ::-webkit-scrollbar-track {
-      background-color:transparent;
+      background-color: transparent;
       border-radius: 20px;
    }
 }
