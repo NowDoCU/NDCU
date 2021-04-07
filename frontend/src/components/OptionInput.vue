@@ -49,46 +49,34 @@
             </div>
          </div>
          <div class="bottom-wrapper">
-            <span>📋 추가정보</span>
+            <span class="bottom-header">📋 추가정보</span>
             <div class="option-wrapper">
                <div class="deposit-wrapper">
                   <div class="b-header">
                      <span class="title">보증금</span>
-                     <span class="won">단위 : 원</span>
+                     <span class="won">{{ deposit }}만원 이하</span>
                   </div>
-                  <vue-slide-bar 
-                     v-model="deposit"
-                     :data="dSlider.data"
-                     :range="dSlider.range"
-                     :processStyle="dSlider.processStyle"
-                     @callbackRange="callbackRange1"
-                  >
-                     <template slot="tooltip">
-                        <img class="handler" src="@/assets/image/dollar.png">
-                     </template>
-                  </vue-slide-bar>
+                  <input type="range" v-model="deposit" min="250" max="3500" value="55000" name="" class="range">
+                  <div class="d-label">
+                     <span class="l-span">250</span>
+                     <span class="l-span">990</span>
+                     <span class="l-span">1850</span>
+                     <span class="l-span">2700</span>
+                     <span class="l-span">3500</span>
+                  </div>
                </div>
                <div class="rent-wrapper">
                   <div class="b-header">
                      <span class="title">월임대료(제곱미터 기준)</span>
-                     <span class="won">단위 : 원</span>
+                     <span class="won">{{ rent }}원 이하</span>
                   </div>
-                  <!-- <vue-slide-bar 
-                     v-model="rent"
-                     :data="rSlider.data"
-                     :range="rSlider.range"
-                     :processStyle="rSlider.processStyle"
-                     @callbackRange="callbackRange2">
-                     <template slot="tooltip">
-                        <img class="handler" src="@/assets/image/dollar.png">
-                     </template>
-                  </vue-slide-bar> -->
-                  <div class="rent-bts">
-                     <div class="rent-bt">2.3만원 미만</div>
-                     <div class="rent-bt">2.3만원<br>~<br>3.0만원</div>
-                     <div class="rent-bt">3.0만원<br>~<br> 37000원</div>
-                     <div class="rent-bt">37000원 <br>~<br> 44000원</div>
-                     <div class="rent-bt">44000원 이상</div>
+                  <input type="range" v-model="rent" min="15000" max="55000" value="55000" name="" class="range">
+                  <div class="r-label">
+                     <span class="l-span">15000</span>
+                     <span class="l-span">25000</span>
+                     <span class="l-span">35000</span>
+                     <span class="l-span">45000</span>
+                     <span class="l-span">55000</span>
                   </div>
                </div>
                <div class="client-wrapper">
@@ -141,14 +129,12 @@
    </div>
 </template>
 <script>
-import VueSlideBar from 'vue-slide-bar'
 import Category from '@/components/Categories/Category.vue';
 
 export default {
    name: 'OptionInput',
    components: {
       Category,
-      VueSlideBar
    },
    data: function() {
       return {
@@ -157,94 +143,10 @@ export default {
          selectedClient: '',
          showUl: false,
          deposit: 3441,
-         rent: 53000,
+         rent: 55000,
          query: '', // 지역 검색어
          selectedDs: [], // 선택된 지역
          selectedAges: [],
-         dSlider: { // 보증금 정보
-            data: [
-               207,
-               750,
-               1300,
-               1800,
-               2400,
-               2900,
-               3441,
-            ],
-            range: [
-               {
-                  label: '207',
-                  isHide: true
-               },
-               {
-                  label: '750'
-               },
-               {
-                  label: '1300',
-                  isHide: true
-               },
-               {
-                  label: '1800'
-               },
-               {
-                  label: '2400',
-                  isHide: true
-               },
-               {
-                  label: '2900'
-               },
-               {
-                  label: '3441',
-                  isHide: true
-               },
-            ],
-            rangeValue: {},
-            processStyle: {
-               backgroundColor: '#ff6633'
-            }
-         },
-          rSlider: { // 임대료 정보
-            data: [
-               14723,
-               20000,
-               25000,
-               30000,
-               35000,
-               40000,
-               52600,
-            ],
-            range: [
-               {
-                  label: '14723',
-                  isHide: true
-               },
-               {
-                  label: '20000'
-               },
-               {
-                  label: '25000',
-                  isHide: true
-               },
-               {
-                  label: '30000'
-               },
-               {
-                  label: '35000',
-                  isHide: true
-               },
-               {
-                  label: '40000'
-               },
-               {
-                  label: '52600',
-                  isHide: true
-               },
-            ],
-            rangeValue: {},
-            processStyle: {
-               backgroundColor: '#ff6633'
-            }
-         },
          districts: [
             '종로구',
             '중구',
@@ -642,7 +544,7 @@ export default {
          display: flex;
          flex-direction: column;
          justify-content: space-between;
-         span {
+         .bottom-header {
             font-size: 15pt;
             font-weight: 900;
             margin: 0 10px;
@@ -652,7 +554,7 @@ export default {
             width: 100%;
             height: 100%;
             .deposit-wrapper {
-               padding: 0 15px;
+               padding: 15px;
                .b-header {
                   display: flex;
                   justify-content: space-between;
@@ -661,12 +563,58 @@ export default {
                      font-size: 12pt
                   }
                   .won {
-                     font-size: 8pt
+                     font-size: 10pt
+                  }
+               }
+               .range {
+                  margin-top: 20px;
+                  -webkit-appearance: none;
+                  width: 100%;
+                  height: 10px;
+                  border-radius: 5px;
+                  background: #ff6633;
+                  outline: none;
+                  opacity: 1;
+               }
+                              
+               .range::-webkit-slider-thumb {
+                  -webkit-appearance: none;
+                  appearance: none;
+                  width: 40px;
+                  height: 40px;
+                  border: 0;
+                  border-radius: 50%;
+                  background-image: url('../assets/image/dollar.png');
+                  background-size: contain;
+                  background-position: center center;
+                  background-repeat: no-repeat;
+                  cursor: pointer;
+               }
+               .range::-moz-range-thumb {
+                  width: 40px;
+                  height: 40px;
+                  border: 0;
+                  border-radius: 50%;
+                  background-image: url('../assets/image/dollar.png');
+                  background-size: contain;
+                  background-position: center center;
+                  background-repeat: no-repeat;
+                  cursor: pointer;
+               }
+
+               .d-label {
+                  padding: 10px 0;
+                  widows: 100%;
+                  display: flex;
+                  justify-content: space-between;
+                  .l-span {
+                     font-size: 10pt;
+                     font-weight: 200;
                   }
                }
             }
             .rent-wrapper {
-               padding: 0 15px;
+               padding: 15px;
                .b-header {
                   display: flex;
                   justify-content: space-between;
@@ -675,27 +623,52 @@ export default {
                      font-size: 12pt
                   }
                   .won {
-                     font-size: 8pt
+                     font-size: 10pt
                   }
                }
-               .rent-bts {
-                  padding: 20px 0;
+               .range {
+                  margin-top: 20px;
+                  -webkit-appearance: none;
+                  width: 100%;
+                  height: 10px;
+                  border-radius: 5px;
+                  background: #ff6633;
+                  outline: none;
+                  opacity: 1;
+               }          
+               .range::-webkit-slider-thumb {
+                  -webkit-appearance: none;
+                  appearance: none;
+                  width: 40px;
+                  height: 40px;
+                  border: 0;
+                  border-radius: 50%;
+                  background-image: url('../assets/image/dollar.png');
+                  background-size: contain;
+                  background-position: center center;
+                  background-repeat: no-repeat;
+                  cursor: pointer;
+               }
+               .range::-moz-range-thumb {
+                  width: 40px;
+                  height: 40px;
+                  border: 0;
+                  border-radius: 50%;
+                  background-image: url('../assets/image/dollar.png');
+                  background-size: contain;
+                  background-position: center center;
+                  background-repeat: no-repeat;
+                  cursor: pointer;
+               }
+
+               .r-label {
+                  padding: 10px 0;
+                  widows: 100%;
                   display: flex;
                   justify-content: space-between;
-                  .rent-bt {
-                     width: 13%;
-                     font-size: 9pt;
-                     font-weight: 700;
-                     color: #ff6633;
-                     background-color: white;
-                     border:  2px solid #ff6633;
-                     border-radius: 10px;
-                     padding: 10px;
-                     display: flex;
-                     justify-content: center;
-                     align-items: center;
-                     text-align: center;
-                     box-shadow: 4px 4px 4px #56565629;
+                  .l-span {
+                     font-size: 10pt;
+                     font-weight: 200;
                   }
                }
             }
