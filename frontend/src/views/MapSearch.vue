@@ -51,7 +51,7 @@ import SideMenu from '@/components/SideMenu.vue';
 import Toast from '@/components/Toast.vue';
 
 import { mapState } from 'vuex';
-import { findDongData, findAllData } from '@/api/mapDetail.js';
+import { findDongData, findAllData, findAllGu } from '@/api/mapDetail.js';
 import { getBookmarkList } from '@/api/bookmark';
 import { coordsB2H } from '@/api/kakaoAPI.js';
 
@@ -296,32 +296,51 @@ export default {
       // 구-1) 구별 폴리곤 이름을 만듦
       makeGuBoundary() {
          console.log('[make] 구 전체 폴리곤, 이름 생성');
-         var totalBounds = {
-            // 서울시 전체 범위로 조회
-            ha: 126.72845050681946,
-            qa: 37.437210868999315,
-            oa: 127.17018320519693,
-            pa: 37.7014997773775,
-         };
 
-         for (var idx in this.guCoords) {
-            var position = new kakao.maps.LatLng(this.guCoords[idx].lat, this.guCoords[idx].lng);
+         findAllGu(
+            (success) => {
+               console.log('findAllGu', success.data);
 
-            var content = `<div class="gu">
-                              ${this.guCoords[idx].sig_kor_nm}
+               success.data.forEach((item) => {
+                  var position = new kakao.maps.LatLng(item.lat, item.lng);
+
+                  var content = `<div class="gu">
+                              ${item.sig_kor_nm}
                            </div>`;
 
-            // 커스텀 오버레이를 생성합니다
-            var guOverlay = new kakao.maps.CustomOverlay({
-               map: this.mapObject,
-               position: position,
-               content: content,
-            });
+                  console.log(item.sig_kor_nm);
 
-            this.gu_Overlays.push(guOverlay);
+                  // 커스텀 오버레이를 생성합니다
+                  var guOverlay = new kakao.maps.CustomOverlay({
+                     map: this.mapObject,
+                     position: position,
+                     content: content,
+                  });
+               });
+            },
+            (fail) => {
+               console.log('ERR_findAllGu : ', fail);
+            }
+         );
 
-            this.apiGuPolygon(totalBounds, guCoords[idx].sig_cd, position);
-         }
+         // for (var idx in this.guCoords) {
+         //    var position = new kakao.maps.LatLng(this.guCoords[idx].lat, this.guCoords[idx].lng);
+
+         //    var content = `<div class="gu">
+         //                      ${this.guCoords[idx].sig_kor_nm}
+         //                   </div>`;
+
+         //    // 커스텀 오버레이를 생성합니다
+         //    var guOverlay = new kakao.maps.CustomOverlay({
+         //       map: this.mapObject,
+         //       position: position,
+         //       content: content,
+         //    });
+
+         //    this.gu_Overlays.push(guOverlay);
+
+         //    this.apiGuPolygon(totalBounds, guCoords[idx].sig_cd, position);
+         // }
       },
 
       // 구-2) API에 현재 동의 폴리곤을 받아서 생성함
@@ -812,24 +831,26 @@ export default {
 
       // 해당 회원이 북마크한 상권인지 아닌 지 확인
       setIsBookmark() {
-         if(!this.isLogin) { return; }
+         if (!this.isLogin) {
+            return;
+         }
 
          /** 북마크 리스트 가져오기 */
          getBookmarkList(
-               (res) => {
-                  this.bookmarkList = res.data;
-                  this.isBookmark = false;
-                  for(var i=0; i<this.bookmarkList.length; ++i) {           
-                     if(this.bookmarkList[i].commercial.commercialCode == this.detailData.commercialCode) {
-                        this.isBookmark = true;
-                        break;
-                     }
+            (res) => {
+               this.bookmarkList = res.data;
+               this.isBookmark = false;
+               for (var i = 0; i < this.bookmarkList.length; ++i) {
+                  if (this.bookmarkList[i].commercial.commercialCode == this.detailData.commercialCode) {
+                     this.isBookmark = true;
+                     break;
                   }
-               }, 
-               (err) => {
-                  console.log(err);
                }
-         )
+            },
+            (err) => {
+               console.log(err);
+            }
+         );
       },
 
       // 동-0) 입력값에 따라 정보를 삭제함

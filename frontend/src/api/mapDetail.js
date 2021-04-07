@@ -16,4 +16,12 @@ function findDongData(emd_cd, success, fail) {
       .catch(fail);
 }
 
-export { findAllData, findDongData };
+// 전체 구 폴리곤, 중심 좌표 정보 조회
+function findAllGu(success, fail) {
+   instance
+      .get(`gu`)
+      .then(success)
+      .catch(fail);
+}
+
+export { findAllData, findDongData, findAllGu };
