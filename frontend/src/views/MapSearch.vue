@@ -1243,7 +1243,8 @@ export default {
       top: 40px;
       left: 50%;
 
-      transform: translate(-50%, -50%);
+      transform: translateX(-400px);
+      /* transform: translate(-50%, -50%);  원본 위치 */
 
       border-radius: 30px;
       z-index: 30;
@@ -1270,7 +1271,7 @@ export default {
 
    .slide-down-enter,
    .slide-down-leave-to {
-      transform: translate(-50%, -50%) translateY(-200px);
+      transform: translateX(-400px) translateY(-200px);
    }
 
    .detail-compo {
