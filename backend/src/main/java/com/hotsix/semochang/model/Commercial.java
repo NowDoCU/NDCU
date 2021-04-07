@@ -69,4 +69,8 @@ public class Commercial {
     @OneToOne
     @JoinColumn(name = "commercial_code")
     private StoreRentalPrice storeRentalPrice;
+
+    @OneToOne
+    @JoinColumn(name = "commercial_code")
+    private Facilities facilities;
 }
