@@ -119,6 +119,11 @@
                      </div>
                   </div>
                </div>
+               <div class="gender-wrapper">
+                  <div class="g-header">
+                     대상 성별
+                  </div>
+               </div>
             </div>
          </div>
 
