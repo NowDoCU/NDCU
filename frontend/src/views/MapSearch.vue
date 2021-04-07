@@ -299,8 +299,6 @@ export default {
 
          findAllGu(
             (success) => {
-               console.log('findAllGu', success.data);
-
                success.data.forEach((item) => {
                   var position = new kakao.maps.LatLng(item.lat, item.lng);
 
@@ -308,86 +306,29 @@ export default {
                               ${item.sig_kor_nm}
                            </div>`;
 
-                  console.log(item.sig_kor_nm);
-
                   // 커스텀 오버레이를 생성합니다
                   var guOverlay = new kakao.maps.CustomOverlay({
                      map: this.mapObject,
                      position: position,
                      content: content,
                   });
+
+                  this.gu_Overlays.push(guOverlay);
+
+                  var polygonPath = [];
+
+                  // 해당 데이터를 polygonPath에서 원하는 방식으로 맵핑
+                  for (let i = 0; i < item.coordinates.length; i++) {
+                     polygonPath.push(new kakao.maps.LatLng(item.coordinates[i][1], item.coordinates[i][0]));
+                  }
+
+                  this.makeGuPolygon(polygonPath, item.sig_kor_nm, position);
                });
             },
             (fail) => {
                console.log('ERR_findAllGu : ', fail);
             }
          );
-
-         // for (var idx in this.guCoords) {
-         //    var position = new kakao.maps.LatLng(this.guCoords[idx].lat, this.guCoords[idx].lng);
-
-         //    var content = `<div class="gu">
-         //                      ${this.guCoords[idx].sig_kor_nm}
-         //                   </div>`;
-
-         //    // 커스텀 오버레이를 생성합니다
-         //    var guOverlay = new kakao.maps.CustomOverlay({
-         //       map: this.mapObject,
-         //       position: position,
-         //       content: content,
-         //    });
-
-         //    this.gu_Overlays.push(guOverlay);
-
-         //    this.apiGuPolygon(totalBounds, guCoords[idx].sig_cd, position);
-         // }
-      },
-
-      // 구-2) API에 현재 동의 폴리곤을 받아서 생성함
-      apiGuPolygon(bounds, sig_cd, center) {
-         var key = '13C339D4-B453-3C5E-A6A1-CCA6792A2D6B'; // 공간정보 오픈플랫폼
-         var domain = 'http://localhost:8080';
-         var crs = 'EPSG:4326'; // 반환되는 좌표(WGS84)
-         var data = 'LT_C_ADSIGG_INFO'; // 시군구 조회
-         var geo = `BOX(${bounds.ha},${bounds.qa},${bounds.oa},${bounds.pa})`; //minx, miny, maxx, maxy로 검색 범위 설정
-         var filter = `sig_cd:like:${sig_cd}`; // 해당되는 동 정보 1개만 반환하기 위함
-
-         jsonp(`http://api.vworld.kr/req/data?request=GetFeature&data=${data}&key=${key}&format=json&domain=${domain}&crs=${crs}&attrFilter=${filter}&size=1&geomFilter=${geo}`).then((response) => {
-            var local = response.response.result.featureCollection.features;
-
-            var polygonArr = local[0].geometry.coordinates[0][0];
-            var polygonPath = [];
-            var korName = local[0].properties.sig_kor_nm;
-
-            // 해당 데이터를 polygonPath에서 원하는 방식으로 맵핑
-            for (let i = 0; i < polygonArr.length; i++) {
-               polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
-            }
-
-            this.makeGuPolygon(polygonPath, korName, center);
-         });
-
-         // axios
-         //    .get(`http://api.vworld.kr/req/data?request=GetFeature&data=${data}&key=${key}&format=json&domain=${domain}&crs=${crs}&attrFilter=${filter}&size=1&geomFilter=${geo}`, {
-         //       dataType: 'jsonp',
-         //    })
-         //    .then((response) => {
-         //       var local = response.data.response.result.featureCollection.features;
-
-         //       var polygonArr = local[0].geometry.coordinates[0][0];
-         //       var polygonPath = [];
-         //       var korName = local[0].properties.sig_kor_nm;
-
-         //       // 해당 데이터를 polygonPath에서 원하는 방식으로 맵핑
-         //       for (let i = 0; i < polygonArr.length; i++) {
-         //          polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
-         //       }
-
-         //       this.makeGuPolygon(polygonPath, korName, center);
-         //    })
-         //    .catch((err) => {
-         //       console.log('ERROR : ' + err);
-         //    });
       },
 
       // 구-3) API에서 받은 폴리곤 데이터로 실제 구별 폴리곤 생성
