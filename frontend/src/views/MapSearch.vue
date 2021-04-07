@@ -219,6 +219,7 @@ export default {
          this.bookMarkCompo = false;
 
          this.detailCompo = false;
+         this.loadStatus = 0;
          this.detailData = new Object();
 
          this.initCenter();
@@ -235,6 +236,7 @@ export default {
          this.bookMarkCompo = false;
 
          this.detailCompo = false;
+         this.loadStatus = 0;
          this.detailData = new Object();
 
          this.toastShow = false;
@@ -796,7 +798,6 @@ export default {
             this.detailData = new Object(); // 디테일 컴포넌트에 새로운 결과값을 주기위해 초기 값 셋팅
             resolve(this.getDistrictDetail(item.district.commercialCode));
          }).then((result) => {
-            // console.log('_*_*_*_*_*_*_*_*_*_*_*_');
             this.loadStatus = 1;
             this.detailCompo = true;
             this.detailData = result;
@@ -1004,9 +1005,12 @@ export default {
 
          // 검색 결과 조회
          new Promise((resolve) => {
-            this.detailData = new Object();
+            // 초기 값 셋팅
+            this.loadStatus = 0; // 디테일 컴포넌트 로드가 안된 초기 상태로 셋팅
+            this.detailData = new Object(); // 디테일 컴포넌트에 새로운 결과값을 주기위해 초기 값 셋팅
             resolve(this.getDistrictDetail(item.district.commercialCode));
          }).then((result) => {
+            this.loadStatus = 1;
             this.detailData = result;
             this.detailCompo = true;
             this.setIsBookmark();
