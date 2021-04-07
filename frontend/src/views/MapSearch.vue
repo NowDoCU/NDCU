@@ -153,7 +153,6 @@ export default {
       // sidemenu의 옵션입력 버튼 눌렀을 때
       onClickInputBt: function() {
          this.optionCompo = !this.optionCompo;
-         this.test = true
          this.bookMarkCompo = false;
       },
       onClickBookmarkBt: function() {

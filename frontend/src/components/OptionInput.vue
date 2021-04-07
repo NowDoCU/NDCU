@@ -1,8 +1,7 @@
 <template>
    <div class="oi-container">
-      <div class="header">
-         <i @click="closeCompo" class="fas fa-angle-double-left"></i>
-      </div>
+      <i @click="closeCompo" class="fas fa-angle-double-left oi-close"></i>
+      <div class="oi-header">상권 추천 받기</div>
       <div class="content-wrapper">
          <div class="top-wrapper">
             <span>🍳 업종</span>
@@ -59,7 +58,7 @@
                   <input type="range" v-model="deposit" min="250" max="3500" value="55000" name="" class="range">
                   <div class="d-label">
                      <span class="l-span">250</span>
-                     <span class="l-span">990</span>
+                     <span class="l-span">1000</span>
                      <span class="l-span">1850</span>
                      <span class="l-span">2700</span>
                      <span class="l-span">3500</span>
@@ -159,7 +158,7 @@ export default {
          selectedCate: '',
          selectedDs: [], // 선택된 지역
          selectedClient: [],
-         deposit: 3441,
+         deposit: 3500,
          rent: 55000,
          selectedAges: [],
          selectedGender: [],
@@ -417,57 +416,55 @@ export default {
 .oi-container {
    height: 100%;
    padding: 0 15px;
-   display: flex;
-   flex-direction: column;
-   justify-content: space-between;
-   align-items: center;
-   .header {
+   .oi-close {
       position: absolute;
       right: 20px;
       top: 20px;
-      i {
-         font-size: 24pt;
-         color: rgb(148, 148, 148);
-      }
-      i:hover {
-         cursor: pointer;
-         color: #808080;
-      }
+      font-size: 24pt;
+      color: rgb(148, 148, 148);
+   }
+   .oi-close:hover {
+      cursor: pointer;
+      color: #808080;
+   }
+   .oi-header {
+      padding: 50px 0 0 15px;
+      font-size: 20pt;
+      font-weight: 700;
    }
    
    .content-wrapper {
+      margin-top: 35px;
       overflow-y: scroll;
       overflow-x: hidden;
-      margin-top: 60px;
       margin-bottom: 30px;
       padding: 0 15px;
-      height: 80%;
+      height: 75%;
       display: flex;
       flex-direction: column;
-      justify-content: space-around;
       .top-wrapper {
          height: 200px;
          width: 100%;
          span {
             font-size: 15pt;
             font-weight: 900;
-            margin: 0 10px;
+            // margin: 0 10px;
          }
          .category {
             margin-top: 15px;
          }
       }
       .middle-wrapper {
-         margin-top: 15px;
+         margin-top: 35px;
          height: 120px;
          width: 100%;
          .md-subtitle {
             font-size: 15pt;
             font-weight: 900;
-            margin: 0 10px;
+            // margin: 0 10px;
          }
          .selected-ds {
-            margin: 5px;
+            margin: 10px 5px;
             display: flex;
             justify-content: center;
             animation: 0.5s ease-out 0s 1 collapse;
@@ -590,22 +587,21 @@ export default {
          }
       }
       .bottom-wrapper {
-         height: 250px;
-         width: 100%;
+         margin-top: 35px;
          display: flex;
          flex-direction: column;
          justify-content: space-between;
          .bottom-header {
             font-size: 15pt;
             font-weight: 900;
-            margin: 0 10px;
+            // margin: 0 10px;
          }
          .option-wrapper {
-            margin-top: 20px;
+            margin-top: 15px;
             width: 100%;
             height: 100%;
             .deposit-wrapper {
-               padding: 15px;
+               padding: 10px 15px;
                .b-header {
                   display: flex;
                   justify-content: space-between;
@@ -621,7 +617,7 @@ export default {
                   margin-top: 20px;
                   -webkit-appearance: none;
                   width: 100%;
-                  height: 10px;
+                  height: 8px;
                   border-radius: 5px;
                   background: #ff6633;
                   outline: none;
@@ -654,7 +650,7 @@ export default {
                }
 
                .d-label {
-                  padding: 10px 0;
+                  padding: 8px 0;
                   widows: 100%;
                   display: flex;
                   justify-content: space-between;
@@ -665,7 +661,7 @@ export default {
                }
             }
             .rent-wrapper {
-               padding: 15px;
+               padding: 10px 15px;
                .b-header {
                   display: flex;
                   justify-content: space-between;
@@ -681,7 +677,7 @@ export default {
                   margin-top: 20px;
                   -webkit-appearance: none;
                   width: 100%;
-                  height: 10px;
+                  height: 8px;
                   border-radius: 5px;
                   background: #ff6633;
                   outline: none;
@@ -713,7 +709,7 @@ export default {
                }
 
                .r-label {
-                  padding: 10px 0;
+                  padding: 8px 0;
                   widows: 100%;
                   display: flex;
                   justify-content: space-between;
@@ -724,7 +720,7 @@ export default {
                }
             }
             .client-wrapper {
-               padding: 0 20px;
+               padding: 15px;
                .c-header {
                   font-weight: 600;
                   font-size: 12pt;
@@ -738,7 +734,7 @@ export default {
                      cursor: pointer;
                      border-radius: 30px;
                      width: 90px;
-                     // color: white;
+                     border: #ffcc00 1px solid;
                      height: 90px;
                      display: flex;
                      flex-direction: column;
@@ -759,7 +755,7 @@ export default {
                }
             }
             .age-wrapper {
-               padding: 20px;
+               padding: 15px;
                .a-header {
                   font-weight: 600;
                   font-size: 12pt;
@@ -875,7 +871,7 @@ export default {
                }
             }
             .gender-wrapper {
-               padding: 20px;
+               padding: 15px;
                .g-header {
                   font-weight: 600;
                   font-size: 12pt;
@@ -885,10 +881,14 @@ export default {
                   display: flex;
                   justify-content: space-around;
                   .f-bt, .m-bt {
+                     width: 90px;
+                     height: 90px;
                      cursor: pointer;
+                     border: #ffcc00 1px solid;
                      display: flex;
                      flex-direction: column;
                      align-items: center;
+                     justify-content: center;
                      color: gray;
                      i {
                         font-size: 25pt;
@@ -907,8 +907,10 @@ export default {
 
    }
    .footer {
-      height: 10%;
-      margin-bottom: 25px;
+      position: absolute;
+      bottom: 50px;
+      left: 50%;
+      margin-left: -20px;
       .com-bt {
          color: rgb(57, 104, 235);
          font-weight: 700;
@@ -922,7 +924,7 @@ export default {
          background: white;
       }
       .com-bt:hover {
-         margin-top: 5px;
+         margin-bottom: -5px;
          margin-left: 5px;
          cursor: pointer;
          // background: linear-gradient(to bottom right,#1D3CAA,  #7A9FFF);
@@ -933,9 +935,5 @@ export default {
          outline: none;
       }
    }
-}
-.handler {
-   width: 30px;
-   height: 30px;
 }
 </style>

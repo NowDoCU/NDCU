@@ -3,7 +3,7 @@
       <div class="header">
          <i @click="closeCompo" class="fas fa-angle-double-left"></i>
       </div>
-      <div class="bookmark-name">📌 즐겨찾기</div>
+      <div class="bookmark-name">즐겨찾기</div>
       <div class="bookmarks">
         <BookmarkListItem  @delete-bm="onDeleteBm(idx, bookmark)" @goDetail="goDetail" v-for="(bookmark, idx) in bookmarkList" :key="idx" :bookmark="bookmark" :idx="idx"/>
       </div>
@@ -72,7 +72,7 @@ export default {
 <style scoped lang="scss">
 .bookmark-container {
     height: 100%;
-    padding: 0 20px;
+    padding: 0 15px;
     display: flex;
     flex-direction: column;
     .header {
@@ -89,11 +89,12 @@ export default {
         }
     }
     .bookmark-name {
-        padding: 50px 0 20px 20px;
+        padding: 50px 0 0 15px;
         font-size: 20pt;
         font-weight: 700;
     }
     .bookmarks {
+        margin-top: 35px;
         height: 83%;
         overflow-y: scroll;
     }
