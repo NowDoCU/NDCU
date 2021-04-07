@@ -1,65 +1,69 @@
 <template lang="">
    <div class="md-container">
-      <div class="header">
-         <div class="name"><i class="fas fa-store"></i> {{ this.detailData.commercialName }}</div>
-         <div class="btnLike">
-            <i v-if="isBookmark" class="fas fa-star" @click="bookmark"></i>
-            <i v-else class="far fa-star" @click="bookmark"></i>
+      <div class="top-wrapper">
+         <div class="header">
+            <div class="name"><i class="fas fa-store"></i> {{ this.detailData.commercialName }}</div>
+            <div class="btnLike">
+               <i v-if="isBookmark" class="fas fa-star" @click="bookmark"></i>
+               <i v-else class="far fa-star" @click="bookmark"></i>
+            </div>
+            <i @click="closeCompo" class="fas fa-times btn-close"></i>
          </div>
-         <i @click="closeCompo" class="fas fa-times btn-close"></i>
-      </div>
-      <!-- <div class="content-recommend">
+         <!-- <div class="content-recommend">
          <div class="score">
             추천지수 <span class="number"> {{ score }} </span> 점
          </div>
          <p class="description">* 본 추천지수는 'KNN 알고리즘'을 적용하여 도출된 점수입니다.</p>
       </div> -->
-      <div class="content-common">
-         <div class="info-basic">
-            <span class="title">
-               상권코드<span class="value">{{ this.detailData.commercialCode }}</span>
-            </span>
-            <span class="title">
-               상권구분<span class="value">{{ this.detailData.divisionName }}</span>
-            </span>
-         </div>
-         <div class="info-special">
-            <div class="box recommend">
-               <div class="title">추천지수</div>
-               <div class="value">97</div>
+         <div class="content-common">
+            <div class="info-basic">
+               <span class="title">
+                  상권코드<span class="value">{{ this.detailData.commercialCode }}</span>
+               </span>
+               <span class="title">
+                  상권구분<span class="value">{{ this.detailData.divisionName }}</span>
+               </span>
             </div>
-            <div class="box rent">
-               <div class="title">추정 매출</div>
-               <div class="value">2000</div>
-            </div>
-            <div class="box sales">
-               <div class="title">평균 임대료</div>
-               <div class="value">4000</div>
+            <div class="info-special">
+               <div class="box recommend">
+                  <div class="title">추천지수</div>
+                  <div class="value">97</div>
+               </div>
+               <div class="box rent">
+                  <div class="title">추정 매출</div>
+                  <div class="value">2000</div>
+               </div>
+               <div class="box sales">
+                  <div class="title">평균 임대료</div>
+                  <div class="value">4000</div>
+               </div>
             </div>
          </div>
       </div>
-      <div class="content-detail">
-         <div class="section">
-            <p class="title">유동인구 변화추이</p>
-            <LineGraph :isLoad="isLoad" :dataset="population" class="graph" />
-         </div>
-         <div class="section">
-            <p class="title">연령대 분포</p>
-            <span class="notes">(updated 2020-4분기)</span>
-            <BarGraph :isLoad="isLoad" :dataset="age" class="graph" />
-         </div>
-         <div class="section">
-            <p class="title">요일별 유동인구</p>
-            <span class="notes">(updated 2020-4분기)</span>
-            <BarGraph :isLoad="isLoad" :dataset="weekPop" class="graph" />
-         </div>
-         <div class="section">
-            <p class="title">요일별 유동인구</p>
-            <PieChart :dataset="week" class="graph" />
-         </div>
-         <div class="section">
-            <p class="title">어쩌구 저쩌구</p>
-            <!-- <LineGraph :dataset="type" class="graph" /> -->
+      <div class="bottom-wrapper">
+         <div class="content-detail">
+            <div class="section">
+               <p class="title">유동인구 변화추이</p>
+               <LineGraph :isLoad="isLoad" :dataset="population" class="graph" />
+            </div>
+            <div class="section">
+               <p class="title">연령대 분포</p>
+               <span class="notes">(updated 2020-4분기)</span>
+               <BarGraph :isLoad="isLoad" :dataset="age" class="graph" />
+            </div>
+            <div class="section">
+               <p class="title">요일별 유동인구</p>
+               <span class="notes">(updated 2020-4분기)</span>
+               <BarGraph :isLoad="isLoad" :dataset="weekPop" class="graph" />
+            </div>
+            <div class="section">
+               <p class="title">요일별 유동인구</p>
+               <PieChart :dataset="week" class="graph" />
+            </div>
+            <div class="section">
+               <p class="title">어쩌구 저쩌구</p>
+               <!-- <LineGraph :dataset="type" class="graph" /> -->
+            </div>
          </div>
       </div>
    </div>
@@ -266,141 +270,149 @@ export default {
    height: 100%;
    display: flex;
    flex-direction: column;
-   padding: 25px 25px;
 
-   .header {
-      /* background-color: red; */
-      height: 50px;
+   .top-wrapper {
+      height: 400px;
+      box-shadow: 9px 9px 20px #56565629;
+      border-radius: 0px 0px 20px 20px;
+      padding: 25px;
 
-      .name {
-         display: inline-block;
-         font-size: 22pt;
-         font-weight: 600;
+      .header {
+         /* background-color: red; */
+         height: 50px;
 
-         i {
-            font-size: 14pt;
-         }
-      }
-
-      .btnLike {
-         display: inline-block;
-         margin-left: 5px;
-         color: rgb(236, 201, 3);
-         font-size: 18px;
-      }
-
-      .btn-close {
-         float: right;
-
-         font-size: 18pt;
-         color: rgb(148, 148, 148);
-         cursor: pointer;
-
-         &:hover {
-            color: #ff6633;
-         }
-      }
-   }
-
-   .content-common {
-      display: flex;
-      flex-direction: column;
-      margin-top: 15px;
-
-      .info-basic {
-         width: 100%;
-         height: 40px;
-
-         font-size: 10pt;
-         color: rgb(63, 63, 63);
-         /* text-align: center; */
-         padding: 0px 20px;
-         line-height: 40px;
-
-         background-color: rgb(230, 230, 230);
-         border: 1px solid rgb(203, 203, 203);
-
-         .title {
-            margin-right: 10px;
+         .name {
+            display: inline-block;
+            font-size: 22pt;
             font-weight: 600;
+
+            i {
+               font-size: 14pt;
+            }
          }
 
-         .value {
-            margin-left: 3px;
-            color: #ff6633;
+         .btnLike {
+            display: inline-block;
+            margin-left: 5px;
+            color: rgb(236, 201, 3);
+            font-size: 18px;
+         }
+
+         .btn-close {
+            float: right;
+
+            font-size: 18pt;
+            color: rgb(148, 148, 148);
+            cursor: pointer;
+
+            &:hover {
+               color: #ff6633;
+            }
          }
       }
 
-      .info-special {
-         margin: 15px 0px;
+      .content-common {
          display: flex;
+         flex-direction: column;
+         margin-top: 15px;
 
-         /* 공통 속성 */
-         .box {
-            $radiusVal: 15px;
-
+         .info-basic {
             width: 100%;
-            height: 100px;
-            border-radius: $radiusVal;
-            background-color: rgb(255, 244, 226);
-            /* box-shadow: 0px 3px 8px rgb(0 0 0 / 46%); */
-            margin: 0px 10px;
+            height: 40px;
+
+            font-size: 10pt;
+            color: rgb(63, 63, 63);
+            /* text-align: center; */
+            padding: 0px 20px;
+            line-height: 40px;
+
+            background-color: rgb(230, 230, 230);
+            border: 1px solid rgb(203, 203, 203);
 
             .title {
-               height: 30px;
-               background-color: rgba(29, 29, 29, 0.119);
-               border-radius: $radiusVal $radiusVal 0px 0px;
-
-               font-size: 11pt;
+               margin-right: 10px;
                font-weight: 600;
-               text-align: center;
-               line-height: 30px;
             }
 
             .value {
-               font-size: 26pt;
-               font-weight: 600;
-               text-align: center;
-               line-height: 60px;
+               margin-left: 3px;
+               color: #ff6633;
             }
          }
 
-         .recommend {
-            background-color: #ffcc00;
+         .info-special {
+            margin: 15px 0px;
+            display: flex;
+
+            /* 공통 속성 */
+            .box {
+               $radiusVal: 15px;
+
+               width: 100%;
+               height: 100px;
+               border-radius: $radiusVal;
+               background-color: rgb(255, 244, 226);
+               /* box-shadow: 0px 3px 8px rgb(0 0 0 / 46%); */
+               margin: 0px 10px;
+
+               .title {
+                  height: 30px;
+                  background-color: rgba(29, 29, 29, 0.119);
+                  border-radius: $radiusVal $radiusVal 0px 0px;
+
+                  font-size: 11pt;
+                  font-weight: 600;
+                  text-align: center;
+                  line-height: 30px;
+               }
+
+               .value {
+                  font-size: 26pt;
+                  font-weight: 600;
+                  text-align: center;
+                  line-height: 60px;
+               }
+            }
+
+            .recommend {
+               background-color: #ffcc00;
+            }
          }
       }
    }
-
-   .content-detail {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-
+   .bottom-wrapper {
       width: 100%;
       height: 100%;
       overflow-y: auto;
+      padding: 25px;
 
-      .section {
-         margin-top: 40px;
-         width: 100%;
+      .content-detail {
+         display: flex;
+         flex-direction: column;
+         align-items: center;
 
-         p.title {
-            /* display: inline-block; */
-            font-size: 16pt;
-            font-weight: 500;
-         }
+         .section {
+            margin-top: 40px;
+            width: 100%;
 
-         span.notes {
-            /* float: right; */
-            font-size: 9pt;
-            color: gray;
-         }
+            p.title {
+               /* display: inline-block; */
+               font-size: 16pt;
+               font-weight: 500;
+            }
 
-         .graph {
-            height: 380px;
-            width: 380px;
-            margin: 0 auto;
-            margin-top: 25px;
+            span.notes {
+               /* float: right; */
+               font-size: 9pt;
+               color: gray;
+            }
+
+            .graph {
+               height: 380px;
+               width: 380px;
+               margin: 0 auto;
+               margin-top: 25px;
+            }
          }
       }
    }
