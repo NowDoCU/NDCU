@@ -12,8 +12,8 @@
          ></toast>
       </transition>
       <transition name="collapse-right">
-         <div v-if="detailCompo" class="detail-compo floating">
-            <map-detail v-if="detailCompo" :isBookmark="isBookmark" :detailData="detailData" @close-expended="onClickCloseDetail"></map-detail>
+         <div v-show="detailCompo" class="detail-compo floating">
+            <map-detail v-show="detailCompo" :isBookmark="isBookmark" :detailData="detailData" :loadStatus="loadStatus" @close-expended="onClickCloseDetail"></map-detail>
          </div>
       </transition>
       <transition name="collapse">
@@ -76,6 +76,7 @@ export default {
 
       // 상권의 상제 정보를 전달하기 위한 변수들
       detailData: new Object(),
+      loadStatus: 0, //Detail 컴포넌트의 상태 관리
       isBookmark: false,
       detailCompo: false,
 
@@ -246,7 +247,7 @@ export default {
       },
 
       goDetail(value) {
-         this.detailCompo = value;
+         this.detailCompo = true;
          this.bookMarkCompo = false;
       },
 
@@ -565,37 +566,29 @@ export default {
                   polygonPath.push(new kakao.maps.LatLng(polygonArr[i][1], polygonArr[i][0]));
                }
 
-               console.log('===========================');
-
                this.removeDongLayer('polygon');
                this.makeDongPolygon(polygonPath);
-
-               console.log(1);
 
                this.mapObject.setCenter(center);
                this.mapObject.setLevel(3, { animate: true });
 
-               console.log(2);
-
                this.removeDongLayer('innerDong');
-
-               console.log(3);
 
                // 메소드 체이싱
                new Promise((resolve) => {
                   resolve(this.convertCoordsBtoH(center));
                })
                   .then((result) => {
-                     console.log(4);
-                     console.log('Promise result(H_CODE) => ', result);
+                     // console.log(4);
+                     // console.log('Promise result(H_CODE) => ', result);
                      return this.apiDongDistrict(result);
                   })
                   .then((result) => {
-                     console.log(5, result);
+                     // console.log(5, result);
                      this.dongInnerDistricts = result;
                   })
                   .then(() => {
-                     console.log(6, this.dongInnerDistricts);
+                     // console.log(6, this.dongInnerDistricts);
                      this.setDongInnerMarker();
                   });
 
@@ -794,14 +787,21 @@ export default {
          this.mapObject.setLevel(4, { animate: true });
          this.mapObject.setCenter(item.position);
 
+         // console.log('=====================================');
+
          // 검색 결과 조회
          new Promise((resolve) => {
+            // 초기 값 셋팅
+            this.loadStatus = 0; // 디테일 컴포넌트 로드가 안된 초기 상태로 셋팅
+            this.detailData = new Object(); // 디테일 컴포넌트에 새로운 결과값을 주기위해 초기 값 셋팅
             resolve(this.getDistrictDetail(item.district.commercialCode));
          }).then((result) => {
-            this.detailData = result;
+            // console.log('_*_*_*_*_*_*_*_*_*_*_*_');
+            this.loadStatus = 1;
             this.detailCompo = true;
+            this.detailData = result;
             this.setIsBookmark();
-            console.log('#out getDistrictDetail', this.detailData);
+            // console.log('#out getDistrictDetail', typeof this.detailData);
          });
 
          // 토스트 메뉴
@@ -812,24 +812,26 @@ export default {
 
       // 해당 회원이 북마크한 상권인지 아닌 지 확인
       setIsBookmark() {
-         if(!this.isLogin) { return; }
+         if (!this.isLogin) {
+            return;
+         }
 
          /** 북마크 리스트 가져오기 */
          getBookmarkList(
-               (res) => {
-                  this.bookmarkList = res.data;
-                  this.isBookmark = false;
-                  for(var i=0; i<this.bookmarkList.length; ++i) {           
-                     if(this.bookmarkList[i].commercial.commercialCode == this.detailData.commercialCode) {
-                        this.isBookmark = true;
-                        break;
-                     }
+            (res) => {
+               this.bookmarkList = res.data;
+               this.isBookmark = false;
+               for (var i = 0; i < this.bookmarkList.length; ++i) {
+                  if (this.bookmarkList[i].commercial.commercialCode == this.detailData.commercialCode) {
+                     this.isBookmark = true;
+                     break;
                   }
-               }, 
-               (err) => {
-                  console.log(err);
                }
-         )
+            },
+            (err) => {
+               console.log(err);
+            }
+         );
       },
 
       // 동-0) 입력값에 따라 정보를 삭제함
@@ -1002,6 +1004,7 @@ export default {
 
          // 검색 결과 조회
          new Promise((resolve) => {
+            this.detailData = new Object();
             resolve(this.getDistrictDetail(item.district.commercialCode));
          }).then((result) => {
             this.detailData = result;
@@ -1021,7 +1024,7 @@ export default {
             findAllData(
                commercialCode,
                (success) => {
-                  console.log('#in getDistrictDetail', success.data);
+                  // console.log('#in getDistrictDetail', success.data);
                   resolve(success.data);
                },
                (fail) => {

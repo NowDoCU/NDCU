@@ -1,12 +1,9 @@
 <script>
-import { Line } from 'vue-chartjs';
+import { Bar } from 'vue-chartjs';
 
 export default {
-   extends: Line,
-   props: {
-      dataset: Object,
-      isLoad: Boolean,
-   },
+   name: 'BarGraph',
+   extends: Bar,
    data: function() {
       return {
          datacollection: {
@@ -14,21 +11,28 @@ export default {
             datasets: [
                {
                   label: '',
-                  pointBackgroudColor: 'white',
-                  pointBorderColor: '#cccccc',
-                  borderColor: '#cccccc',
+                  backgroundColor: [],
+                  pointBackgroundColor: 'white',
+                  borderWidth: 1,
                   data: [],
                },
             ],
          },
          options: {
-            maintainAspectRatio: true,
+            maintainAspectRatio: false,
             scales: {
                yAxes: [
                   {
                      ticks: {
                         beginAtZero: true,
-                        stepSize: 500000,
+                        stepSize: 100000,
+                     },
+                  },
+               ],
+               xAxes: [
+                  {
+                     gridLines: {
+                        lineWidth: 0,
                      },
                   },
                ],
@@ -36,20 +40,35 @@ export default {
          },
       };
    },
+   props: {
+      dataset: Object,
+      isLoad: Boolean,
+   },
    methods: {
       getValue: function() {
          this.datacollection.datasets[0].label = this.dataset.name;
          this.datacollection.labels = this.dataset.category;
          this.datacollection.datasets[0].data = this.dataset.value;
 
+         var maxValue = Math.max.apply(null, this.dataset.value);
+         console.log(maxValue);
+
+         for (var i = 0; i < this.dataset.value.length; i++) {
+            if (this.datacollection.datasets[0].data[i] == maxValue) {
+               this.datacollection.datasets[0].backgroundColor.push('rgb(220, 27, 27, 0.7)');
+            } else {
+               this.datacollection.datasets[0].backgroundColor.push('#cccccc');
+            }
+         }
+
          // 셋팅 후 재랜더링
          this.renderChart(this.datacollection, this.options);
-         //  console.log('- 그래프 값 셋팅 완료', this.datacollection.datasets[0].data[0]);
       },
       initValue: function() {
          this.datacollection.datasets[0].label = '';
          this.datacollection.labels = [];
          this.datacollection.datasets[0].data = [];
+         this.datacollection.datasets[0].backgroundColor = [];
          //  console.log('- 그래프 값 초기화', this.datacollection.datasets[0].data.length);
       },
    },
@@ -69,5 +88,4 @@ export default {
    },
 };
 </script>
-
 <style scoped lang="scss"></style>
