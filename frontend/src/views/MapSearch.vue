@@ -6,7 +6,7 @@
             :isExplore="isExplore"
             :toastDist="toastDist"
             class="toast-pop-up floating"
-            @emit-initRecommend="onInputComplete"
+            @emit-initRecommend="initRecommend"
             @emit-closeRecommend="closeRecommend"
             @emit-closeExplore="closeExplore"
          ></toast>
@@ -85,6 +85,7 @@ export default {
       toastDist: null, // 토스트 메뉴에게 건내줄 상권명
 
       // [추천 상권]
+      inputOption: {}, // 옵션 값을 저장함
       recommendResult: null,
       markers: [],
       customOverlays: [],
@@ -168,6 +169,7 @@ export default {
       onInputComplete: function(options) {
          // console.log(options);
 
+         this.inputOption = options;
          this.optionCompo = false;
          this.detailCompo = false;
          this.toastShow = false;
@@ -202,6 +204,7 @@ export default {
       */
       // 토스트 메뉴에서 추천 결과 삭제
       closeRecommend() {
+         this.inputOption = {};
          this.toastShow = false;
          this.optionCompo = false;
          this.bookMarkCompo = false;
@@ -224,6 +227,8 @@ export default {
             this.initCenter();
             this.recommendResult = null;
          }
+
+         this.inputOption = {};
          this.optionCompo = false;
          this.bookMarkCompo = false;
 
@@ -312,6 +317,12 @@ export default {
                this.removeDongLayer('total');
                this.removeRcommendLayers();
             }
+         }
+      },
+
+      initRecommend() {
+         if (this.inputOption.length !== 0) {
+            this.onInputComplete(this.inputOption);
          }
       },
 
