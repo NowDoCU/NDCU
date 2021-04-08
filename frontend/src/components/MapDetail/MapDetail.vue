@@ -55,7 +55,8 @@
       <div class="bottom-wrapper">
          <div class="content-detail">
             <div class="section store">
-               <p class="title">상가 임대료</p>
+               <p class="title">상가 임대료 시세</p>
+               <span class="notes">10평 기준(33m²)</span>
                <div v-show="isRentalNull" class="nullInfo">상권 임대료 정보가 없습니다 :-(</div>
                <div :class="{ nullRental: isRentalNull }" class="wrapper">
                   <div class="left-box">
@@ -65,15 +66,15 @@
                   </div>
                   <div class="mid-box">
                      <p class="label">활성화 지역</p>
-                     <p class="second">{{ rentalPrice.activate.second }}</p>
-                     <p class="first">{{ rentalPrice.activate.first }}</p>
-                     <p class="under">{{ rentalPrice.activate.under }}</p>
+                     <p class="second">{{ rentalPrice.activate.second | currency }}원</p>
+                     <p class="first">{{ rentalPrice.activate.first | currency }}원</p>
+                     <p class="under">{{ rentalPrice.activate.under | currency }}원</p>
                   </div>
                   <div class="right-box">
                      <p class="label">비활성화 지역</p>
-                     <p class="second">{{ rentalPrice.deactivate.second }}</p>
-                     <p class="first">{{ rentalPrice.deactivate.first }}</p>
-                     <p class="under">{{ rentalPrice.deactivate.under }}</p>
+                     <p class="second">{{ rentalPrice.deactivate.second | currency }}원</p>
+                     <p class="first">{{ rentalPrice.deactivate.first | currency }}원</p>
+                     <p class="under">{{ rentalPrice.deactivate.under | currency }}원</p>
                   </div>
                   <img src="@/assets/image/detail/house_fee.png" alt="" />
                   <p class="notes-footer">
@@ -136,7 +137,7 @@
             <div class="section">
                <p class="title">📊 업종별 평균 매출액</p>
                <span class="notes">(updated 2020-4분기)</span>
-               <BarGraph :isLoad="isLoad" :dataset="storeSales" class="graph" />
+               <BarGraph :isLoad="isLoad" :maxSales="maxSales" :dataset="storeSales" class="graph" />
                <p class="notes-footer"><span>*</span> 매출액은 카드사 데이터로 도출한 매출추정액입니다. <br /></p>
             </div>
             <div class="section">
@@ -174,14 +175,6 @@
                   </tbody>
                </table>
             </div>
-            <div class="section">
-               <p class="title">요일별 유동인구</p>
-               <PieChart :dataset="week" class="graph" />
-            </div>
-            <div class="section">
-               <p class="title">어쩌구 저쩌구</p>
-               <!-- <LineGraph :dataset="type" class="graph" /> -->
-            </div>
          </div>
       </div>
    </div>
@@ -189,7 +182,6 @@
 
 <script>
 import BarGraph from './BarGraph';
-import PieChart from './PieChart';
 import LineGraph from './LineGraph';
 import { createBookmark, removeBookmark } from '@/api/bookmark';
 import { mapState } from 'vuex';
@@ -203,7 +195,6 @@ export default {
    },
    components: {
       BarGraph,
-      PieChart,
       LineGraph,
    },
    data: function() {
@@ -237,7 +228,7 @@ export default {
             CS100010: 0,
          },
 
-         isRentalNull: false,
+         isRentalNull: true,
          rentalPrice: {
             activate: {
                second: '-',
@@ -259,6 +250,9 @@ export default {
          storeSales: {}, // 업종별 매출액
          type: {},
          week: {},
+
+         maxAge: '',
+         maxSales: 0,
       };
    },
    watch: {
@@ -275,6 +269,8 @@ export default {
             // 전달 받은 값 있을 경우
             this.dataInsert();
             this.convertData2Graph();
+            this.insertRentData();
+            this.insertFacilitiesData();
          }
       },
    },
@@ -306,11 +302,6 @@ export default {
             category: ['한식음식점', '양식음식점', '일식음식점', '분식전문점', '패스트푸드점', '호프/간이주점', '커피/음료', '베이커리'],
             value: [22, 30, 11, 27, 4, 3, 2, 1],
          };
-         this.week = {
-            name: '주중/주말 매출',
-            category: ['주중', '주말'],
-            value: [45, 55],
-         };
       },
 
       dataInsert() {
@@ -318,18 +309,14 @@ export default {
          this.commercialCode = this.detailData.commercialCode;
          this.divisionName = this.detailData.divisionName;
 
-         this.facilities.school = this.detailData.facilities.school;
-         this.facilities.entertainment = this.detailData.facilities.entertainment;
-         this.facilities.str = this.detailData.facilities.accommodation;
-         this.facilities.rail = this.detailData.facilities.rail;
-         this.facilities.bus = this.detailData.facilities.bus;
-
          var MAX_IDX = 99;
          var MAX = 0;
 
          // 가장 붐비는 요일 찾기
          var week = ['monPopulation', 'tuePopulation', 'wedPopulation', 'thuPopulation', 'firPopulation', 'satPopulation', 'sunPopulation'];
          var result = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];
+         if(this.detailData.estimatedPopulationList === undefined) { return; }
+
          for (const idx in week) {
             var now = eval(`this.detailData.estimatedPopulationList[0].${week[idx]}`);
 
@@ -379,11 +366,33 @@ export default {
          function convertPop(target) {
             return target.toString().substr(0, target.toString().length - 4);
          }
+      },
 
-         // 3자리 마다 , 찍기
-         // function covertComman(target) {
-         //    return target.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',');
-         // }
+      insertFacilitiesData() {
+         if(this.facilities == null) { return; }
+
+         this.facilities.school = this.detailData.facilities.school;
+         this.facilities.entertainment = this.detailData.facilities.entertainment;
+         this.facilities.str = this.detailData.facilities.accommodation;
+         this.facilities.rail = this.detailData.facilities.rail;
+         this.facilities.bus = this.detailData.facilities.bus;
+      },
+
+      insertRentData() {
+
+         this.isRentalNull = true;
+         if(this.detailData.storeRentalPrice == null) { return; }
+
+         var area = 33;
+
+         // 임대료 정보 매핑
+         this.isRentalNull = false;
+         this.rentalPrice.activate.second = this.detailData.storeRentalPrice.activateSecondRent * area;
+         this.rentalPrice.activate.first = this.detailData.storeRentalPrice.activateFirstRent * area;
+         this.rentalPrice.activate.under = this.detailData.storeRentalPrice.activateUnderRent * area;
+         this.rentalPrice.deactivate.second = this.detailData.storeRentalPrice.deactivateSecondRent * area;
+         this.rentalPrice.deactivate.first = this.detailData.storeRentalPrice.deactivateFirstRent * area;
+         this.rentalPrice.deactivate.under = this.detailData.storeRentalPrice.deactivateUnderRent * area;
       },
 
       // ============================
@@ -421,6 +430,15 @@ export default {
          this.age.value = result;
       },
 
+      getMax(arr) {
+         this.maxSales = 0;
+         for(var i=0; i<arr.length; ++i) {
+            if(this.maxSales < arr[i]) { 
+               this.maxSales = arr[i];
+            }
+         }
+      },
+
       // 업종별 매출액
       makeStoreSales() {
          var seq = ['CS100001', 'CS100002', 'CS100003', 'CS100004', 'CS100008', 'CS100006', 'CS100007', 'CS100009', 'CS100010', 'CS100005'];
@@ -436,8 +454,8 @@ export default {
                var sale = this.detailData.estimatedSalesList[idx].salesMonth;
                var cnt = this.detailData.estimatedSalesList[idx].storesCount;
 
-               if (seq[key] === code) {
-                  result.push(eval(`${sale}/${cnt}`));
+               if (cnt != 0 && seq[key] === code) {
+                  result.push(Math.floor(eval(`${sale}/${cnt}`)));
                   continue here;
                }
             }
@@ -445,6 +463,7 @@ export default {
             // 없는 경우
             result.push(0);
          }
+         this.getMax(result);
 
          this.storeSales.value = result;
       },
@@ -491,6 +510,12 @@ export default {
          this.$emit('close-expended');
       },
    },
+   filters: {
+        currency: function (value) {
+            var num = new Number(value);
+            return num.toFixed(0).replace(/(\d)(?=(\d{3})+(?:\.\d+)?$)/g, "$1,")
+        }
+    },
 };
 </script>
 <style scoped lang="scss">

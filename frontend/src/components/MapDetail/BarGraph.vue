@@ -6,6 +6,7 @@ export default {
    extends: Bar,
    data: function() {
       return {
+         size: 0,
          datacollection: {
             labels: [],
             datasets: [
@@ -43,6 +44,7 @@ export default {
    props: {
       dataset: Object,
       isLoad: Boolean,
+      maxSales: Number,
    },
    methods: {
       getValue: function() {
@@ -61,6 +63,21 @@ export default {
             }
          }
 
+         if(this.maxSales != undefined) {
+            var cnt = 1;
+            this.size = this.maxSales;
+
+            while(this.size >= 10) {
+               this.size /= 10;
+               cnt *= 10;
+            }
+
+            this.size = Math.floor(this.size);
+            this.size *= cnt;
+
+            this.options.scales.yAxes[0].ticks.stepSize = this.size;
+         }
+
          // 셋팅 후 재랜더링
          this.renderChart(this.datacollection, this.options);
       },
@@ -69,6 +86,7 @@ export default {
          this.datacollection.labels = [];
          this.datacollection.datasets[0].data = [];
          this.datacollection.datasets[0].backgroundColor = [];
+
          //  console.log('- 그래프 값 초기화', this.datacollection.datasets[0].data.length);
       },
    },
