@@ -46,8 +46,7 @@ export default {
             this.$emit('close-expended')
         },
         goDetail(value) {
-            this.goDetailValue = value;
-            this.$emit('goDetail', this.goDetailValue)
+            this.$emit('goDetail', value);
         },
 
         /** 북마크 삭제하기 */
