@@ -47,10 +47,12 @@ def commercial(request):
     else:
         return JsonResponse({})
 
-def algorithm(request_data={}, clustering_select='K'):
+def algorithm(request_data, clustering_select='K'):
     
     commercial_dataset = pd.DataFrame(list(Commercial.objects.all().values()))
     
+    print(commercial_dataset)
+
     day_columns = ['week', 'weekend', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
     time_columns = ['time_00_06', 'time_06_11', 'time_11_14', 'time_14_17', 'time_17_21', 'time_21_24']
     gender_columns = ['Man', 'Female']
