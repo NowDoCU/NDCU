@@ -21,11 +21,7 @@ from sklearn.cluster import KMeans
 def index(request):
     return "aa"
 
-# @api_view(['GET'])
-# def func(request):
-#     return Response(serializer.data, status=status.HTTP_200_OK)
-
-@api_view(['GET', 'POST'])
+@api_view(['POST'])
 def commercial(request):
     
     ##    REQUEST   ##
@@ -50,16 +46,45 @@ def commercial(request):
         return JsonResponse(result_commercial.to_dict(orient='index'))
     else:
         return JsonResponse({})
-    
-def algorithm(request_data, clustering_select='K'):
+
+def algorithm(request_data={}, clustering_select='K'):
     
     commercial_dataset = pd.DataFrame(list(Commercial.objects.all().values()))
     
-    print(commercial_dataset.head())
+    day_columns = ['week', 'weekend', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    time_columns = ['time_00_06', 'time_06_11', 'time_11_14', 'time_14_17', 'time_17_21', 'time_21_24']
+    gender_columns = ['Man', 'Female']
+    age_columns = ['age_10', 'age_20', 'age_30', 'age_40', 'age_50', 'age_60']
 
-    # sigungu_list, service_name
-    service_name = request_data['category']
+    service_name = request_data['category'] # services
     sigungu_list = request_data['districts'] # sigungu list
+
+    # age
+    if request_data['age'] == []:
+        request_data['age'] = ['10', '20', '30', '40', '50', '60']
+    age_columns = list(pd.Series(request_data['age']).map({
+        '10': 'age_10', '20': 'age_20', '30': 'age_30',
+        '40': 'age_40', '50': 'age_50', '60': 'age_60'
+        }))
+
+    # gender
+    if request_data['gender'] == []:
+        request_data['gender'] = ['male', 'female']
+    gender_columns = list(pd.Series(request_data['gender']).map({'male': 'Man', 'female': 'Woman'}))
+
+    # 상권 특성 반영
+    if service_name == '일식음식점':
+        age_columns += ['age_20', 'age_30', 'age_40']
+    if service_name == '양식음식점':
+        age_columns += ['age_30']
+    if service_name == '패스트푸드점':
+        age_columns += ['age_10', 'age_20', 'age_30']
+    if service_name == '호프-간이주점':
+        age_columns += ['age_30', 'age_40', 'age_50']
+        time_columns += ['time_14_17', 'time_17_21', 'time_21_24']
+    if service_name == '커피-음료':
+        age_columns += ['age_20', 'age_30', 'age_40']
+        time_columns += ['time_11_14']
 
     # Clustering target columns
     clust_columns = ['week', 'weekend', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', \
@@ -114,7 +139,7 @@ def algorithm(request_data, clustering_select='K'):
     result_commercial = result_commercial.rename_axis('commercial_code').reset_index()
 
     result_commercial = pd.merge(
-        result_commercial, commercial_dataset[['commercial_code', 'commercial_name', 'x', 'y']], \
+        result_commercial, commercial_dataset[['commercial_code', 'commercial_name', 'division_code', 'division_name', 'x', 'y']], \
         left_on="commercial_code", right_on="commercial_code"
     ).drop_duplicates()
 
@@ -123,5 +148,5 @@ def algorithm(request_data, clustering_select='K'):
     
     result_commercial['score'] = round((max_distance - result_commercial['distance'])*100 / max_distance, 2)
     result_commercial.index = range(1,6)
-
+    
     return result_commercial
