@@ -25,30 +25,41 @@ def index(request):
 # def func(request):
 #     return Response(serializer.data, status=status.HTTP_200_OK)
 
+@api_view(['GET', 'POST'])
 def commercial(request):
     
-    # if request.method == 'POST':
-    #     pass
-
-    result_commercial = algorithm()
+    ##    REQUEST   ##
+    #
+    # category
+    # districts
+    # deposit
+    # rent
+    # client
+    # age
+    # gender
+    if request.method == 'POST':
+        result_commercial = algorithm(request.data)
+        
+        ##    RESPONSE  ##
+        #
+        # code:     상권 코드
+        # name:     상권 이름
+        # score:    추천 점수
+        # x:        x 좌표
+        # y:        y 좌표
+        return JsonResponse(result_commercial.to_dict(orient='index'))
+    else:
+        return JsonResponse({})
     
-    # code: 12314,
-    # name: '교대역_1',
-    # score: 55,
-    # x: '201023', //상권영역.csv
-    # y: '443482',
-    return JsonResponse(result_commercial.to_dict(orient='index'))
-
+def algorithm(request_data, clustering_select='K'):
     
-def algorithm(clustering_select='K'):
-
     commercial_dataset = pd.DataFrame(list(Commercial.objects.all().values()))
     
     print(commercial_dataset.head())
 
     # sigungu_list, service_name
-    sigungu_list = ['노원구', '동작구']
-    service_name = '한식음식점'
+    service_name = request_data['category']
+    sigungu_list = request_data['districts'] # sigungu list
 
     # Clustering target columns
     clust_columns = ['week', 'weekend', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun', \
@@ -72,7 +83,7 @@ def algorithm(clustering_select='K'):
       result["cluster"] = kmeans.labels_
       result.index=target_dataset.index
 
-    # Fuzzy C-means Clustering
+    # Fuzzy C-means Clustering - linux 환경에서만 가능
     # if clustering_select == 'C':
     #   fcm = FCM(n_clusters=10)
     #   fcm.fit(np.array(scaled_dataset))
@@ -114,6 +125,3 @@ def algorithm(clustering_select='K'):
     result_commercial.index = range(1,6)
 
     return result_commercial
-
-
-
