@@ -31,9 +31,8 @@ export default {
             this.$emit('delete-bm', this.bookmark)
         },
         goDetail: function() {
-            this.goDetailValue = true;
             // 정보도 가져가기 구현
-            this.$emit('goDetail', this.idx);
+            this.$emit('goDetail', this.bookmark.commercial.commercialCode);
         }
     }
 }
