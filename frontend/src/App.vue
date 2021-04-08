@@ -78,7 +78,7 @@ export default {
 
    }
 }
-@media (max-width:1200px) { 
+@media (max-width:1000px) { 
    .screenProtect{
       display: flex;
       z-index: 10000;
