@@ -11,6 +11,13 @@
             @emit-closeExplore="closeExplore"
          ></toast>
       </transition>
+      <transition name="slide-up">
+         <div v-show="isRecommend" class="caution-msg floating">
+            <p>추천 결과는 <span class="bold">FUZZY-CMEANS 클러스터링</span>을 기반으로 추천된 지수입니다.</p>
+            <p>높은 매출을 기록하는 상권과 몇 퍼센트 유사한지 보여줍니다.</p>
+            <p class="danger">⚠️ 단, 이 결과는 어디까지나 참고용이며 본 추천으로 인해 발생한 결과에 대한 책임은 본인에게 있습니다.</p>
+         </div>
+      </transition>
       <transition name="collapse-right">
          <div v-show="detailCompo" class="detail-compo floating">
             <map-detail v-show="detailCompo" :isBookmark="isBookmark" :detailData="detailData" :loadStatus="loadStatus" @close-expended="onClickCloseDetail"></map-detail>
@@ -83,6 +90,9 @@ export default {
       // 토스트 메뉴를 표시하기 위한
       toastShow: false,
       toastDist: null, // 토스트 메뉴에게 건내줄 상권명
+
+      // 추천중일 경우 안내 메세지 표시
+      isRecommend: false,
 
       // [추천 상권]
       inputOption: {}, // 옵션 값을 저장함
@@ -161,6 +171,7 @@ export default {
       onClickCloseDetail: function() {
          this.closeExplore();
          this.detailCompo = false;
+
          this.detailData = new Object();
          this.loadStatus = 0;
       },
@@ -195,6 +206,7 @@ export default {
             .then(() => {
                // 추천 받은 상권들을 마커로 표시
                this.setRecommendMarker();
+               this.isRecommend = true;
             });
       },
 
@@ -866,6 +878,7 @@ export default {
          // 검색 결과 조회
          new Promise((resolve) => {
             // 초기 값 셋팅
+            this.isRecommend = false;
             this.loadStatus = 0; // 디테일 컴포넌트 로드가 안된 초기 상태로 셋팅
             this.detailData = new Object(); // 디테일 컴포넌트에 새로운 결과값을 주기위해 초기 값 셋팅
             resolve(this.getDistrictDetail(item.district.commercial_code));
@@ -1081,6 +1094,44 @@ export default {
       z-index: 30;
    }
 
+   .caution-msg {
+      display: flex;
+      flex-direction: column;
+      /* align-items: center; */
+      justify-content: center;
+
+      background-color: rgb(255, 255, 255);
+      padding: 25px;
+
+      width: 400px;
+      height: 60px;
+
+      bottom: 60px;
+      left: 50%;
+
+      font-size: 10pt;
+      font-weight: 500;
+      line-height: 15px;
+      color: rgb(55, 55, 55);
+      box-shadow: 0px 9px 20px 0px #56565685;
+
+      transform: translateX(-50%);
+      /* transform: translate(-50%, -50%);  원본 위치 */
+
+      border-radius: 10px;
+      z-index: 30;
+
+      span.bold {
+         color: rgb(8, 8, 155);
+         font-weight: 600;
+      }
+
+      .danger {
+         margin-top: 6px;
+         color: rgb(177, 2, 2);
+      }
+   }
+
    // detail-compo slide in 기능
    .collapse-right-enter-active,
    .collapse-right-leave-active {
@@ -1103,6 +1154,16 @@ export default {
    .slide-down-enter,
    .slide-down-leave-to {
       transform: translateX(-400px) translateY(-200px);
+   }
+
+   // 경고 메세지 팝업 아래에서 올라오는 기능
+   .slide-up-enter-active,
+   .slide-up-leave-active {
+      transition: all 0.5s ease;
+   }
+   .slide-up-enter,
+   .slide-up-leave-to {
+      transform: translateX(-50%) translateY(200px);
    }
 
    .detail-compo {
