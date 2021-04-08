@@ -242,7 +242,7 @@ export default {
       loadStatus: function() {
          if (this.loadStatus == 0) {
             // 초기화
-            console.log('- 데이터베이스와 로드값을 초기화합니다');
+            // console.log('- 데이터베이스와 로드값을 초기화합니다');
             this.isLoad = false; // 로드 상태 0으로 초기화
             this.initDataset(); // 데이터셋 초기화
          }
@@ -433,7 +433,7 @@ export default {
          var result = [];
 
          here: for (const key in seq) {
-            console.log(seq[key]);
+            // console.log(seq[key]);
 
             // 해당 코드값이 있는지 확인
             for (const idx in this.detailData.estimatedSalesList) {
