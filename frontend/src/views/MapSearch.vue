@@ -248,7 +248,6 @@ export default {
       },
 
       goDetail(value) {
-         alert(value);
          this.detailCompo = true;
          this.bookMarkCompo = false;
       },
