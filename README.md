@@ -1,4 +1,4 @@
-# 세상의 모든 창업 - 세모창
+# NOW DO 창업 - 나두창업
 
 ## 기획 의도
 
@@ -17,20 +17,3 @@
 <b>Back-End</b><br>
 김한솔<br>
 장재용<br>
-
----
-
-### Tree (21.03.22)
-
-```
-.
-├── backend
-├── frontend
-│   ├── public
-│   └── src
-│       ├── assets
-│       ├── components
-│       ├── css
-│       └── views
-└── recommend
-```
