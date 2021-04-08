@@ -138,7 +138,7 @@ def algorithm(request_data, clustering_select='K'):
     #   fcm_labels = fcm.predict(np.array(scaled_dataset))
     #   result = scaled_dataset.copy()
     #   result["cluster"] = fcm_labels
-    #   result.index=target_dataset.index
+    #   result.index=scaled_dataset.index
     #   centroids = fcm.centers
 
     service_name_in_commercial = list(top_rate_commercial['service_name'] == service_name)
