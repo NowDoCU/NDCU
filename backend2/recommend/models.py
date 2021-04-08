@@ -3,6 +3,19 @@ from django.db import models
 # Create your models here.
 class Commercial(models.Model):
     
+    commercial_code = models.IntegerField()
+    division_code = models.TextField()
+    division_name = models.TextField()
+    commercial_name = models.TextField()
+    service_code = models.TextField()
+    service_name = models.TextField()
+    sales_per_store = models.IntegerField()
+    x = models.IntegerField()
+    y = models.IntegerField()
+    sigungu_code = models.IntegerField()
+    sigungu_name = models.TextField()
+    dong_code = models.IntegerField()
+
     week = models.IntegerField()
     weekend = models.IntegerField()
     Mon = models.IntegerField()
@@ -26,3 +39,7 @@ class Commercial(models.Model):
     age_40 = models.IntegerField()
     age_50 = models.IntegerField()
     age_60 = models.IntegerField()
+
+# class :
+    # category
+    # districts

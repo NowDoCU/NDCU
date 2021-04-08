@@ -25,7 +25,7 @@ SECRET_KEY = '9xx4m+8@7m_x@jklu9_%#f-u4^-nn9n#6m#hzq7l%@!g@s9n6f'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -79,14 +79,36 @@ DATABASES = {
     #     'ENGINE': 'django.db.backends.sqlite3',
     #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     # }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'NAME': 'ndcu-db3',
+    #     'USER': 'root',
+    #     'PASSWORD': 'root',
+    #     'HOST': 'localhost',
+    #     'PORT': '3306',
+    # }
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'ndcu-db',
-        'USER': 'root',
-        'PASSWORD': 'root',
-        'HOST': 'localhost',
+        'USER': 'ndcu',
+        'PASSWORD': 'ndcu',
+        'HOST': 'j4a106.p.ssafy.io',
         'PORT': '3306',
     }
+    # 'default': {
+    #     'ENGINE': 'djongo',
+    #     'NAME': 'ndcu2',
+    #     'CLIENT': {
+    #         'host': 'j4a106.p.ssafy.io:27017'
+    #     }
+    # }
+    # 'default': {
+    #     'ENGINE': 'djongo',
+    #     'NAME': 'ndcu2',
+    #     'CLIENT': {
+    #         'host': 'localhost:27017'
+    #     }
+    # }
 }
 
 
