@@ -34,23 +34,6 @@
                >분들이 더 자주 찾아요
             </p>
          </div>
-
-         <!-- <div class="content-common">
-            <div class="info-special">
-               <div class="box recommend">
-                  <div class="title">추천지수</div>
-                  <div class="value">97</div>
-               </div>
-               <div class="box rent">
-                  <div class="title">추정 매출</div>
-                  <div class="value">2000</div>
-               </div>
-               <div class="box sales">
-                  <div class="title">평균 임대료</div>
-                  <div class="value">4000</div>
-               </div>
-            </div>
-         </div> -->
       </div>
       <div class="bottom-wrapper">
          <div class="content-detail">
@@ -315,7 +298,9 @@ export default {
          // 가장 붐비는 요일 찾기
          var week = ['monPopulation', 'tuePopulation', 'wedPopulation', 'thuPopulation', 'firPopulation', 'satPopulation', 'sunPopulation'];
          var result = ['월요일', '화요일', '수요일', '목요일', '금요일', '토요일', '일요일'];
-         if(this.detailData.estimatedPopulationList === undefined) { return; }
+         if (this.detailData.estimatedPopulationList === undefined) {
+            return;
+         }
 
          for (const idx in week) {
             var now = eval(`this.detailData.estimatedPopulationList[0].${week[idx]}`);
@@ -369,7 +354,9 @@ export default {
       },
 
       insertFacilitiesData() {
-         if(this.facilities == null) { return; }
+         if (this.facilities == null) {
+            return;
+         }
 
          this.facilities.school = this.detailData.facilities.school;
          this.facilities.entertainment = this.detailData.facilities.entertainment;
@@ -379,9 +366,10 @@ export default {
       },
 
       insertRentData() {
-
          this.isRentalNull = true;
-         if(this.detailData.storeRentalPrice == null) { return; }
+         if (this.detailData.storeRentalPrice == null) {
+            return;
+         }
 
          var area = 33;
 
@@ -432,8 +420,8 @@ export default {
 
       getMax(arr) {
          this.maxSales = 0;
-         for(var i=0; i<arr.length; ++i) {
-            if(this.maxSales < arr[i]) { 
+         for (var i = 0; i < arr.length; ++i) {
+            if (this.maxSales < arr[i]) {
                this.maxSales = arr[i];
             }
          }
@@ -511,11 +499,11 @@ export default {
       },
    },
    filters: {
-        currency: function (value) {
-            var num = new Number(value);
-            return num.toFixed(0).replace(/(\d)(?=(\d{3})+(?:\.\d+)?$)/g, "$1,")
-        }
-    },
+      currency: function(value) {
+         var num = new Number(value);
+         return num.toFixed(0).replace(/(\d)(?=(\d{3})+(?:\.\d+)?$)/g, '$1,');
+      },
+   },
 };
 </script>
 <style scoped lang="scss">
@@ -549,7 +537,7 @@ export default {
    flex-direction: column;
 
    .top-wrapper {
-      height: 400px;
+      height: 200px;
       box-shadow: 9px 9px 20px #56565629;
       border-radius: 0px 0px 35px 35px;
       padding: 25px;
@@ -773,10 +761,10 @@ export default {
                text-align: center;
                font-weight: 600;
                line-height: 40px;
-               color: rgb(52, 52, 52);
+               color: rgb(50, 50, 50);
                position: relative;
-               top: 80px;
-               left: 120px;
+               top: 130px;
+               left: 10px;
                z-index: 10;
             }
 
