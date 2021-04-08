@@ -1,0 +1,13 @@
+django
+djangorestframework
+mysqlclient
+scikit-learn
+scipy
+numpy
+pandas
+
+djongo
+
+fuzzy-c-means
+
+django-cors-headers

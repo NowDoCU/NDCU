@@ -27,11 +27,30 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:8080',
+    "http://j4a106.p.ssafy.io:8080",
+)
+
+CORS_ALLOWED_ORIGINS  = [
+     "http://localhost:8080" ,
+     "http://j4a106.p.ssafy.io:8080",
+]
+
+CORS_ALLOW_METHODS  = [
+     'DELETE' ,
+     'GET' ,
+     'OPTIONS' ,
+     'PATCH' ,
+     'POST' ,
+     'PUT' ,
+]
 
 # Application definition
 
 INSTALLED_APPS = [
     'recommend',
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,6 +60,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -75,18 +95,6 @@ WSGI_APPLICATION = 'backend2.wsgi.application'
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    # }
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'ndcu-db3',
-    #     'USER': 'root',
-    #     'PASSWORD': 'root',
-    #     'HOST': 'localhost',
-    #     'PORT': '3306',
-    # }
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'ndcu-db',
@@ -95,20 +103,6 @@ DATABASES = {
         'HOST': 'j4a106.p.ssafy.io',
         'PORT': '3306',
     }
-    # 'default': {
-    #     'ENGINE': 'djongo',
-    #     'NAME': 'ndcu2',
-    #     'CLIENT': {
-    #         'host': 'j4a106.p.ssafy.io:27017'
-    #     }
-    # }
-    # 'default': {
-    #     'ENGINE': 'djongo',
-    #     'NAME': 'ndcu2',
-    #     'CLIENT': {
-    #         'host': 'localhost:27017'
-    #     }
-    # }
 }
 
 
