@@ -4,15 +4,6 @@ import Main from '../views/MapSearch.vue'
 
 Vue.use(VueRouter);
 
-// const onlyAuthUser = (to, from, next) => {
-//     if (localStorage.getItem('accessToken') !== null) {
-//       next();
-//     } else {
-//       alert('로그인이 필요한 페이지입니다. ');
-//       next('/');
-//     }
-//   };
-
 const routes = [{
     path: '/',
     name: 'Main',    

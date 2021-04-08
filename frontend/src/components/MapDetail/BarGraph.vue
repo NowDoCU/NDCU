@@ -53,7 +53,6 @@ export default {
          this.datacollection.datasets[0].data = this.dataset.value;
 
          var maxValue = Math.max.apply(null, this.dataset.value);
-         console.log(maxValue);
 
          for (var i = 0; i < this.dataset.value.length; i++) {
             if (this.datacollection.datasets[0].data[i] == maxValue) {
@@ -86,8 +85,6 @@ export default {
          this.datacollection.labels = [];
          this.datacollection.datasets[0].data = [];
          this.datacollection.datasets[0].backgroundColor = [];
-
-         //  console.log('- 그래프 값 초기화', this.datacollection.datasets[0].data.length);
       },
    },
    mounted() {

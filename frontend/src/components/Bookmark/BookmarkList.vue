@@ -37,9 +37,7 @@ export default {
                 (res) => {
                     this.bookmarkList = res.data;
                 }, 
-                (err) => {
-                    console.log(err);
-                }
+                () => {}
             )
         },
         closeCompo: function () {
@@ -56,9 +54,7 @@ export default {
                 () => {
                     this.bookmarkList.splice(idx, 1);
                 },
-                (err) => {
-                    console.log(err);
-                }
+                () => {}
             )            
         }
     },

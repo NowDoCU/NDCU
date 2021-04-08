@@ -44,13 +44,11 @@ export default {
 
          // 셋팅 후 재랜더링
          this.renderChart(this.datacollection, this.options);
-         //  console.log('- 그래프 값 셋팅 완료', this.datacollection.datasets[0].data[0]);
       },
       initValue: function() {
          this.datacollection.datasets[0].label = '';
          this.datacollection.labels = [];
          this.datacollection.datasets[0].data = [];
-         //  console.log('- 그래프 값 초기화', this.datacollection.datasets[0].data.length);
       },
    },
    mounted() {
