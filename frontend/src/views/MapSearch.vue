@@ -181,20 +181,27 @@ export default {
          this.toastDist = '';
 
          // options 데이터를 추천 API 요청 -> 상권명 / 추천 지수 / 상권영역 내 x,y 좌표 받음
-         var result = this.apiRecommend(options);
-         this.recommendResult = JSON.stringify(result);
-         // console.log(result);
 
-         this.removeDongLayer('total');
-         this.removeDongLayer('polygon');
-         this.removeDongLayer('innerDong');
-         this.removeGuLayer();
-         this.removeRcommendLayers();
+         new Promise((resolve) => {
+            resolve(this.apiRecommend(options));
+         })
+            .then((result) => {
+               console.log(result);
 
-         this.initCenter();
+               this.recommendResult = JSON.stringify(result);
 
-         // 추천 받은 상권들을 마커로 표시
-         this.setRecommendMarker();
+               this.removeDongLayer('total');
+               this.removeDongLayer('polygon');
+               this.removeDongLayer('innerDong');
+               this.removeGuLayer();
+               this.removeRcommendLayers();
+
+               this.initCenter();
+            })
+            .then(() => {
+               // 추천 받은 상권들을 마커로 표시
+               this.setRecommendMarker();
+            });
       },
 
       /* ==========================
@@ -824,16 +831,19 @@ export default {
 
       // 추천) 추천 결과 받기
       apiRecommend(option) {
-         return getRecommendedCommercials(
-            option,
-            (success) => {
-               // console.log(success);
-               success;
-            },
-            (err) => {
-               console.log(err);
-            }
-         );
+         console.log('apiRecommend');
+         return new Promise((resolve, reject) => {
+            getRecommendedCommercials(
+               option,
+               (success) => {
+                  console.log(success);
+                  resolve(success);
+               },
+               (err) => {
+                  console.log('getRecommendedCommercials : ', err);
+               }
+            );
+         });
       },
 
       // 추천-1) 추천받은 상권들의 마커 정보 입력
