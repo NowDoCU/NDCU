@@ -1,7 +1,7 @@
 // 서버 API
 const API_BASE_URL = 'http://j4a106.p.ssafy.io:8080/api/v1/';
-// const API_BASE_URL_2 = 'http://j4a106.p.ssafy.io:8000/'
-const API_BASE_URL_2 = 'http://localhost:8000/';
+const API_BASE_URL_2 = 'http://j4a106.p.ssafy.io:8000/';
+// const API_BASE_URL_2 = 'http://localhost:8000/';
 
 // 외부 API
 // Kakao Local

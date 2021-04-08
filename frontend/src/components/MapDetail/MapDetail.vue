@@ -470,9 +470,7 @@ export default {
             let commercial = { commercialCode: this.detailData.commercialCode };
             createBookmark(
                commercial,
-               () => {
-                  alert('북마크 추가');
-               },
+               () => {},
                (err) => {
                   console.log(err);
                }

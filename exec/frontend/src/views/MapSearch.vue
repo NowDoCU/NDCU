@@ -1,43 +1,12 @@
 <template lang="">
-   <div class="container">
-      <transition name="slide-down">
-         <toast
-            v-show="toastShow"
-            :isExplore="isExplore"
-            :toastDist="toastDist"
-            class="toast-pop-up floating"
-            @emit-initRecommend="onInputComplete"
-            @emit-closeRecommend="closeRecommend"
-            @emit-closeExplore="closeExplore"
-         ></toast>
-      </transition>
-      <transition name="collapse-right">
-         <div v-show="detailCompo" class="detail-compo floating">
-            <map-detail v-show="detailCompo" :isBookmark="isBookmark" :detailData="detailData" :loadStatus="loadStatus" @close-expended="onClickCloseDetail"></map-detail>
-         </div>
-      </transition>
-      <transition name="collapse">
-         <div v-show="optionCompo || bookMarkCompo" class="menu-expand-compo floating">
-            <option-input v-show="optionCompo" @close-expended="onClickClose" @input-complete="onInputComplete"></option-input>
-            <bookmark-list v-if="bookMarkCompo" @close-expended="onClickClose" @goDetail="goDetail"></bookmark-list>
-         </div>
-      </transition>
-      <div class="sidemenu-compo floating">
-         <side-menu @open-input-form="onClickInputBt" @open-bookmark="onClickBookmarkBt" @dialog-change="onDialogChange"></side-menu>
-      </div>
-      <vue-daum-map
-         id="map"
-         :appKey="appKey"
-         :center.sync="center"
-         :level.sync="level"
-         :mapTypeId="mapTypeId"
-         :libraries="libraries"
-         @load="onLoad"
-         @tilesloaded="onMapEvent('titlesloaded', $event)"
-         @zoom_changed="onMapEvent('zoom_changed', $event)"
-      >
-      </vue-daum-map>
-   </div>
+   <div class="container"> <transition name="slide-down"> <toast v-show="toastShow" :isExplore="isExplore" :toastDist="toastDist" class="toast-pop-up floating" @emit-initRecommend="onInputComplete"
+   @emit-closeRecommend="closeRecommend" @emit-closeExplore="closeExplore" ></toast> </transition> <transition name="collapse-right"> <div v-show="detailCompo" class="detail-compo floating">
+   <map-detail v-show="detailCompo" :isBookmark="isBookmark" :detailData="detailData" :loadStatus="loadStatus" @close-expended="onClickCloseDetail"></map-detail> </div> </transition> <transition
+   name="collapse"> <div v-show="optionCompo || bookMarkCompo" class="menu-expand-compo floating"> <option-input v-show="optionCompo" @close-expended="onClickClose"
+   @input-complete="onInputComplete"></option-input> <bookmark-list v-if="bookMarkCompo" @close-expended="onClickClose" @goDetail="goDetail"></bookmark-list> </div> </transition> <div
+   class="sidemenu-compo floating"> <side-menu @open-input-form="onClickInputBt" @open-bookmark="onClickBookmarkBt" @dialog-change="onDialogChange"></side-menu> </div> <vue-daum-map id="map"
+   :appKey="appKey" :center.sync="center" :level.sync="level" :mapTypeId="mapTypeId" :libraries="libraries" @load="onLoad" @tilesloaded="onMapEvent('titlesloaded', $event)"
+   @zoom_changed="onMapEvent('zoom_changed', $event)" > </vue-daum-map> </div>
 </template>
 
 <script type="text/javascript" src="http://dapi.kakao.com/v2/maps/sdk.js?appkey=b20bb90eb97f8724820808bd2047982e&libraries=services,clusterer"></script>
@@ -114,7 +83,7 @@ export default {
    },
 
    watch: {
-      level: function() {
+      level: function () {
          // 조건 만족 시 1회만 생성 -> 성능..
          if (this.mapObject != null && this.recommendResult == null) {
             if (this.level >= 6 && this.gu_Overlays.length == 0) {
@@ -135,7 +104,7 @@ export default {
 
    methods: {
       // 모달 생성시 블러 적용
-      onDialogChange: function(dialog) {
+      onDialogChange: function (dialog) {
          if (dialog === true) {
             document.querySelector('.container').classList.add('blur-display');
          } else {
@@ -144,20 +113,20 @@ export default {
       },
 
       // sidemenu의 옵션입력 버튼 눌렀을 때
-      onClickInputBt: function() {
+      onClickInputBt: function () {
          this.optionCompo = !this.optionCompo;
          this.bookMarkCompo = false;
       },
-      onClickBookmarkBt: function() {
+      onClickBookmarkBt: function () {
          this.bookMarkCompo = !this.bookMarkCompo;
          this.optionCompo = false;
       },
       //expended compo 닫기 버튼 눌렀을 때
-      onClickClose: function() {
+      onClickClose: function () {
          this.optionCompo = false;
          this.bookMarkCompo = false;
       },
-      onClickCloseDetail: function() {
+      onClickCloseDetail: function () {
          this.closeExplore();
          this.detailCompo = false;
          this.detailData = new Object();
@@ -165,7 +134,7 @@ export default {
       },
 
       //추천조건 입력 완료되어 버튼 클릭시 (상권추천)
-      onInputComplete: function(options) {
+      onInputComplete: function (options) {
          // console.log(options);
 
          this.optionCompo = false;
@@ -373,16 +342,16 @@ export default {
          });
 
          // 다각형에 mouseover 이벤트를 등록하고 이벤트가 발생하면 폴리곤의 채움색을 변경합니다
-         kakao.maps.event.addListener(polygon, 'mouseover', function(mouseEvent) {
+         kakao.maps.event.addListener(polygon, 'mouseover', function (mouseEvent) {
             polygon.setOptions({ fillColor: '#09f' });
          });
 
          // 다각형에 mouseout 이벤트를 등록하고 이벤트가 발생하면 폴리곤의 채움색을 원래색으로 변경합니다
-         kakao.maps.event.addListener(polygon, 'mouseout', function() {
+         kakao.maps.event.addListener(polygon, 'mouseout', function () {
             polygon.setOptions({ fillColor: '#fff' });
          });
 
-         kakao.maps.event.addListener(polygon, 'click', function(mouseEvent) {
+         kakao.maps.event.addListener(polygon, 'click', function (mouseEvent) {
             // console.log(name, ' -> ', mouseEvent.latLng);
             polygon.f.setCenter(center);
             polygon.f.setLevel(5, { anchor: center, animate: true });
@@ -507,7 +476,7 @@ export default {
          clusterer.addMarkers(this.dong_Markers);
 
          // 클러스터 클릭시 확대
-         kakao.maps.event.addListener(clusterer, 'clusterclick', function(cluster) {
+         kakao.maps.event.addListener(clusterer, 'clusterclick', function (cluster) {
             var level = cluster._map.getLevel() - 1;
             cluster._map.setLevel(level, { anchor: cluster.getCenter(), animate: true });
          });
@@ -530,7 +499,7 @@ export default {
       // 동-3) 행정동 코드를 기준으로 선택한 마커 폴리곤 생성 및 중앙 이동
       apiDongPolygon(emd_cd, center) {
          var key = '13C339D4-B453-3C5E-A6A1-CCA6792A2D6B'; // 공간정보 오픈플랫폼
-         var domain = 'http://localhost:8080';
+         var domain = 'http://j4a106.p.ssafy.io';
          var crs = 'EPSG:4326'; // 반환되는 좌표(WGS84)
          var data = 'LT_C_ADEMD_INFO'; // 읍면동 조회
          var geo = '';
@@ -780,7 +749,7 @@ export default {
                   resolve(success);
                },
                (err) => {
-                  console.log('getRecommendedCommercials : ', err);
+                  console.log('ERR : ', err);
                }
             );
          });
@@ -892,7 +861,7 @@ export default {
       // 추천-3) 오픈 API를 통해 폴리곤 정보를 불러옴
       getPolygonDistrict(position) {
          var key = '13C339D4-B453-3C5E-A6A1-CCA6792A2D6B'; // 공간정보 오픈플랫폼
-         var domain = 'http://localhost:8080';
+         var domain = 'http://j4a106.p.ssafy.io';
          var crs = 'EPSG:4326'; // 반환되는 좌표(WGS84)
          var geo = `POINT(${position.La} ${position.Ma})`;
          var data = 'LT_C_DGMAINBIZ'; // 상권 폴리곤 출력

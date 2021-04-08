@@ -15,23 +15,24 @@
                   <i @click="deleteDs(idx)" class="fas fa-times-circle del"></i>
                </div>
             </div>
-            <div 
-               class="search" 
-               :class="[{'unsel': selectedDs.length == 0}, { 'selec': selectedDs.length }]"
+            <div
+               class="search"
+               :class="[{ unsel: selectedDs.length == 0 }, { selec: selectedDs.length }]"
                @keyup.up="selectValue('up')"
                @keyup.down="selectValue('down')"
-               @keyup.right="selectValue('right')" 
-               @keyup.left="selectValue('left')">
-               <input 
-                  id="districtInput" 
-                  class="ds-input" 
-                  type="text" 
-                  @input="filter($event.target.value)" 
-                  @keypress.enter="addDistrct($event.target.value)" 
-                  @click="showUl=!showUl" 
-                  autocomplete="off" 
+               @keyup.right="selectValue('right')"
+               @keyup.left="selectValue('left')"
+            >
+               <input
+                  id="districtInput"
+                  class="ds-input"
+                  type="text"
+                  @input="filter($event.target.value)"
+                  @keypress.enter="addDistrct($event.target.value)"
+                  @click="showUl = !showUl"
+                  autocomplete="off"
                />
-               <i v-show="showUl" @click="showUl=false" class="fas fa-times-circle cancle"></i>
+               <i v-show="showUl" @click="showUl = false" class="fas fa-times-circle cancle"></i>
                <ul tabindex="0" class="ds-list" v-if="showUl" @mouseover="removeValue">
                   <li
                      class="ds-items"
@@ -55,7 +56,7 @@
                      <span class="title">보증금</span>
                      <span class="won">{{ deposit | moneyFormat }}만원 이하</span>
                   </div>
-                  <input type="range" v-model="deposit" min="250" max="3500" value="55000" name="" class="range">
+                  <input type="range" v-model="deposit" min="250" max="3500" value="55000" name="" class="range" />
                   <div class="d-label">
                      <span class="l-span">250</span>
                      <span class="l-span">1,000</span>
@@ -72,7 +73,7 @@
                      </div>
                      <span class="won">{{ rent | moneyFormat }}원 이하</span>
                   </div>
-                  <input type="range" v-model="rent" min="15000" max="55000" value="55000" name="" class="range">
+                  <input type="range" v-model="rent" min="15000" max="55000" value="55000" name="" class="range" />
                   <div class="r-label">
                      <span class="l-span">15,000</span>
                      <span class="l-span">25,000</span>
@@ -84,11 +85,11 @@
                <div class="client-wrapper">
                   <div class="c-header">대상고객</div>
                   <div class="bts">
-                     <div class="l-bt" @click="selectClient('직장인')" :class="{'sel-cl': officeSel}">
+                     <div class="l-bt" @click="selectClient('직장인')" :class="{ 'sel-cl': officeSel }">
                         <i class="fas fa-building"></i>
                         <span>직장인</span>
                      </div>
-                     <div class="r-bt" @click="selectClient('주거인')" :class="{'sel-cl': resiSel}">
+                     <div class="r-bt" @click="selectClient('주거인')" :class="{ 'sel-cl': resiSel }">
                         <i class="fas fa-home"></i>
                         <span>주거인</span>
                      </div>
@@ -99,11 +100,11 @@
                      대상 성별
                   </div>
                   <div class="g-bts">
-                     <div class="f-bt" :class="{'sel-cl': feSel}" @click="selectGender('female')">
+                     <div class="f-bt" :class="{ 'sel-cl': feSel }" @click="selectGender('female')">
                         <i class="fas fa-venus"></i>
                         <span>여성</span>
                      </div>
-                     <div class="m-bt" :class="{'sel-cl': maSel}" @click="selectGender('male')">
+                     <div class="m-bt" :class="{ 'sel-cl': maSel }" @click="selectGender('male')">
                         <i class="fas fa-mars"></i>
                         <span>남성</span>
                      </div>
@@ -113,35 +114,33 @@
                   <div class="a-header">대상 연령층</div>
                   <div class="a-checks">
                      <div class="checks etrans small">
-                        <input type="checkbox" name="age" value="10" v-model="selectedAges" id="10age">
+                        <input type="checkbox" name="age" value="10" v-model="selectedAges" id="10age" />
                         <label for="10age">10대</label>
                      </div>
                      <div class="checks etrans small">
-                        <input type="checkbox" name="age" value="20" v-model="selectedAges" id="20age">
+                        <input type="checkbox" name="age" value="20" v-model="selectedAges" id="20age" />
                         <label for="20age">20대</label>
                      </div>
                      <div class="checks etrans small">
-                        <input type="checkbox" name="age" value="30" v-model="selectedAges" id="30age">
+                        <input type="checkbox" name="age" value="30" v-model="selectedAges" id="30age" />
                         <label for="30age">30대</label>
                      </div>
                      <div class="checks etrans small">
-                        <input type="checkbox" name="age" value="40" v-model="selectedAges" id="40age">
+                        <input type="checkbox" name="age" value="40" v-model="selectedAges" id="40age" />
                         <label for="40age">40대</label>
                      </div>
                      <div class="checks etrans small">
-                        <input type="checkbox" name="age" value="50" v-model="selectedAges" id="50age">
+                        <input type="checkbox" name="age" value="50" v-model="selectedAges" id="50age" />
                         <label for="50age">50대</label>
                      </div>
                      <div class="checks etrans small">
-                        <input type="checkbox" name="age" value="60" v-model="selectedAges" id="60age">
+                        <input type="checkbox" name="age" value="60" v-model="selectedAges" id="60age" />
                         <label for="60age">60대</label>
                      </div>
                   </div>
                </div>
-               
             </div>
          </div>
-
       </div>
       <div class="footer">
          <button @click="getRecommended" class="com-bt">추천 받아보기</button>
@@ -229,34 +228,37 @@ export default {
    },
    methods: {
       // expeneded compo 닫기
-      closeCompo: function () {
-         this.$emit('close-expended')
+      closeCompo: function() {
+         this.$emit('close-expended');
       },
       // 업종 선택 완료햇을 때
       onCateSelect: function(category) {
-         this.selectedCate = category
+         this.selectedCate = category;
       },
       // 자동완성 결과에서 하나 선택 했을 때
       changeValue(district) {
          this.addDistrct(district); // 선택된 지역 목록에 추가
-         document.querySelector('.ds-list').classList.remove('key') // ul에 포커싱된 항목 없다는 것 표시
-         document.querySelector('.ds-input').focus()
-         this.filterList = this.districts
+         document.querySelector('.ds-list').classList.remove('key'); // ul에 포커싱된 항목 없다는 것 표시
+         document.querySelector('.ds-input').focus();
+         this.filterList = this.districts;
       },
       addDistrct: function(district) {
          const isSel = this.selectedDs.indexOf(district);
-         if (isSel >= 0) { // 이미 선택된 지역이면
+         if (isSel >= 0) {
+            // 이미 선택된 지역이면
             alert('이미 선택된 지역입니다.');
          } else {
-            if (this.districts.indexOf(district) != -1) { // 입력된 값이 유효한 지역구 이름이면(검색창에서 지역이름 아닌 것 입력한 경우나 오타났을 경우 차단)
-               if (this.selectedDs.length < 3) { // 선택된 지역목록이 최대목록이 아니면
+            if (this.districts.indexOf(district) != -1) {
+               // 입력된 값이 유효한 지역구 이름이면(검색창에서 지역이름 아닌 것 입력한 경우나 오타났을 경우 차단)
+               if (this.selectedDs.length < 3) {
+                  // 선택된 지역목록이 최대목록이 아니면
                   this.selectedDs.push(district); // 추가
                   document.querySelector('.ds-input').value = null;
                   if (this.selectedDs.length === 3) {
-                     this.showUl = false
-                  } 
+                     this.showUl = false;
+                  }
                } else {
-                  this.showUl = false
+                  this.showUl = false;
                   alert('지역은 최대 3개까지 선택가능합니다.');
                }
             } else {
@@ -291,12 +293,13 @@ export default {
                   // 이미 선택된 항목이 있으면
                   const lastEl = document.querySelector('.ds-list li:last-child');
                   const thisEl = document.querySelector('.ds-list li.sel');
-                  if (this.filterList.indexOf(thisEl.innerText) < 20 && this.filterList.length > 5) { // 선택된 항목이 맨 밑줄 항목이 아니면 (ul에서)
+                  if (this.filterList.indexOf(thisEl.innerText) < 20 && this.filterList.length > 5) {
+                     // 선택된 항목이 맨 밑줄 항목이 아니면 (ul에서)
                      const lowerEl = thisEl.nextElementSibling.nextElementSibling.nextElementSibling.nextElementSibling.nextElementSibling; //밑의 항목(index 5차이남)
                      if (!lastEl.classList.contains('sel') && lowerEl) {
                         // 현재 선택된 항목이 마지막항목이 아니면
                         thisEl.classList.remove('sel'); // 현재 선택된 항목 선택 제거
-                        lowerEl.classList.add('sel'); // 선택됐다는 클래스(스타일링) 적용 
+                        lowerEl.classList.add('sel'); // 선택됐다는 클래스(스타일링) 적용
                         lowerEl.focus(); //다음 항목 선택
                      }
                   }
@@ -325,17 +328,19 @@ export default {
             } else if (keycode === 'up' && hasClass) {
                const firstEl = document.querySelectorAll('.ds-list li')[0];
                const thisEl = document.querySelector('.ds-list li.sel');
-               if (this.filterList.indexOf(thisEl.innerText) >= 5 && this.filterList.length > 5) { // 선택된 항목이 맨 윗줄 항목이 아니면 (ul에서)
+               if (this.filterList.indexOf(thisEl.innerText) >= 5 && this.filterList.length > 5) {
+                  // 선택된 항목이 맨 윗줄 항목이 아니면 (ul에서)
                   const upperEl = thisEl.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling;
                   if (!firstEl.classList.contains('sel') && upperEl) {
                      //현재 선택된 항목이 첫번쨰 항목이 아니면
                      thisEl.classList.remove('sel');
                      upperEl.classList.add('sel');
                      upperEl.focus();
-                  } 
-               } else if (firstEl === thisEl) { // 맨 윗줄 항목이면
-                  thisEl.classList.remove('sel'); 
-                  document.querySelector('.ds-list').classList.remove('key')
+                  }
+               } else if (firstEl === thisEl) {
+                  // 맨 윗줄 항목이면
+                  thisEl.classList.remove('sel');
+                  document.querySelector('.ds-list').classList.remove('key');
                   document.querySelector('.ds-input').focus(); // input 으로 포커싱
                }
             } else if (keycode === 'enter' && hasClass) {
@@ -354,7 +359,7 @@ export default {
       },
       // 조건 입력 완료했을 때
       getRecommended: function() {
-         if (this.selectedCate && this.selectedDs) {
+         if (this.selectedCate.length && this.selectedDs.length) {
             const options = {
                category: this.selectedCate,
                districts: this.selectedDs,
@@ -362,65 +367,65 @@ export default {
                rent: this.rent,
                client: this.selectedClient,
                age: this.selectedAges,
-               gender: this.selectedGender
+               gender: this.selectedGender,
             };
             this.$emit('input-complete', options);
          } else {
-            alert('필수 조건을 입력해주세요. (업종, 지역)')
+            alert('필수 조건을 입력해주세요. (업종, 지역)');
          }
       },
       // slide bar 함수
-      callbackRange1: function (val) {
-         this.dSlider.rangeValue = val
+      callbackRange1: function(val) {
+         this.dSlider.rangeValue = val;
       },
-      callbackRange2: function (val) {
-         this.rSlider.rangeValue = val
+      callbackRange2: function(val) {
+         this.rSlider.rangeValue = val;
       },
       // 대상고객 선택
-      selectClient: function (cl) {
-         if (cl==='직장인') {
-            this.officeSel = !this.officeSel
+      selectClient: function(cl) {
+         if (cl === '직장인') {
+            this.officeSel = !this.officeSel;
             if (this.officeSel) {
-               this.selectedClient.push(cl)
+               this.selectedClient.push(cl);
             } else {
-               this.selectedClient.splice(this.selectedClient.indexOf(cl), 1)
+               this.selectedClient.splice(this.selectedClient.indexOf(cl), 1);
             }
          } else {
-            this.resiSel = !this.resiSel
+            this.resiSel = !this.resiSel;
             if (this.resiSel) {
-               this.selectedClient.push(cl)
+               this.selectedClient.push(cl);
             } else {
-               this.selectedClient.splice(this.selectedClient.indexOf(cl), 1)
+               this.selectedClient.splice(this.selectedClient.indexOf(cl), 1);
             }
          }
       },
       // 대상성별 선택
-      selectGender: function (ge) {
-         if (ge==='female') {
-            this.feSel = !this.feSel
+      selectGender: function(ge) {
+         if (ge === 'female') {
+            this.feSel = !this.feSel;
             if (this.feSel) {
-               this.selectedGender.push(ge)
+               this.selectedGender.push(ge);
             } else {
-               this.selectedGender.splice(this.selectedGender.indexOf(ge), 1)
+               this.selectedGender.splice(this.selectedGender.indexOf(ge), 1);
             }
          } else {
-            this.maSel = !this.maSel
+            this.maSel = !this.maSel;
             if (this.maSel) {
-               this.selectedGender.push(ge)
+               this.selectedGender.push(ge);
             } else {
-               this.selectedGender.splice(this.selectedGender.indexOf(ge), 1)
+               this.selectedGender.splice(this.selectedGender.indexOf(ge), 1);
             }
          }
-      }
+      },
    },
    filters: {
-      moneyFormat: function (str) {
+      moneyFormat: function(str) {
          if (str.length > 3) {
-            return [str.slice(0, str.length - 3), ',', str.slice(-3 , str.length)].join('')
+            return [str.slice(0, str.length - 3), ',', str.slice(-3, str.length)].join('');
          }
-         return str
-      }
-   }   
+         return str;
+      },
+   },
 };
 </script>
 <style scoped lang="scss">
@@ -443,7 +448,7 @@ export default {
       font-size: 20pt;
       font-weight: 700;
    }
-   
+
    .content-wrapper {
       margin-top: 35px;
       overflow-y: scroll;
@@ -537,7 +542,7 @@ export default {
                z-index: 100;
                width: 350px;
                height: 35px;
-               border:none;
+               border: none;
                border-radius: 20px;
                background-color: #e7e7e7;
             }
@@ -575,15 +580,15 @@ export default {
                .unsel:hover {
                   cursor: pointer;
                   background-color: #ff6633;
-                  color:white
+                  color: white;
                }
                .sel {
                   background-color: #ff6633;
-                  color:white
+                  color: white;
                }
                .sele {
                   background-color: #ff6633;
-                  color:white
+                  color: white;
                }
             }
             .ds-list:focus {
@@ -591,7 +596,7 @@ export default {
             }
          }
          .unsel {
-            margin-top:30px;
+            margin-top: 30px;
          }
          .selec {
             margin-top: 15px;
@@ -618,7 +623,7 @@ export default {
                   justify-content: space-between;
                   font-weight: 600;
                   .title {
-                     font-size: 12pt
+                     font-size: 12pt;
                   }
                   .won {
                      font-size: 11pt;
@@ -635,7 +640,7 @@ export default {
                   outline: none;
                   opacity: 1;
                }
-                              
+
                .range::-webkit-slider-thumb {
                   -webkit-appearance: none;
                   appearance: none;
@@ -680,7 +685,7 @@ export default {
                   font-weight: 600;
                   .subtitle {
                      .title {
-                        font-size: 12pt
+                        font-size: 12pt;
                      }
                      .sub {
                         color: gray;
@@ -701,7 +706,7 @@ export default {
                   background: #ff6633;
                   outline: none;
                   opacity: 1;
-               }          
+               }
                .range::-webkit-slider-thumb {
                   -webkit-appearance: none;
                   appearance: none;
@@ -749,7 +754,8 @@ export default {
                   display: flex;
                   justify-content: center;
                   align-items: center;
-                  .l-bt, .r-bt {
+                  .l-bt,
+                  .r-bt {
                      width: 50%;
                      cursor: pointer;
                      height: 80px;
@@ -776,7 +782,6 @@ export default {
                      background-color: #ffcc00;
                      color: rgb(43, 43, 43);
                   }
-
                }
             }
             .age-wrapper {
@@ -791,19 +796,22 @@ export default {
                   align-items: center;
                   justify-content: space-between;
                   // checkbox styling
-                  .checks {position: relative;}
+                  .checks {
+                     position: relative;
+                  }
 
-                  .checks input[type="checkbox"] {  /* 실제 체크박스는 화면에서 숨김 */
+                  .checks input[type='checkbox'] {
+                     /* 실제 체크박스는 화면에서 숨김 */
                      position: absolute;
                      width: 1px;
                      height: 1px;
                      padding: 0;
                      margin: -1px;
                      overflow: hidden;
-                     clip:rect(0,0,0,0);
-                     border: 0
+                     clip: rect(0, 0, 0, 0);
+                     border: 0;
                   }
-                  .checks input[type="checkbox"] + label {
+                  .checks input[type='checkbox'] + label {
                      display: inline-block;
                      position: relative;
                      cursor: pointer;
@@ -811,80 +819,82 @@ export default {
                      -moz-user-select: none;
                      -ms-user-select: none;
                   }
-                  .checks input[type="checkbox"] + label:before {  /* 가짜 체크박스 */
+                  .checks input[type='checkbox'] + label:before {
+                     /* 가짜 체크박스 */
                      content: ' ';
                      display: inline-block;
-                     width: 21px;  /* 체크박스의 너비를 지정 */
-                     height: 21px;  /* 체크박스의 높이를 지정 */
+                     width: 21px; /* 체크박스의 너비를 지정 */
+                     height: 21px; /* 체크박스의 높이를 지정 */
                      line-height: 21px; /* 세로정렬을 위해 높이값과 일치 */
                      margin: -2px 8 0 0;
-                     text-align: center; 
+                     text-align: center;
                      vertical-align: middle;
                      background: #fafafa;
                      border: 1px solid #cacece;
-                     border-radius : 3px;
-                     box-shadow: 0px 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05);
+                     border-radius: 3px;
+                     box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05), inset 0px -15px 10px -12px rgba(0, 0, 0, 0.05);
                   }
-                  .checks input[type="checkbox"] + label:active:before,
-                  .checks input[type="checkbox"]:checked + label:active:before {
-                     box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px 1px 3px rgba(0,0,0,0.1);
+                  .checks input[type='checkbox'] + label:active:before,
+                  .checks input[type='checkbox']:checked + label:active:before {
+                     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), inset 0px 1px 3px rgba(0, 0, 0, 0.1);
                   }
 
-                  .checks input[type="checkbox"]:checked + label:before {  /* 체크박스를 체크했을때 */ 
-                     content: '\2714';  /* 체크표시 유니코드 사용 */
+                  .checks input[type='checkbox']:checked + label:before {
+                     /* 체크박스를 체크했을때 */
+                     content: '\2714'; /* 체크표시 유니코드 사용 */
                      color: #99a1a7;
                      text-shadow: 1px 1px #fff;
                      background: #e9ecee;
                      border-color: #adb8c0;
-                     box-shadow: 0px 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05), inset 15px 10px -12px rgba(255,255,255,0.1);
+                     box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05), inset 0px -15px 10px -12px rgba(0, 0, 0, 0.05), inset 15px 10px -12px rgba(255, 255, 255, 0.1);
                   }
 
-                  .checks.small input[type="checkbox"] + label {
+                  .checks.small input[type='checkbox'] + label {
                      font-size: 15px;
                   }
 
-                  .checks.small input[type="checkbox"] + label:before {
+                  .checks.small input[type='checkbox'] + label:before {
                      width: 15px;
                      height: 15px;
                      line-height: 15px;
                      font-size: 11px;
                   }
 
-                  .checks.etrans input[type="checkbox"] + label {
+                  .checks.etrans input[type='checkbox'] + label {
                      padding-left: 23px;
                   }
-                  .checks.etrans input[type="checkbox"] + label:before {
+                  .checks.etrans input[type='checkbox'] + label:before {
                      position: absolute;
                      left: 0;
                      top: 0;
                      margin-top: 0;
-                     opacity: .6;
+                     opacity: 0.6;
                      box-shadow: none;
                      border-color: #ff6633;
-                     -webkit-transition: all .12s, border-color .08s;
-                     transition: all .12s, border-color .08s;
+                     -webkit-transition: all 0.12s, border-color 0.08s;
+                     transition: all 0.12s, border-color 0.08s;
                   }
 
-                  .checks.etrans input[type="checkbox"]:checked + label:before {
+                  .checks.etrans input[type='checkbox']:checked + label:before {
                      position: absolute;
-                     content: "";
+                     content: '';
                      width: 10px;
                      top: -5px;
                      left: 5px;
                      border-radius: 0;
-                     opacity:1; 
+                     opacity: 1;
                      background: transparent;
-                     border-color:transparent #ff6633 #ff6633 transparent;
-                     border-top-color:transparent;
-                     border-left-color:transparent;
-                     -ms-transform:rotate(45deg);
-                     -webkit-transform:rotate(45deg);
-                     transform:rotate(45deg);
+                     border-color: transparent #ff6633 #ff6633 transparent;
+                     border-top-color: transparent;
+                     border-left-color: transparent;
+                     -ms-transform: rotate(45deg);
+                     -webkit-transform: rotate(45deg);
+                     transform: rotate(45deg);
                   }
 
-                  .no-csstransforms .checks.etrans input[type="checkbox"]:checked + label:before {
-                  /*content:"\2713";*/
-                     content: "\2714";
+                  .no-csstransforms .checks.etrans input[type='checkbox']:checked + label:before {
+                     /*content:"\2713";*/
+                     content: '\2714';
                      top: 0;
                      left: 0;
                      width: 21px;
@@ -905,7 +915,8 @@ export default {
                   margin-top: 20px;
                   display: flex;
                   justify-content: space-around;
-                  .f-bt, .m-bt {
+                  .f-bt,
+                  .m-bt {
                      width: 50%;
                      cursor: pointer;
                      height: 80px;
@@ -935,7 +946,6 @@ export default {
             }
          }
       }
-
    }
    .footer {
       height: 15%;
