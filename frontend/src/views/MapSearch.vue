@@ -180,8 +180,6 @@ export default {
             resolve(this.apiRecommend(options));
          })
             .then((result) => {
-               // console.log(result);
-
                this.recommendResult = JSON.stringify(result);
 
                this.removeDongLayer('total');
@@ -530,7 +528,7 @@ export default {
       // 동-3) 행정동 코드를 기준으로 선택한 마커 폴리곤 생성 및 중앙 이동
       apiDongPolygon(emd_cd, center) {
          var key = '13C339D4-B453-3C5E-A6A1-CCA6792A2D6B'; // 공간정보 오픈플랫폼
-         var domain = 'http://localhost:8080';
+         var domain = 'http://j4a106.p.ssafy.io';
          var crs = 'EPSG:4326'; // 반환되는 좌표(WGS84)
          var data = 'LT_C_ADEMD_INFO'; // 읍면동 조회
          var geo = '';
@@ -776,8 +774,7 @@ export default {
             getRecommendedCommercials(
                option,
                (success) => {
-                  // console.log(success);
-                  resolve(success);
+                  resolve(success.data);
                },
                (err) => {
                   console.log('getRecommendedCommercials : ', err);
@@ -797,14 +794,13 @@ export default {
 
          var recommendObj = JSON.parse(this.recommendResult);
 
-         recommendObj.forEach((district) => {
-            var position = new this.coordsChange(district);
+         for (const key in recommendObj) {
+            var position = new this.coordsChange(recommendObj[key]);
 
-            // 커스텀 오버레이에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
             var content = `<div class="customoverlay2">
-                  <div class="circle">${district.score}<span>점</span></div>
-                  <div class="division">${district.division_name}</div>
-                  <div class="name"><i class="fas fa-map-marker-alt"></i> ${district.commercial_name}</div>
+                  <div class="circle">${recommendObj[key].score}<span>%</span></div>
+                  <div class="division">${recommendObj[key].division_name}</div>
+                  <div class="name"><i class="fas fa-map-marker-alt"></i> ${recommendObj[key].commercial_name}</div>
                </div>`;
 
             // 커스텀 오버레이를 생성합니다
@@ -826,7 +822,7 @@ export default {
                clickable: true,
             });
 
-            marker.district = district;
+            marker.district = recommendObj[key];
             marker.position = position;
 
             // 마커가 지도 위에 표시되도록 설정합니다
@@ -835,7 +831,7 @@ export default {
 
             customOverlay.setMap(this.mapObject);
             this.customOverlays.push(customOverlay);
-         });
+         }
 
          // 추천 상권 마커에 이벤트 등록 (츄파츕스)
          this.makeRecommendMarkerClick();
@@ -892,7 +888,7 @@ export default {
       // 추천-3) 오픈 API를 통해 폴리곤 정보를 불러옴
       getPolygonDistrict(position) {
          var key = '13C339D4-B453-3C5E-A6A1-CCA6792A2D6B'; // 공간정보 오픈플랫폼
-         var domain = 'http://localhost:8080';
+         var domain = 'http://j4a106.p.ssafy.io';
          var crs = 'EPSG:4326'; // 반환되는 좌표(WGS84)
          var geo = `POINT(${position.La} ${position.Ma})`;
          var data = 'LT_C_DGMAINBIZ'; // 상권 폴리곤 출력

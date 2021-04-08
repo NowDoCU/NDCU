@@ -53,7 +53,6 @@ export default {
          this.datacollection.datasets[0].data = this.dataset.value;
 
          var maxValue = Math.max.apply(null, this.dataset.value);
-         console.log(maxValue);
 
          for (var i = 0; i < this.dataset.value.length; i++) {
             if (this.datacollection.datasets[0].data[i] == maxValue) {
@@ -63,11 +62,11 @@ export default {
             }
          }
 
-         if(this.maxSales != undefined) {
+         if (this.maxSales != undefined) {
             var cnt = 1;
             this.size = this.maxSales;
 
-            while(this.size >= 10) {
+            while (this.size >= 10) {
                this.size /= 10;
                cnt *= 10;
             }

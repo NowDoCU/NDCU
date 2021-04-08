@@ -1,166 +1,35 @@
 <template lang="">
-   <div class="md-container">
-      <div class="top-wrapper">
-         <div class="header">
-            <div class="name"><i class="fas fa-store"></i> {{ commercialName }}</div>
-            <div class="btnLike">
-               <i v-if="isBookmark" class="fas fa-star" @click="bookmark"></i>
-               <i v-else class="far fa-star" @click="bookmark"></i>
-            </div>
-            <i @click="closeCompo" class="fas fa-times btn-close"></i>
-         </div>
-         <div class="header__info">
-            <span class="title">
-               상권코드<span class="value">{{ commercialCode }}</span>
-            </span>
-            <span class="title">| </span>
-            <span class="title">
-               상권구분<span class="value">{{ divisionName }}</span>
-            </span>
-         </div>
-
-         <!-- 기본 정보 섹션 -->
-         <div class="basic-info-section">
-            <p class="info-line">
-               <i class="fas fa-calendar-week"></i> 이 상권은 <span class="value">{{ busyWeek }}</span
-               >에 가장 사람이 붐벼요
-            </p>
-            <p class="info-line">
-               <i class="far fa-clock"></i> 이 상권은 <span class="value">{{ busyTime }}</span
-               >에 유동 인구가 많아요
-            </p>
-            <p class="info-line">
-               <i class="fas fa-venus-mars"></i> 이 상권은 <span class="value">{{ busyGender }}</span
-               >분들이 더 자주 찾아요
-            </p>
-         </div>
-      </div>
-      <div class="bottom-wrapper">
-         <div class="content-detail">
-            <div class="section store">
-               <p class="title">상가 임대료 시세</p>
-               <span class="notes">10평 기준(33m²)</span>
-               <div v-show="isRentalNull" class="nullInfo">상권 임대료 정보가 없습니다 :-(</div>
-               <div :class="{ nullRental: isRentalNull }" class="wrapper">
-                  <div class="left-box">
-                     <p class="second">2층</p>
-                     <p class="first">1층</p>
-                     <p class="under">지하</p>
-                  </div>
-                  <div class="mid-box">
-                     <p class="label">활성화 지역</p>
-                     <p class="second">{{ rentalPrice.activate.second | currency }}원</p>
-                     <p class="first">{{ rentalPrice.activate.first | currency }}원</p>
-                     <p class="under">{{ rentalPrice.activate.under | currency }}원</p>
-                  </div>
-                  <div class="right-box">
-                     <p class="label">비활성화 지역</p>
-                     <p class="second">{{ rentalPrice.deactivate.second | currency }}원</p>
-                     <p class="first">{{ rentalPrice.deactivate.first | currency }}원</p>
-                     <p class="under">{{ rentalPrice.deactivate.under | currency }}원</p>
-                  </div>
-                  <img src="@/assets/image/detail/house_fee.png" alt="" />
-                  <p class="notes-footer">
-                     <span>*</span> 임대료는 10평을 기준으로 계산된 금액입니다. <br />
-                     <span>**</span> 활성화지역은 대로변에서 100~200m이내에서 매출액,주요상권등 다양한 변수들로 복합적으로 계산해서 시스템에서 자동산출되어 구분되는 영역
-                  </p>
-               </div>
-            </div>
-            <div class="section">
-               <p class="title">집객시설 분포</p>
-               <table class="table facilities">
-                  <tbody>
-                     <tr>
-                        <td>
-                           <img class="emoji" src="@/assets/image/detail/emoji/graduation-cap_1f393.png" />
-                           <p>교육시설</p>
-                        </td>
-                        <td>
-                           <img class="emoji" src="@/assets/image/detail/emoji/squinting-face-with-tongue_1f61d.png" />
-                           <p>문화시설</p>
-                        </td>
-                        <td>
-                           <img class="emoji" src="@/assets/image/detail/emoji/house-with-garden_1f3e1.png" />
-                           <p>숙박시설</p>
-                        </td>
-                        <td>
-                           <img class="emoji" src="@/assets/image/detail/emoji/metro_1f687.png" />
-                           <p>지하철</p>
-                        </td>
-                        <td>
-                           <img class="emoji" src="@/assets/image/detail/emoji/bus_1f68c.png" />
-                           <p>버스</p>
-                        </td>
-                     </tr>
-                     <tr>
-                        <td>{{ facilities.school }}</td>
-                        <td>{{ facilities.entertainment }}</td>
-                        <td>{{ facilities.accommodation }}</td>
-                        <td>{{ facilities.rail }}</td>
-                        <td>{{ facilities.bus }}</td>
-                     </tr>
-                  </tbody>
-               </table>
-               <p class="notes-footer">
-                  <span>*</span> 교육시설 = 상권 내 유치원/초/중/고/대학교 <br />
-                  <span>**</span> 문화시설 = 상권 내 극장, 백화점<br />
-                  <span>***</span> 지하철 = 상권 내 극장, 지하철역, 철도역<br />
-                  <span>****</span> 버스 = 상권 내 버스 정거장, 버스터미널<br />
-               </p>
-            </div>
-            <div class="section">
-               <p class="title">📊 유동인구 변화추이</p>
-               <LineGraph :isLoad="isLoad" :dataset="population" class="graph" />
-            </div>
-            <div class="section">
-               <p class="title">📊 연령대 분포</p>
-               <span class="notes">(updated 2020-4분기)</span>
-               <BarGraph :isLoad="isLoad" :dataset="age" class="graph" />
-            </div>
-            <div class="section">
-               <p class="title">📊 업종별 평균 매출액</p>
-               <span class="notes">(updated 2020-4분기)</span>
-               <BarGraph :isLoad="isLoad" :maxSales="maxSales" :dataset="storeSales" class="graph" />
-               <p class="notes-footer"><span>*</span> 매출액은 카드사 데이터로 도출한 매출추정액입니다. <br /></p>
-            </div>
-            <div class="section">
-               <p class="title">🏘 점포수</p>
-               <table class="table storeCnt">
-                  <tbody>
-                     <tr>
-                        <td class="cate">한식</td>
-                        <td class="cate">중식</td>
-                        <td class="cate">일식</td>
-                        <td class="cate">양식</td>
-                        <td class="cate">분식</td>
-                     </tr>
-                     <tr>
-                        <td>{{ storeCnt.CS100001 }}</td>
-                        <td>{{ storeCnt.CS100002 }}</td>
-                        <td>{{ storeCnt.CS100003 }}</td>
-                        <td>{{ storeCnt.CS100004 }}</td>
-                        <td>{{ storeCnt.CS100008 }}</td>
-                     </tr>
-                     <tr>
-                        <td class="cate">패스트푸드</td>
-                        <td class="cate">치킨</td>
-                        <td class="cate">호프, 주점</td>
-                        <td class="cate">커피, 음료</td>
-                        <td class="cate">제과점</td>
-                     </tr>
-                     <tr>
-                        <td>{{ storeCnt.CS100006 }}</td>
-                        <td>{{ storeCnt.CS100007 }}</td>
-                        <td>{{ storeCnt.CS100009 }}</td>
-                        <td>{{ storeCnt.CS100010 }}</td>
-                        <td>{{ storeCnt.CS100005 }}</td>
-                     </tr>
-                  </tbody>
-               </table>
-            </div>
-         </div>
-      </div>
-   </div>
+   <div class="md-container"> <div class="top-wrapper"> <div class="header"> <div class="name"><i class="fas fa-store"></i> {{ commercialName }}</div> <div class="btnLike"> <i v-if="isBookmark"
+   class="fas fa-star" @click="bookmark"></i> <i v-else class="far fa-star" @click="bookmark"></i> </div> <i @click="closeCompo" class="fas fa-times btn-close"></i> </div> <div class="header__info">
+   <span class="title"> 상권코드<span class="value">{{ commercialCode }}</span> </span> <span class="title">| </span> <span class="title"> 상권구분<span class="value">{{ divisionName }}</span> </span>
+   </div> <!-- 기본 정보 섹션 --> <div class="basic-info-section"> <p class="info-line"> <i class="fas fa-calendar-week"></i> 이 상권은 <span class="value">{{ busyWeek }}</span >에 가장 사람이 붐벼요
+   </p> <p class="info-line"> <i class="far fa-clock"></i> 이 상권은 <span class="value">{{ busyTime }}</span >에 유동 인구가 많아요 </p> <p class="info-line"> <i class="fas fa-venus-mars"></i> 이
+   상권은 <span class="value">{{ busyGender }}</span >분들이 더 자주 찾아요 </p> </div> </div> <div class="bottom-wrapper"> <div class="content-detail"> <div class="section store"> <p
+   class="title">상가 임대료 시세</p> <span class="notes">10평 기준(33m²)</span> <div v-show="isRentalNull" class="nullInfo">상권 임대료 정보가 없습니다 :-(</div> <div :class="{ nullRental:
+   isRentalNull }" class="wrapper"> <div class="left-box"> <p class="second">2층</p> <p class="first">1층</p> <p class="under">지하</p> </div> <div class="mid-box"> <p class="label">활성화 지역</p> <p
+   class="second">{{ rentalPrice.activate.second | currency }}원</p> <p class="first">{{ rentalPrice.activate.first | currency }}원</p> <p class="under">{{
+      rentalPrice.activate.under | currency
+   }}원</p> </div> <div class="right-box"> <p class="label">비활성화 지역</p> <p class="second">{{ rentalPrice.deactivate.second | currency }}원</p> <p class="first">{{
+      rentalPrice.deactivate.first | currency
+   }}원</p> <p class="under">{{ rentalPrice.deactivate.under | currency }}원</p> </div> <img src="@/assets/image/detail/house_fee.png" alt="" /> <p class="notes-footer"> <span>*</span> 임대료는 10평을
+   기준으로 계산된 금액입니다. <br /> <span>**</span> 활성화지역은 대로변에서 100~200m이내에서 매출액,주요상권등 다양한 변수들로 복합적으로 계산해서 시스템에서 자동산출되어 구분되는 영역 </p> </div>
+   </div> <div class="section"> <p class="title">집객시설 분포</p> <table class="table facilities"> <tbody> <tr> <td> <img class="emoji" src="@/assets/image/detail/emoji/graduation-cap_1f393.png" />
+   <p>교육시설</p> </td> <td> <img class="emoji" src="@/assets/image/detail/emoji/squinting-face-with-tongue_1f61d.png" /> <p>문화시설</p> </td> <td> <img class="emoji"
+   src="@/assets/image/detail/emoji/house-with-garden_1f3e1.png" /> <p>숙박시설</p> </td> <td> <img class="emoji" src="@/assets/image/detail/emoji/metro_1f687.png" /> <p>지하철</p> </td> <td> <img
+   class="emoji" src="@/assets/image/detail/emoji/bus_1f68c.png" /> <p>버스</p> </td> </tr> <tr> <td>{{ facilities.school }}</td> <td>{{ facilities.entertainment }}</td> <td>{{
+      facilities.accommodation
+   }}</td> <td>{{ facilities.rail }}</td> <td>{{ facilities.bus }}</td> </tr> </tbody> </table> <p class="notes-footer"> <span>*</span> 교육시설 = 상권 내 유치원/초/중/고/대학교 <br /> <span>**</span>
+   문화시설 = 상권 내 극장, 백화점<br /> <span>***</span> 지하철 = 상권 내 극장, 지하철역, 철도역<br /> <span>****</span> 버스 = 상권 내 버스 정거장, 버스터미널<br /> </p> </div> <div class="section">
+   <p class="title">📊 유동인구 변화추이</p> <LineGraph :isLoad="isLoad" :dataset="population" class="graph" /> </div> <div class="section"> <p class="title">📊 연령대 분포</p> <span
+   class="notes">(updated 2020-4분기)</span> <BarGraph :isLoad="isLoad" :dataset="age" class="graph" /> </div> <div class="section"> <p class="title">📊 업종별 평균 매출액</p> <span
+   class="notes">(updated 2020-4분기)</span> <BarGraph :isLoad="isLoad" :maxSales="maxSales" :dataset="storeSales" class="graph" /> <p class="notes-footer"><span>*</span> 매출액은 카드사 데이터로
+   도출한 매출추정액입니다. <br /></p> </div> <div class="section"> <p class="title">🏘 점포수</p> <table class="table storeCnt"> <tbody> <tr> <td class="cate">한식</td> <td class="cate">중식</td> <td
+   class="cate">일식</td> <td class="cate">양식</td> <td class="cate">분식</td> </tr> <tr> <td>{{ storeCnt.CS100001 }}</td> <td>{{ storeCnt.CS100002 }}</td> <td>{{ storeCnt.CS100003 }}</td> <td>{{
+      storeCnt.CS100004
+   }}</td> <td>{{ storeCnt.CS100008 }}</td> </tr> <tr> <td class="cate">패스트푸드</td> <td class="cate">치킨</td> <td class="cate">호프, 주점</td> <td class="cate">커피, 음료</td> <td
+   class="cate">제과점</td> </tr> <tr> <td>{{ storeCnt.CS100006 }}</td> <td>{{ storeCnt.CS100007 }}</td> <td>{{ storeCnt.CS100009 }}</td> <td>{{ storeCnt.CS100010 }}</td> <td>{{
+      storeCnt.CS100005
+   }}</td> </tr> </tbody> </table> </div> </div> </div> </div>
 </template>
 
 <script>
@@ -180,7 +49,7 @@ export default {
       BarGraph,
       LineGraph,
    },
-   data: function() {
+   data: function () {
       return {
          commercialName: '',
          commercialCode: '',
@@ -239,7 +108,7 @@ export default {
       };
    },
    watch: {
-      loadStatus: function() {
+      loadStatus: function () {
          if (this.loadStatus == 0) {
             // 초기화
             // console.log('- 데이터베이스와 로드값을 초기화합니다');
@@ -247,7 +116,7 @@ export default {
             this.initDataset(); // 데이터셋 초기화
          }
       },
-      detailData: function() {
+      detailData: function () {
          if (this.detailData.commercialName !== undefined) {
             // 전달 받은 값 있을 경우
             this.dataInsert();
@@ -458,7 +327,7 @@ export default {
 
       // ====================================
 
-      bookmark: function() {
+      bookmark: function () {
          // 로그인되어 있는지 확인
          if (!this.isLogin) {
             alert('로그인이 필요합니다.');
@@ -470,9 +339,7 @@ export default {
             let commercial = { commercialCode: this.detailData.commercialCode };
             createBookmark(
                commercial,
-               () => {
-                  alert('북마크 추가');
-               },
+               () => {},
                (err) => {
                   console.log(err);
                }
@@ -491,7 +358,7 @@ export default {
          this.isBookmark = !this.isBookmark;
       },
 
-      closeCompo: function() {
+      closeCompo: function () {
          this.isLoad = false;
          this.initDataset();
 
@@ -499,7 +366,7 @@ export default {
       },
    },
    filters: {
-      currency: function(value) {
+      currency: function (value) {
          var num = new Number(value);
          return num.toFixed(0).replace(/(\d)(?=(\d{3})+(?:\.\d+)?$)/g, '$1,');
       },
