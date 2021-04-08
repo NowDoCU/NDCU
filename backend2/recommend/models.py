@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 class Commercial(models.Model):
-    
+
     commercial_code = models.IntegerField()
     division_code = models.TextField()
     division_name = models.TextField()
@@ -39,3 +39,15 @@ class Commercial(models.Model):
     age_40 = models.IntegerField()
     age_50 = models.IntegerField()
     age_60 = models.IntegerField()
+
+
+class StoreRentalPrice(models.Model):
+
+    commercial_code = models.IntegerField()
+    deactivate_under_deposit = models.IntegerField()
+    deactivate_under_rent = models.IntegerField()
+
+class OfficeWorker(models.Model):
+
+    commercial_code = models.IntegerField()
+    office_worker_count = models.IntegerField()
