@@ -39,13 +39,3 @@ class Commercial(models.Model):
     age_40 = models.IntegerField()
     age_50 = models.IntegerField()
     age_60 = models.IntegerField()
-
-# class Recommend(models.Model):
-#     category = models.CharField(max_length=50)
-#     districts = models.Ma()
-    
-#     deposit = models.TextField()
-#     rent = models.TextField()
-#     client = models.TextField()
-#     age = models.TextField()
-#     gender = models.TextField()

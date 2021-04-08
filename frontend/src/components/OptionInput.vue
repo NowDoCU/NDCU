@@ -938,9 +938,12 @@ export default {
 
    }
    .footer {
+      height: 15%;
       width: 100%;
       display: flex;
+      margin-top: -50px;
       justify-content: center;
+      align-items: center;
       .com-bt {
          color: rgb(57, 104, 235);
          font-weight: 700;
