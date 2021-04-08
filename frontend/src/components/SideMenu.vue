@@ -14,9 +14,9 @@
       <div class="bottom-wrapper">
          <i @click="aboutDialog = true" class="fas fa-info-circle about"></i><br /><br /><br /><br />
          <!--  login == 1 signup == 2 -->
-         <span v-if="isLogin">{{ userInfo.name }}님</span><br><br>
+         <span v-if="isLogin" @click="onClickBookmarkBt">{{ userInfo.name }}</span><br><br>
+         <span v-if="isLogin" @click="doLogout">로그아웃</span>
          <span v-if="!isLogin" @click="controlModal(1, 'open')">로그인</span><br /><br />
-         <span v-if="isLogin" @click="doLogout">로그아웃</span><br /><br />
          <span v-if="!isLogin" @click="controlModal(2, 'open')">회원가입</span>
       </div>
 
@@ -109,12 +109,15 @@
          <div v-if="aboutDialog" class="about-modal">
             <div class="left-wrapper">
                <div class="l-top-wrapper">
-                  <span class="name">세모창</span><br />
-                  <span class="description">Lorem ipsum dolor sit amet consectetur adipisicing elit.</span>
+                  <div class="name-wrapper">
+                     <img class="about-logo" src="@/assets/image/NDCU_logo_icon.png/" alt="">
+                     <span class="name">나두창업</span><span class="sub-name"> Now Do 창업</span>
+                  </div><br>
+                  <span class="description">FUZZY-C-MEANS 클러스터링 알고리즘을 기반으로<br> 후보 상권지를 추천하는 예비 창업자를 위한 서포터,<br> 나두창업입니다</span>
                </div>
                <div class="l-bottom-wrapper">
-                  <span>본 사이트의 저작권은 SSAFY 4기 핫식스팀에게 있습니다.</span><br />
-                  <span>Copyright © Hot6 All Rights Reserved.</span>
+                  <span>본 사이트는 SSAFY 4기 핫식스팀에 의해 개발되었습니다.</span><br />
+                  <span>Developed By. Team Hot6</span>
                </div>
             </div>
             <div class="right-wrapper">
@@ -472,18 +475,34 @@ export default {
       height: 100%;
       width: 40%;
       .l-top-wrapper {
-         .name {
-            font-size: 18pt;
-            font-weight: 800;
+         .name-wrapper {
+            display: flex;
+            align-items: center;
+            .about-logo {
+               width: 30px;
+            }
+            .name {
+               margin-left: 10px;
+               font-size: 15pt;
+               font-weight: 800;
+            }
+            .sub-name {
+               font-size: 12pt;
+               margin-left: 5px;
+               color: rgba(255, 255, 255, 0.753)
+            };
          }
          .description {
-            font-size: 11pt;
-            font-weight: 100;
+            font-size: 10pt;
+            font-weight: 600;
+            line-height: 24px;
          }
       }
       .l-bottom-wrapper {
          span {
-            font-size: 10pt;
+            font-size: 9pt;
+            font-weight: 100;
+            color: rgba(255, 255, 255, 0.753)
          }
       }
    }

@@ -1,10 +1,10 @@
 <template>
    <div class="oi-container">
       <i @click="closeCompo" class="fas fa-angle-double-left oi-close"></i>
-      <div class="oi-header">🍔 상권 추천 받기</div>
+      <div class="oi-header">🌞 상권 추천 받기</div>
       <div class="content-wrapper">
          <div class="top-wrapper">
-            <span>🍳 업종</span>
+            <span>🍴 업종</span>
             <category class="category" @category-select="onCateSelect"></category>
          </div>
          <div class="middle-wrapper">
@@ -48,7 +48,7 @@
             </div>
          </div>
          <div class="bottom-wrapper">
-            <span class="bottom-header">📋 추가정보</span>
+            <span class="bottom-header">📝 추가정보</span>
             <div class="option-wrapper">
                <div class="deposit-wrapper">
                   <div class="b-header">
@@ -938,10 +938,9 @@ export default {
 
    }
    .footer {
-      position: absolute;
-      bottom: 40px;
-      left: 50%;
-      margin-left: -20px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
       .com-bt {
          color: rgb(57, 104, 235);
          font-weight: 700;
