@@ -1,7 +1,7 @@
 <template>
    <div class="oi-container">
       <i @click="closeCompo" class="fas fa-angle-double-left oi-close"></i>
-      <div class="oi-header">상권 추천 받기</div>
+      <div class="oi-header">🍔 상권 추천 받기</div>
       <div class="content-wrapper">
          <div class="top-wrapper">
             <span>🍳 업종</span>
@@ -53,29 +53,32 @@
                <div class="deposit-wrapper">
                   <div class="b-header">
                      <span class="title">보증금</span>
-                     <span class="won">{{ deposit }}만원 이하</span>
+                     <span class="won">{{ deposit | moneyFormat }}만원 이하</span>
                   </div>
                   <input type="range" v-model="deposit" min="250" max="3500" value="55000" name="" class="range">
                   <div class="d-label">
                      <span class="l-span">250</span>
-                     <span class="l-span">1000</span>
-                     <span class="l-span">1850</span>
-                     <span class="l-span">2700</span>
-                     <span class="l-span">3500</span>
+                     <span class="l-span">1,000</span>
+                     <span class="l-span">1,850</span>
+                     <span class="l-span">2,700</span>
+                     <span class="l-span">3,500</span>
                   </div>
                </div>
                <div class="rent-wrapper">
                   <div class="b-header">
-                     <span class="title">월임대료(제곱미터 기준)</span>
-                     <span class="won">{{ rent }}원 이하</span>
+                     <div class="subtitle">
+                        <span class="title">월임대료</span>
+                        <span class="sub">(제곱미터기준)</span>
+                     </div>
+                     <span class="won">{{ rent | moneyFormat }}원 이하</span>
                   </div>
                   <input type="range" v-model="rent" min="15000" max="55000" value="55000" name="" class="range">
                   <div class="r-label">
-                     <span class="l-span">15000</span>
-                     <span class="l-span">25000</span>
-                     <span class="l-span">35000</span>
-                     <span class="l-span">45000</span>
-                     <span class="l-span">55000</span>
+                     <span class="l-span">15,000</span>
+                     <span class="l-span">25,000</span>
+                     <span class="l-span">35,000</span>
+                     <span class="l-span">45,000</span>
+                     <span class="l-span">55,000</span>
                   </div>
                </div>
                <div class="client-wrapper">
@@ -158,8 +161,8 @@ export default {
          selectedCate: '',
          selectedDs: [], // 선택된 지역
          selectedClient: [],
-         deposit: 3500,
-         rent: 55000,
+         deposit: '3500',
+         rent: '55000',
          selectedAges: [],
          selectedGender: [],
          showUl: false,
@@ -410,6 +413,14 @@ export default {
          }
       }
    },
+   filters: {
+      moneyFormat: function (str) {
+         if (str.length > 3) {
+            return [str.slice(0, str.length - 3), ',', str.slice(-3 , str.length)].join('')
+         }
+         return str
+      }
+   }   
 };
 </script>
 <style scoped lang="scss">
@@ -610,7 +621,8 @@ export default {
                      font-size: 12pt
                   }
                   .won {
-                     font-size: 10pt
+                     font-size: 11pt;
+                     color: #ff6633;
                   }
                }
                .range {
@@ -666,11 +678,18 @@ export default {
                   display: flex;
                   justify-content: space-between;
                   font-weight: 600;
-                  .title {
-                     font-size: 12pt
+                  .subtitle {
+                     .title {
+                        font-size: 12pt
+                     }
+                     .sub {
+                        color: gray;
+                        font-size: 11pt;
+                     }
                   }
                   .won {
-                     font-size: 10pt
+                     font-size: 11pt;
+                     color: #ff6633;
                   }
                }
                .range {
@@ -728,28 +747,34 @@ export default {
                .bts {
                   margin-top: 20px;
                   display: flex;
-                  justify-content: space-around;
+                  justify-content: center;
                   align-items: center;
                   .l-bt, .r-bt {
+                     width: 50%;
                      cursor: pointer;
-                     border-radius: 30px;
-                     width: 90px;
-                     border: #ffcc00 1px solid;
-                     height: 90px;
+                     height: 80px;
                      display: flex;
-                     flex-direction: column;
+                     background-color: #e7e7e7;
                      justify-content: center;
                      align-items: center;
-                     color: gray;
+                     color: rgb(43, 43, 43);
                      i {
-                        font-size: 25pt;
+                        font-size: 18pt;
                      }
                      span {
-                        margin-top: 10px;
+                        margin: 0 0 0 10px;
+                        font-weight: 600;
                      }
                   }
+                  .l-bt {
+                     border-radius: 10px 0 0 10px;
+                  }
+                  .r-bt {
+                     border-radius: 0 10px 10px 0;
+                  }
                   .sel-cl {
-                     color: #ffcc00;
+                     background-color: #ffcc00;
+                     color: rgb(43, 43, 43);
                   }
 
                }
@@ -881,24 +906,30 @@ export default {
                   display: flex;
                   justify-content: space-around;
                   .f-bt, .m-bt {
-                     width: 90px;
-                     height: 90px;
+                     width: 50%;
                      cursor: pointer;
-                     border: #ffcc00 1px solid;
+                     height: 80px;
                      display: flex;
-                     flex-direction: column;
-                     align-items: center;
+                     background-color: #e7e7e7;
                      justify-content: center;
-                     color: gray;
+                     align-items: center;
+                     color: rgb(43, 43, 43);
                      i {
                         font-size: 25pt;
                      }
                      span {
-                        margin-top: 10px;
+                        margin-left: 10px;
                      }
                   }
+                  .f-bt {
+                     border-radius: 10px 0 0 10px;
+                  }
+                  .m-bt {
+                     border-radius: 0 10px 10px 0;
+                  }
                   .sel-cl {
-                     color: #ffcc00;
+                     background-color: #ffcc00;
+                     color: rgb(43, 43, 43);
                   }
                }
             }
@@ -908,7 +939,7 @@ export default {
    }
    .footer {
       position: absolute;
-      bottom: 50px;
+      bottom: 40px;
       left: 50%;
       margin-left: -20px;
       .com-bt {

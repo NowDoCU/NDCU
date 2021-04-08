@@ -82,7 +82,7 @@ export default {
     cursor: pointer;
   }
   .sel {
-    background-color: #cccccc;
+    background-color: #ffcc00;
   }
   .sel:hover {
     cursor: pointer;

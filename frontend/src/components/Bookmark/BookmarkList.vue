@@ -3,7 +3,7 @@
       <div class="header">
          <i @click="closeCompo" class="fas fa-angle-double-left"></i>
       </div>
-      <div class="bookmark-name">즐겨찾기</div>
+      <div class="bookmark-name">📌 즐겨찾기</div>
       <div class="bookmarks">
         <BookmarkListItem  @delete-bm="onDeleteBm(idx, bookmark)" @goDetail="goDetail" v-for="(bookmark, idx) in bookmarkList" :key="idx" :bookmark="bookmark" :idx="idx"/>
       </div>
