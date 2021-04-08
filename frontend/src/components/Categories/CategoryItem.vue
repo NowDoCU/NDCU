@@ -64,6 +64,7 @@ export default {
   }
   .cate-text {
     font-size: 6pt;
+    font-weight: 600;
   }
 
 }

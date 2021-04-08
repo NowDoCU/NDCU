@@ -1,8 +1,7 @@
 <template>
    <div class="oi-container">
-      <div class="header">
-         <i @click="closeCompo" class="fas fa-angle-double-left"></i>
-      </div>
+      <i @click="closeCompo" class="fas fa-angle-double-left oi-close"></i>
+      <div class="oi-header">🍔 상권 추천 받기</div>
       <div class="content-wrapper">
          <div class="top-wrapper">
             <span>🍳 업종</span>
@@ -54,29 +53,32 @@
                <div class="deposit-wrapper">
                   <div class="b-header">
                      <span class="title">보증금</span>
-                     <span class="won">{{ deposit }}만원 이하</span>
+                     <span class="won">{{ deposit | moneyFormat }}만원 이하</span>
                   </div>
                   <input type="range" v-model="deposit" min="250" max="3500" value="55000" name="" class="range">
                   <div class="d-label">
                      <span class="l-span">250</span>
-                     <span class="l-span">990</span>
-                     <span class="l-span">1850</span>
-                     <span class="l-span">2700</span>
-                     <span class="l-span">3500</span>
+                     <span class="l-span">1,000</span>
+                     <span class="l-span">1,850</span>
+                     <span class="l-span">2,700</span>
+                     <span class="l-span">3,500</span>
                   </div>
                </div>
                <div class="rent-wrapper">
                   <div class="b-header">
-                     <span class="title">월임대료(제곱미터 기준)</span>
-                     <span class="won">{{ rent }}원 이하</span>
+                     <div class="subtitle">
+                        <span class="title">월임대료</span>
+                        <span class="sub">(제곱미터기준)</span>
+                     </div>
+                     <span class="won">{{ rent | moneyFormat }}원 이하</span>
                   </div>
                   <input type="range" v-model="rent" min="15000" max="55000" value="55000" name="" class="range">
                   <div class="r-label">
-                     <span class="l-span">15000</span>
-                     <span class="l-span">25000</span>
-                     <span class="l-span">35000</span>
-                     <span class="l-span">45000</span>
-                     <span class="l-span">55000</span>
+                     <span class="l-span">15,000</span>
+                     <span class="l-span">25,000</span>
+                     <span class="l-span">35,000</span>
+                     <span class="l-span">45,000</span>
+                     <span class="l-span">55,000</span>
                   </div>
                </div>
                <div class="client-wrapper">
@@ -159,8 +161,8 @@ export default {
          selectedCate: '',
          selectedDs: [], // 선택된 지역
          selectedClient: [],
-         deposit: 3441,
-         rent: 55000,
+         deposit: '3500',
+         rent: '55000',
          selectedAges: [],
          selectedGender: [],
          showUl: false,
@@ -411,63 +413,69 @@ export default {
          }
       }
    },
+   filters: {
+      moneyFormat: function (str) {
+         if (str.length > 3) {
+            return [str.slice(0, str.length - 3), ',', str.slice(-3 , str.length)].join('')
+         }
+         return str
+      }
+   }   
 };
 </script>
 <style scoped lang="scss">
 .oi-container {
    height: 100%;
    padding: 0 15px;
-   display: flex;
-   flex-direction: column;
-   justify-content: space-between;
-   align-items: center;
-   .header {
+   .oi-close {
       position: absolute;
       right: 20px;
       top: 20px;
-      i {
-         font-size: 24pt;
-         color: rgb(148, 148, 148);
-      }
-      i:hover {
-         cursor: pointer;
-         color: #808080;
-      }
+      font-size: 24pt;
+      color: rgb(148, 148, 148);
+   }
+   .oi-close:hover {
+      cursor: pointer;
+      color: #808080;
+   }
+   .oi-header {
+      padding: 50px 0 0 15px;
+      font-size: 20pt;
+      font-weight: 700;
    }
    
    .content-wrapper {
+      margin-top: 35px;
       overflow-y: scroll;
       overflow-x: hidden;
-      margin-top: 60px;
       margin-bottom: 30px;
       padding: 0 15px;
-      height: 80%;
+      height: 75%;
       display: flex;
       flex-direction: column;
-      justify-content: space-around;
       .top-wrapper {
          height: 200px;
          width: 100%;
          span {
             font-size: 15pt;
             font-weight: 900;
-            margin: 0 10px;
+            // margin: 0 10px;
          }
          .category {
             margin-top: 15px;
          }
       }
       .middle-wrapper {
-         margin-top: 15px;
+         margin-top: 35px;
          height: 120px;
          width: 100%;
          .md-subtitle {
             font-size: 15pt;
             font-weight: 900;
-            margin: 0 10px;
+            // margin: 0 10px;
          }
          .selected-ds {
-            margin: 5px;
+            margin: 10px 5px;
             display: flex;
             justify-content: center;
             animation: 0.5s ease-out 0s 1 collapse;
@@ -590,22 +598,21 @@ export default {
          }
       }
       .bottom-wrapper {
-         height: 250px;
-         width: 100%;
+         margin-top: 35px;
          display: flex;
          flex-direction: column;
          justify-content: space-between;
          .bottom-header {
             font-size: 15pt;
             font-weight: 900;
-            margin: 0 10px;
+            // margin: 0 10px;
          }
          .option-wrapper {
-            margin-top: 20px;
+            margin-top: 15px;
             width: 100%;
             height: 100%;
             .deposit-wrapper {
-               padding: 15px;
+               padding: 10px 15px;
                .b-header {
                   display: flex;
                   justify-content: space-between;
@@ -614,14 +621,15 @@ export default {
                      font-size: 12pt
                   }
                   .won {
-                     font-size: 10pt
+                     font-size: 11pt;
+                     color: #ff6633;
                   }
                }
                .range {
                   margin-top: 20px;
                   -webkit-appearance: none;
                   width: 100%;
-                  height: 10px;
+                  height: 8px;
                   border-radius: 5px;
                   background: #ff6633;
                   outline: none;
@@ -654,7 +662,7 @@ export default {
                }
 
                .d-label {
-                  padding: 10px 0;
+                  padding: 8px 0;
                   widows: 100%;
                   display: flex;
                   justify-content: space-between;
@@ -665,23 +673,30 @@ export default {
                }
             }
             .rent-wrapper {
-               padding: 15px;
+               padding: 10px 15px;
                .b-header {
                   display: flex;
                   justify-content: space-between;
                   font-weight: 600;
-                  .title {
-                     font-size: 12pt
+                  .subtitle {
+                     .title {
+                        font-size: 12pt
+                     }
+                     .sub {
+                        color: gray;
+                        font-size: 11pt;
+                     }
                   }
                   .won {
-                     font-size: 10pt
+                     font-size: 11pt;
+                     color: #ff6633;
                   }
                }
                .range {
                   margin-top: 20px;
                   -webkit-appearance: none;
                   width: 100%;
-                  height: 10px;
+                  height: 8px;
                   border-radius: 5px;
                   background: #ff6633;
                   outline: none;
@@ -713,7 +728,7 @@ export default {
                }
 
                .r-label {
-                  padding: 10px 0;
+                  padding: 8px 0;
                   widows: 100%;
                   display: flex;
                   justify-content: space-between;
@@ -724,7 +739,7 @@ export default {
                }
             }
             .client-wrapper {
-               padding: 0 20px;
+               padding: 15px;
                .c-header {
                   font-weight: 600;
                   font-size: 12pt;
@@ -732,34 +747,40 @@ export default {
                .bts {
                   margin-top: 20px;
                   display: flex;
-                  justify-content: space-around;
+                  justify-content: center;
                   align-items: center;
                   .l-bt, .r-bt {
+                     width: 50%;
                      cursor: pointer;
-                     border-radius: 30px;
-                     width: 90px;
-                     // color: white;
-                     height: 90px;
+                     height: 80px;
                      display: flex;
-                     flex-direction: column;
+                     background-color: #e7e7e7;
                      justify-content: center;
                      align-items: center;
-                     color: gray;
+                     color: rgb(43, 43, 43);
                      i {
-                        font-size: 25pt;
+                        font-size: 18pt;
                      }
                      span {
-                        margin-top: 10px;
+                        margin: 0 0 0 10px;
+                        font-weight: 600;
                      }
                   }
+                  .l-bt {
+                     border-radius: 10px 0 0 10px;
+                  }
+                  .r-bt {
+                     border-radius: 0 10px 10px 0;
+                  }
                   .sel-cl {
-                     color: #ffcc00;
+                     background-color: #ffcc00;
+                     color: rgb(43, 43, 43);
                   }
 
                }
             }
             .age-wrapper {
-               padding: 20px;
+               padding: 15px;
                .a-header {
                   font-weight: 600;
                   font-size: 12pt;
@@ -875,7 +896,7 @@ export default {
                }
             }
             .gender-wrapper {
-               padding: 20px;
+               padding: 15px;
                .g-header {
                   font-weight: 600;
                   font-size: 12pt;
@@ -885,20 +906,30 @@ export default {
                   display: flex;
                   justify-content: space-around;
                   .f-bt, .m-bt {
+                     width: 50%;
                      cursor: pointer;
+                     height: 80px;
                      display: flex;
-                     flex-direction: column;
+                     background-color: #e7e7e7;
+                     justify-content: center;
                      align-items: center;
-                     color: gray;
+                     color: rgb(43, 43, 43);
                      i {
                         font-size: 25pt;
                      }
                      span {
-                        margin-top: 10px;
+                        margin-left: 10px;
                      }
                   }
+                  .f-bt {
+                     border-radius: 10px 0 0 10px;
+                  }
+                  .m-bt {
+                     border-radius: 0 10px 10px 0;
+                  }
                   .sel-cl {
-                     color: #ffcc00;
+                     background-color: #ffcc00;
+                     color: rgb(43, 43, 43);
                   }
                }
             }
@@ -907,8 +938,10 @@ export default {
 
    }
    .footer {
-      height: 10%;
-      margin-bottom: 25px;
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      margin-left: -20px;
       .com-bt {
          color: rgb(57, 104, 235);
          font-weight: 700;
@@ -922,7 +955,7 @@ export default {
          background: white;
       }
       .com-bt:hover {
-         margin-top: 5px;
+         margin-bottom: -5px;
          margin-left: 5px;
          cursor: pointer;
          // background: linear-gradient(to bottom right,#1D3CAA,  #7A9FFF);
@@ -933,9 +966,5 @@ export default {
          outline: none;
       }
    }
-}
-.handler {
-   width: 30px;
-   height: 30px;
 }
 </style>

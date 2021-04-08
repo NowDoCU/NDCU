@@ -71,7 +71,7 @@ export default {
 <style scoped lang="scss">
 .bookmark-container {
     height: 100%;
-    padding: 0 20px;
+    padding: 0 15px;
     display: flex;
     flex-direction: column;
     .header {
@@ -88,11 +88,12 @@ export default {
         }
     }
     .bookmark-name {
-        padding: 50px 0 20px 20px;
+        padding: 50px 0 0 15px;
         font-size: 20pt;
         font-weight: 700;
     }
     .bookmarks {
+        margin-top: 35px;
         height: 83%;
         overflow-y: scroll;
     }

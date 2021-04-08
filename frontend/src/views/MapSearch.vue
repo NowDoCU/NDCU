@@ -54,6 +54,7 @@ import { mapState } from 'vuex';
 import { findDongData, findAllData, findAllGu } from '@/api/mapDetail.js';
 import { getBookmarkList } from '@/api/bookmark';
 import { coordsB2H } from '@/api/kakaoAPI.js';
+import { getRecommendedCommercials } from '@/api/recommend.js';
 
 import { jsonp } from 'vue-jsonp';
 
@@ -153,7 +154,6 @@ export default {
       // sidemenu의 옵션입력 버튼 눌렀을 때
       onClickInputBt: function() {
          this.optionCompo = !this.optionCompo;
-         this.test = true
          this.bookMarkCompo = false;
       },
       onClickBookmarkBt: function() {
@@ -172,7 +172,7 @@ export default {
 
       //추천조건 입력 완료되어 버튼 클릭시 (상권추천)
       onInputComplete: function(options) {
-         console.log('## 추천 버튼 클릭');
+         console.log(options);
 
          this.optionCompo = false;
          this.detailCompo = false;
@@ -180,17 +180,15 @@ export default {
          this.isExplore = false;
          this.toastDist = '';
 
-         /*
-         options
-         {
-         category: "일식음식점"
-         districts: {
-                        0: "중구"
-                        1: "용산구"
-                        2: "중랑구"
-                     }
-         }
-         */
+         getRecommendedCommercials(
+            options,
+            (success) => {
+               console.log(success)
+            },
+            (err) => {
+               console.log(err)
+            }
+         )
 
          // options 데이터를 추천 API 요청 -> 상권명 / 추천 지수 / 상권영역 내 x,y 좌표 받음
          var result = this.apiRecommend(options);
