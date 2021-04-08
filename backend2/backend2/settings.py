@@ -27,18 +27,14 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+CORS_ORIGIN_ALLOW_ALL = True
+
 CORS_ORIGIN_WHITELIST = (
-    'http://localhost:3306',
-    'http://localhost:80',
-    'http://localhost:8080',
-    "http://j4a106.p.ssafy.io:80",
+    'http://j4a106.p.ssafy.io',
 )
 
 CORS_ALLOWED_ORIGINS  = [
-    'http://localhost:3306',
-    "http://localhost:80",
-    'http://localhost:8080',
-    "http://j4a106.p.ssafy.io:80",
+    'http://j4a106.p.ssafy.io',
 ]
 
 CORS_ALLOW_METHODS  = [
