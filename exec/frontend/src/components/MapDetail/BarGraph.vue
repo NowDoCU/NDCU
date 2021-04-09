@@ -4,7 +4,7 @@ import { Bar } from 'vue-chartjs';
 export default {
    name: 'BarGraph',
    extends: Bar,
-   data: function () {
+   data: function() {
       return {
          size: 0,
          datacollection: {
@@ -47,7 +47,7 @@ export default {
       maxSales: Number,
    },
    methods: {
-      getValue: function () {
+      getValue: function() {
          this.datacollection.datasets[0].label = this.dataset.name;
          this.datacollection.labels = this.dataset.category;
          this.datacollection.datasets[0].data = this.dataset.value;
@@ -80,7 +80,7 @@ export default {
          // 셋팅 후 재랜더링
          this.renderChart(this.datacollection, this.options);
       },
-      initValue: function () {
+      initValue: function() {
          this.datacollection.datasets[0].label = '';
          this.datacollection.labels = [];
          this.datacollection.datasets[0].data = [];
@@ -93,7 +93,7 @@ export default {
       this.renderChart(this.datacollection, this.options);
    },
    watch: {
-      isLoad: function () {
+      isLoad: function() {
          if (this.isLoad) {
             // 로딩이 끝났으면, 그래프 출력
             this.getValue();

@@ -1,12 +1,50 @@
 <template lang="">
-   <div class="container"> <transition name="slide-down"> <toast v-show="toastShow" :isExplore="isExplore" :toastDist="toastDist" class="toast-pop-up floating" @emit-initRecommend="onInputComplete"
-   @emit-closeRecommend="closeRecommend" @emit-closeExplore="closeExplore" ></toast> </transition> <transition name="collapse-right"> <div v-show="detailCompo" class="detail-compo floating">
-   <map-detail v-show="detailCompo" :isBookmark="isBookmark" :detailData="detailData" :loadStatus="loadStatus" @close-expended="onClickCloseDetail"></map-detail> </div> </transition> <transition
-   name="collapse"> <div v-show="optionCompo || bookMarkCompo" class="menu-expand-compo floating"> <option-input v-show="optionCompo" @close-expended="onClickClose"
-   @input-complete="onInputComplete"></option-input> <bookmark-list v-if="bookMarkCompo" @close-expended="onClickClose" @goDetail="goDetail"></bookmark-list> </div> </transition> <div
-   class="sidemenu-compo floating"> <side-menu @open-input-form="onClickInputBt" @open-bookmark="onClickBookmarkBt" @dialog-change="onDialogChange"></side-menu> </div> <vue-daum-map id="map"
-   :appKey="appKey" :center.sync="center" :level.sync="level" :mapTypeId="mapTypeId" :libraries="libraries" @load="onLoad" @tilesloaded="onMapEvent('titlesloaded', $event)"
-   @zoom_changed="onMapEvent('zoom_changed', $event)" > </vue-daum-map> </div>
+   <div class="container">
+      <transition name="slide-down">
+         <toast
+            v-show="toastShow"
+            :isExplore="isExplore"
+            :toastDist="toastDist"
+            class="toast-pop-up floating"
+            @emit-initRecommend="initRecommend"
+            @emit-closeRecommend="closeRecommend"
+            @emit-closeExplore="closeExplore"
+         ></toast>
+      </transition>
+      <transition name="slide-up">
+         <div v-show="isRecommend" class="caution-msg floating">
+            <p>추천 결과는 <span class="bold">FUZZY-CMEANS 클러스터링</span>을 기반으로 추천된 지수입니다.</p>
+            <p>높은 매출을 기록하는 상권과 몇 퍼센트 유사한지 보여줍니다.</p>
+            <p class="danger">⚠️ 단, 이 결과는 어디까지나 참고용이며 본 추천으로 인해 발생한 결과에 대한 책임은 본인에게 있습니다.</p>
+         </div>
+      </transition>
+      <transition name="collapse-right">
+         <div v-show="detailCompo" class="detail-compo floating">
+            <map-detail v-show="detailCompo" :isBookmark="isBookmark" :detailData="detailData" :loadStatus="loadStatus" @close-expended="onClickCloseDetail"></map-detail>
+         </div>
+      </transition>
+      <transition name="collapse">
+         <div v-show="optionCompo || bookMarkCompo" class="menu-expand-compo floating">
+            <option-input v-show="optionCompo" @close-expended="onClickClose" @input-complete="onInputComplete"></option-input>
+            <bookmark-list v-if="bookMarkCompo" @close-expended="onClickClose" @goDetail="goDetail"></bookmark-list>
+         </div>
+      </transition>
+      <div class="sidemenu-compo floating">
+         <side-menu @open-input-form="onClickInputBt" @open-bookmark="onClickBookmarkBt" @dialog-change="onDialogChange"></side-menu>
+      </div>
+      <vue-daum-map
+         id="map"
+         :appKey="appKey"
+         :center.sync="center"
+         :level.sync="level"
+         :mapTypeId="mapTypeId"
+         :libraries="libraries"
+         @load="onLoad"
+         @tilesloaded="onMapEvent('titlesloaded', $event)"
+         @zoom_changed="onMapEvent('zoom_changed', $event)"
+      >
+      </vue-daum-map>
+   </div>
 </template>
 
 <script type="text/javascript" src="http://dapi.kakao.com/v2/maps/sdk.js?appkey=b20bb90eb97f8724820808bd2047982e&libraries=services,clusterer"></script>
@@ -53,7 +91,11 @@ export default {
       toastShow: false,
       toastDist: null, // 토스트 메뉴에게 건내줄 상권명
 
+      // 추천중일 경우 안내 메세지 표시
+      isRecommend: false,
+
       // [추천 상권]
+      inputOption: {}, // 옵션 값을 저장함
       recommendResult: null,
       markers: [],
       customOverlays: [],
@@ -83,7 +125,7 @@ export default {
    },
 
    watch: {
-      level: function () {
+      level: function() {
          // 조건 만족 시 1회만 생성 -> 성능..
          if (this.mapObject != null && this.recommendResult == null) {
             if (this.level >= 6 && this.gu_Overlays.length == 0) {
@@ -104,7 +146,7 @@ export default {
 
    methods: {
       // 모달 생성시 블러 적용
-      onDialogChange: function (dialog) {
+      onDialogChange: function(dialog) {
          if (dialog === true) {
             document.querySelector('.container').classList.add('blur-display');
          } else {
@@ -113,30 +155,32 @@ export default {
       },
 
       // sidemenu의 옵션입력 버튼 눌렀을 때
-      onClickInputBt: function () {
+      onClickInputBt: function() {
          this.optionCompo = !this.optionCompo;
          this.bookMarkCompo = false;
       },
-      onClickBookmarkBt: function () {
+      onClickBookmarkBt: function() {
          this.bookMarkCompo = !this.bookMarkCompo;
          this.optionCompo = false;
       },
       //expended compo 닫기 버튼 눌렀을 때
-      onClickClose: function () {
+      onClickClose: function() {
          this.optionCompo = false;
          this.bookMarkCompo = false;
       },
-      onClickCloseDetail: function () {
+      onClickCloseDetail: function() {
          this.closeExplore();
          this.detailCompo = false;
+
          this.detailData = new Object();
          this.loadStatus = 0;
       },
 
       //추천조건 입력 완료되어 버튼 클릭시 (상권추천)
-      onInputComplete: function (options) {
+      onInputComplete: function(options) {
          // console.log(options);
 
+         this.inputOption = options;
          this.optionCompo = false;
          this.detailCompo = false;
          this.toastShow = false;
@@ -149,8 +193,6 @@ export default {
             resolve(this.apiRecommend(options));
          })
             .then((result) => {
-               // console.log(result);
-
                this.recommendResult = JSON.stringify(result);
 
                this.removeDongLayer('total');
@@ -164,6 +206,7 @@ export default {
             .then(() => {
                // 추천 받은 상권들을 마커로 표시
                this.setRecommendMarker();
+               this.isRecommend = true;
             });
       },
 
@@ -173,6 +216,7 @@ export default {
       */
       // 토스트 메뉴에서 추천 결과 삭제
       closeRecommend() {
+         this.inputOption = {};
          this.toastShow = false;
          this.optionCompo = false;
          this.bookMarkCompo = false;
@@ -195,6 +239,8 @@ export default {
             this.initCenter();
             this.recommendResult = null;
          }
+
+         this.inputOption = {};
          this.optionCompo = false;
          this.bookMarkCompo = false;
 
@@ -286,6 +332,12 @@ export default {
          }
       },
 
+      initRecommend() {
+         if (this.inputOption.length !== 0) {
+            this.onInputComplete(this.inputOption);
+         }
+      },
+
       // =========================================
       //       구 별로 폴리곤 표시 및 이름 표시
       // =========================================
@@ -342,16 +394,16 @@ export default {
          });
 
          // 다각형에 mouseover 이벤트를 등록하고 이벤트가 발생하면 폴리곤의 채움색을 변경합니다
-         kakao.maps.event.addListener(polygon, 'mouseover', function (mouseEvent) {
+         kakao.maps.event.addListener(polygon, 'mouseover', function(mouseEvent) {
             polygon.setOptions({ fillColor: '#09f' });
          });
 
          // 다각형에 mouseout 이벤트를 등록하고 이벤트가 발생하면 폴리곤의 채움색을 원래색으로 변경합니다
-         kakao.maps.event.addListener(polygon, 'mouseout', function () {
+         kakao.maps.event.addListener(polygon, 'mouseout', function() {
             polygon.setOptions({ fillColor: '#fff' });
          });
 
-         kakao.maps.event.addListener(polygon, 'click', function (mouseEvent) {
+         kakao.maps.event.addListener(polygon, 'click', function(mouseEvent) {
             // console.log(name, ' -> ', mouseEvent.latLng);
             polygon.f.setCenter(center);
             polygon.f.setLevel(5, { anchor: center, animate: true });
@@ -476,7 +528,7 @@ export default {
          clusterer.addMarkers(this.dong_Markers);
 
          // 클러스터 클릭시 확대
-         kakao.maps.event.addListener(clusterer, 'clusterclick', function (cluster) {
+         kakao.maps.event.addListener(clusterer, 'clusterclick', function(cluster) {
             var level = cluster._map.getLevel() - 1;
             cluster._map.setLevel(level, { anchor: cluster.getCenter(), animate: true });
          });
@@ -745,11 +797,10 @@ export default {
             getRecommendedCommercials(
                option,
                (success) => {
-                  // console.log(success);
-                  resolve(success);
+                  resolve(success.data);
                },
                (err) => {
-                  console.log('ERR : ', err);
+                  console.log('getRecommendedCommercials : ', err);
                }
             );
          });
@@ -766,14 +817,13 @@ export default {
 
          var recommendObj = JSON.parse(this.recommendResult);
 
-         recommendObj.forEach((district) => {
-            var position = new this.coordsChange(district);
+         for (const key in recommendObj) {
+            var position = new this.coordsChange(recommendObj[key]);
 
-            // 커스텀 오버레이에 표출될 내용으로 HTML 문자열이나 document element가 가능합니다
             var content = `<div class="customoverlay2">
-                  <div class="circle">${district.score}<span>점</span></div>
-                  <div class="division">${district.division_name}</div>
-                  <div class="name"><i class="fas fa-map-marker-alt"></i> ${district.commercial_name}</div>
+                  <div class="circle">${recommendObj[key].score}<span>%</span></div>
+                  <div class="division">${recommendObj[key].division_name}</div>
+                  <div class="name"><i class="fas fa-map-marker-alt"></i> ${recommendObj[key].commercial_name}</div>
                </div>`;
 
             // 커스텀 오버레이를 생성합니다
@@ -795,7 +845,7 @@ export default {
                clickable: true,
             });
 
-            marker.district = district;
+            marker.district = recommendObj[key];
             marker.position = position;
 
             // 마커가 지도 위에 표시되도록 설정합니다
@@ -804,7 +854,7 @@ export default {
 
             customOverlay.setMap(this.mapObject);
             this.customOverlays.push(customOverlay);
-         });
+         }
 
          // 추천 상권 마커에 이벤트 등록 (츄파츕스)
          this.makeRecommendMarkerClick();
@@ -828,6 +878,7 @@ export default {
          // 검색 결과 조회
          new Promise((resolve) => {
             // 초기 값 셋팅
+            this.isRecommend = false;
             this.loadStatus = 0; // 디테일 컴포넌트 로드가 안된 초기 상태로 셋팅
             this.detailData = new Object(); // 디테일 컴포넌트에 새로운 결과값을 주기위해 초기 값 셋팅
             resolve(this.getDistrictDetail(item.district.commercial_code));
@@ -1043,6 +1094,44 @@ export default {
       z-index: 30;
    }
 
+   .caution-msg {
+      display: flex;
+      flex-direction: column;
+      /* align-items: center; */
+      justify-content: center;
+
+      background-color: rgb(255, 255, 255);
+      padding: 25px;
+
+      width: 400px;
+      height: 60px;
+
+      bottom: 60px;
+      left: 50%;
+
+      font-size: 10pt;
+      font-weight: 500;
+      line-height: 15px;
+      color: rgb(55, 55, 55);
+      box-shadow: 0px 9px 20px 0px #56565685;
+
+      transform: translateX(-50%);
+      /* transform: translate(-50%, -50%);  원본 위치 */
+
+      border-radius: 10px;
+      z-index: 30;
+
+      span.bold {
+         color: rgb(8, 8, 155);
+         font-weight: 600;
+      }
+
+      .danger {
+         margin-top: 6px;
+         color: rgb(177, 2, 2);
+      }
+   }
+
    // detail-compo slide in 기능
    .collapse-right-enter-active,
    .collapse-right-leave-active {
@@ -1065,6 +1154,16 @@ export default {
    .slide-down-enter,
    .slide-down-leave-to {
       transform: translateX(-400px) translateY(-200px);
+   }
+
+   // 경고 메세지 팝업 아래에서 올라오는 기능
+   .slide-up-enter-active,
+   .slide-up-leave-active {
+      transition: all 0.5s ease;
+   }
+   .slide-up-enter,
+   .slide-up-leave-to {
+      transform: translateX(-50%) translateY(200px);
    }
 
    .detail-compo {
