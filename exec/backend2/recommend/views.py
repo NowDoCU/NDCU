@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 
 # algorithm
-from .models import Commercial
+from .models import Commercial, StoreRentalPrice, OfficeWorker
 import pandas as pd
 import json
 import scipy as sp
@@ -47,9 +47,29 @@ def commercial(request):
     else:
         return JsonResponse({})
 
-def algorithm(request_data={}, clustering_select='K'):
+def algorithm(request_data, clustering_select='K'):
     
     commercial_dataset = pd.DataFrame(list(Commercial.objects.all().values()))
+    deposit_rent_dataset = pd.DataFrame(list(StoreRentalPrice.objects.all().values()))
+    office_worker_dataset = pd.DataFrame(list(OfficeWorker.objects.all().values()))
+
+    max_deposit = int(request_data['deposit'])
+    max_rent = int(request_data['rent'])
+
+    filtered_deposit_rent = []
+    if max_deposit < 3500 or max_rent < 55000:
+      deposit_rent_dataset = deposit_rent_dataset[deposit_rent_dataset['deactivate_under_deposit'] < max_deposit]
+      deposit_rent_dataset = deposit_rent_dataset[deposit_rent_dataset['deactivate_under_rent'] < max_rent]
+      filtered_deposit_rent = list(deposit_rent_dataset['commercial_code'])
+      if len(filtered_deposit_rent) < 1:
+        return pd.DataFrame()
+    
+    filtered_office = []
+    if len(request_data['client']) == 1:
+      if request_data['client'][0] == '직장인':
+        filtered_office = list(office_worker_dataset[office_worker_dataset['office_worker_count'] > 1000]['commercial_code'])
+      else:
+        filtered_office = list(office_worker_dataset[office_worker_dataset['office_worker_count'] < 120]['commercial_code'])
     
     day_columns = ['week', 'weekend', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
     time_columns = ['time_00_06', 'time_06_11', 'time_11_14', 'time_14_17', 'time_17_21', 'time_21_24']
@@ -91,13 +111,16 @@ def algorithm(request_data={}, clustering_select='K'):
                     'time_00_06', 'time_06_11', 'time_11_14', 'time_14_17', 'time_17_21', 'time_21_24', \
                  'Man', 'Woman', 'age_10', 'age_20', 'age_30', 'age_40', 'age_50', 'age_60']
 
-    top_rate_commercial = commercial_dataset[commercial_dataset['sales_per_store'] > 50000000]
-    target_dataset = top_rate_commercial.groupby(top_rate_commercial['commercial_code']).mean()[clust_columns]
-    
-    # Scaling target dataset
+    # Clustering matrix
     min_max_scaler = preprocessing.MinMaxScaler()
-    scaled_dataset = min_max_scaler.fit_transform(target_dataset)
-    scaled_dataset = pd.DataFrame(scaled_dataset, columns=clust_columns)
+    clust_matrix = pd.DataFrame(min_max_scaler.fit_transform(commercial_dataset[clust_columns]), \
+                       index=commercial_dataset.index, columns=clust_columns)
+    
+    clust_matrix['commercial_code'] = commercial_dataset['commercial_code']
+
+    top_rate_commercial = commercial_dataset[commercial_dataset['sales_per_store'] > 50000000]
+    target_dataset = clust_matrix[clust_matrix.index.isin(list(top_rate_commercial.index))]
+    scaled_dataset = target_dataset.groupby(target_dataset['commercial_code']).mean()[clust_columns]
 
     # K-means Clustering
     if clustering_select == 'K':
@@ -106,7 +129,7 @@ def algorithm(request_data={}, clustering_select='K'):
       result = scaled_dataset.copy()
       centroids = kmeans.cluster_centers_
       result["cluster"] = kmeans.labels_
-      result.index=target_dataset.index
+      result.index=scaled_dataset.index
 
     # Fuzzy C-means Clustering - linux 환경에서만 가능
     # if clustering_select == 'C':
@@ -115,10 +138,10 @@ def algorithm(request_data={}, clustering_select='K'):
     #   fcm_labels = fcm.predict(np.array(scaled_dataset))
     #   result = scaled_dataset.copy()
     #   result["cluster"] = fcm_labels
-    #   result.index=target_dataset.index
+    #   result.index=scaled_dataset.index
     #   centroids = fcm.centers
 
-    service_name_in_commercial = list(top_rate_commercial['service_name'] == service_name)    
+    service_name_in_commercial = list(top_rate_commercial['service_name'] == service_name)
     top_rate_commercial = top_rate_commercial.assign(service_boolean = service_name_in_commercial)
 
     result['service_boolean'] = top_rate_commercial.groupby('commercial_code')['service_boolean'].sum()
@@ -126,15 +149,29 @@ def algorithm(request_data={}, clustering_select='K'):
     result_score = list(result_score)
     result_centroid = result_score.index(max(result_score))
     
+    # 위치 조건
     selected_commercial = commercial_dataset[commercial_dataset['sigungu_name'].isin(sigungu_list)]
+    
+    # 임대료, 보증금 조건
+    if len(filtered_deposit_rent) > 0:
+      selected_commercial = selected_commercial[selected_commercial['commercial_code'].isin(filtered_deposit_rent)]
+
+    # 직장인구 조전
+    if len(filtered_office) > 0:
+      selected_commercial = selected_commercial[selected_commercial['commercial_code'].isin(filtered_office)]
+      
+    if len(selected_commercial) == 0:
+      return pd.DataFrame()
+
     selected_commercial = selected_commercial.groupby('commercial_code').mean()[clust_columns]
-    scaled_selected_commercial = min_max_scaler.fit_transform(selected_commercial)
-    scaled_selected_commercial = pd.DataFrame(scaled_selected_commercial, index=selected_commercial.index, columns=clust_columns)
+    scaled_selected_commercial = clust_matrix[clust_matrix['commercial_code'].isin(list(selected_commercial.index))]
+    scaled_selected_commercial = scaled_selected_commercial.groupby('commercial_code').mean()
+
     result_commercial = (pd.DataFrame(sp.spatial.distance.cdist(scaled_selected_commercial, \
                                         centroids[result_centroid].reshape(1,23), \
                                         "euclidean"), \
                 index=scaled_selected_commercial.index, \
-                columns=['distance'])).sort_values(by='distance').head(5)
+                columns=['distance'])).sort_values(by='distance').head()
     
     result_commercial = result_commercial.rename_axis('commercial_code').reset_index()
 
@@ -143,10 +180,10 @@ def algorithm(request_data={}, clustering_select='K'):
         left_on="commercial_code", right_on="commercial_code"
     ).drop_duplicates()
 
-    max_distance = max(sp.spatial.distance.cdist(min_max_scaler.fit_transform(commercial_dataset[clust_columns]), \
+    max_distance = max(sp.spatial.distance.cdist(clust_matrix[clust_columns], \
                                   centroids[result_centroid].reshape(1,23), "euclidean").reshape(8868))
     
     result_commercial['score'] = round((max_distance - result_commercial['distance'])*100 / max_distance, 2)
-    result_commercial.index = range(1,6)
+    result_commercial.index = range(1,len(result_commercial.index) + 1)
     
     return result_commercial
