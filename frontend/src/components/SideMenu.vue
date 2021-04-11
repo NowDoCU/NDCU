@@ -14,7 +14,8 @@
       <div class="bottom-wrapper">
          <i @click="aboutDialog = true" class="fas fa-info-circle about"></i><br /><br /><br /><br />
          <!--  login == 1 signup == 2 -->
-         <span v-if="isLogin" @click="onClickBookmarkBt">{{ userInfo.name }}</span><br><br>
+         <span v-if="isLogin" @click="onClickBookmarkBt">{{ userInfo.name }}</span
+         ><br /><br />
          <span v-if="isLogin" @click="doLogout">로그아웃</span>
          <span v-if="!isLogin" @click="controlModal(1, 'open')">로그인</span><br /><br />
          <span v-if="!isLogin" @click="controlModal(2, 'open')">회원가입</span>
@@ -24,7 +25,7 @@
       <transition name="slide-to-middle">
          <div v-if="dialog" class="modal">
             <div class="modal__header">
-               <img src="@/assets/image/NDCU_logo_eng.png" alt="">
+               <img src="@/assets/image/NDCU_logo_eng.png" alt="" />
             </div>
             <div class="modal__content">
                <div class="form-wrapper form-su">
@@ -39,18 +40,47 @@
                      <span v-if="!pwdVal1" class="tip">영문, 숫자 포함 6-10자 이내여야 합니다.</span>
                   </div>
                   <div class="input-wrapper">
-                     <input @keypress.enter="doRegister" v-model="suPwdConf" id="pwdc-ip" maxlength="10" type="password" placeholder="비밀번호 확인" @focus="onFocused('pwdc')" @blur="onBlured('pwdc')" />
+                     <input
+                        @keypress.enter="doRegister"
+                        v-model="suPwdConf"
+                        id="pwdc-ip"
+                        maxlength="10"
+                        type="password"
+                        placeholder="비밀번호 확인"
+                        @focus="onFocused('pwdc')"
+                        @blur="onBlured('pwdc')"
+                     />
                      <div id="pwdc-dv" class="divider"></div>
                      <span v-if="!pwdVal2" class="tip">비밀번호가 일치하지 않습니다.</span>
                   </div>
                   <div class="ad-input-wrapper">
                      <div class="input-wrapper">
-                        <input @keypress.enter="doRegister" v-model.trim="name" id="name-ip" maxlength="10" type="text" placeholder="별명" @focus="onFocused('name')" @blur="onBlured('name')" autocomplete="off"/>
+                        <input
+                           @keypress.enter="doRegister"
+                           v-model.trim="name"
+                           id="name-ip"
+                           maxlength="10"
+                           type="text"
+                           placeholder="별명"
+                           @focus="onFocused('name')"
+                           @blur="onBlured('name')"
+                           autocomplete="off"
+                        />
                         <div id="name-dv" class="divider"></div>
                         <span id="name-tip" v-if="!nameVal" class="tip">필수항목(특수문자 제외)</span>
                      </div>
                      <div class="input-wrapper">
-                        <input @keypress.enter="doRegister" v-model="tel" id="tel-ip" maxlength="11" type="tel" placeholder="휴대전화(선택)" @focus="onFocused('tel')" @blur="onBlured('tel')" autocomplete="off"/>
+                        <input
+                           @keypress.enter="doRegister"
+                           v-model="tel"
+                           id="tel-ip"
+                           maxlength="11"
+                           type="tel"
+                           placeholder="휴대전화(선택)"
+                           @focus="onFocused('tel')"
+                           @blur="onBlured('tel')"
+                           autocomplete="off"
+                        />
                         <div id="tel-dv" class="divider"></div>
                         <span v-if="telFocused" class="tel-tip">ex) 01012345678</span>
                      </div>
@@ -69,17 +99,17 @@
       <transition name="slide-to-middle">
          <div v-if="dialog2" class="modal">
             <div class="modal__header">
-               <img src="@/assets/image/NDCU_logo_eng.png" alt="">
+               <img src="@/assets/image/NDCU_logo_eng.png" alt="" />
             </div>
             <div class="modal__content">
                <div class="form-wrapper form-li">
                   <div class="input-wrapper">
-                     <input v-model="liEmail" id="email-ip" type="email" placeholder="이메일" @focus="onFocused('email')" @blur="onBlured('email')" @keypress.enter="doLogin"/>
+                     <input v-model="liEmail" id="email-ip" type="email" placeholder="이메일" @focus="onFocused('email')" @blur="onBlured('email')" @keypress.enter="doLogin" />
                      <div id="email-dv" class="divider"></div>
                      <span v-if="!emailVal" class="tip">이메일 형식이 아닙니다.</span>
                   </div>
                   <div class="input-wrapper">
-                     <input v-model="liPwd" maxlength="10" id="pwd-ip" type="password" placeholder="비밀번호" @focus="onFocused('pwd')" @blur="onBlured('pwd')" @keypress.enter="doLogin"/>
+                     <input v-model="liPwd" maxlength="10" id="pwd-ip" type="password" placeholder="비밀번호" @focus="onFocused('pwd')" @blur="onBlured('pwd')" @keypress.enter="doLogin" />
                      <div id="pwd-dv" class="divider"></div>
                      <span v-if="!pwdVal1" class="tip">영문, 숫자 포함 6-10자 이내여야 합니다.</span>
                   </div>
@@ -108,16 +138,17 @@
       <transition name="slide-up">
          <div v-if="aboutDialog" class="about-modal">
             <div class="left-wrapper">
-               <div class="l-top-wrapper">
-                  <div class="name-wrapper">
-                     <img class="about-logo" src="@/assets/image/NDCU_logo_icon.png/" alt="">
+               <div class="header">
+                  <div class="service-name">
+                     <img class="about-logo" src="@/assets/image/NDCU_logo_icon.png/" alt="" />
                      <span class="name">나두창업</span><span class="sub-name"> Now Do 창업</span>
-                  </div><br>
-                  <span class="description">FUZZY-C-MEANS 클러스터링 알고리즘을 기반으로<br> 후보 상권지를 추천하는 예비 창업자를 위한 서포터,<br> 나두창업입니다</span>
-               </div>
-               <div class="l-bottom-wrapper">
-                  <span>본 사이트는 SSAFY 4기 핫식스팀에 의해 개발되었습니다.</span><br />
-                  <span>Developed By. Team Hot6</span>
+                  </div>
+                  <br />
+                  <p class="description">
+                     FUZZY-C-MEANS 클러스터링 알고리즘을 기반으로 후보 상권지를 추천하는<br />
+                     예비 창업자를 위한 서포터, 나두창업입니다
+                  </p>
+                  <p class="team">본 사이트는 SSAFY 4기 <span class="member">이주상 김수연 김수진 김한솔 장재용</span> 에 의해 개발되었습니다.<br />Developed By. Team Hot6</p>
                </div>
             </div>
             <div class="right-wrapper">
@@ -175,7 +206,7 @@ export default {
       };
    },
    computed: {
-      ...mapState(['userInfo', 'isLogin']),      
+      ...mapState(['userInfo', 'isLogin']),
    },
    methods: {
       // css 적용위한 Validation 함수들
@@ -198,10 +229,10 @@ export default {
          return false;
       },
       nameVali: function(str) {
-         const reg_name = /[~!@#$%^&*()_+|<>?:;{}]/ // 특수문자 test
+         const reg_name = /[~!@#$%^&*()_+|<>?:;{}]/; // 특수문자 test
          if (str === '' || reg_name.test(str)) {
             return false;
-         } else return true
+         } else return true;
       },
       // 추천 조건 입력 창 열기
       onClickInputBt: function() {
@@ -210,12 +241,12 @@ export default {
       // 즐겨찾기 탭 열기
       onClickBookmarkBt: function() {
          // 로그인 여부 확인
-         if(this.isLogin) {
+         if (this.isLogin) {
             this.$emit('open-bookmark');
          } else {
-            alert('로그인이 필요한 서비스입니다.')
+            alert('로그인이 필요한 서비스입니다.');
             this.controlModal(1, 'open');
-         }         
+         }
       },
       // 회원가입,로그인 모달 컨트롤
       controlModal: function(num, con) {
@@ -253,8 +284,8 @@ export default {
                this.nameVal = true;
                this.suEmail = '';
                this.suPwd = '';
-               this.suPwdConf = ''
-               this.name = ''
+               this.suPwdConf = '';
+               this.name = '';
                this.tel = '';
             }
          }
@@ -265,16 +296,17 @@ export default {
          targetInput.classList.remove('unval');
          targetInput.classList.add('divider');
          targetInput.classList.add('focused');
-         if (type === 'tel') { // tel 적는 곳은 포커스 됐을 때만 hint보여주기
-            this.telFocused = true
+         if (type === 'tel') {
+            // tel 적는 곳은 포커스 됐을 때만 hint보여주기
+            this.telFocused = true;
          }
       },
       onBlured: function(type) {
          // 인풋창에서 포키스아웃됐을 때 css 컨트롤위해
          const targetInput = document.getElementById(`${type}-ip`).value; // 회원가입과 로그인이 모달을 공유하기 때문에 데이터 충돌 방지하기 위해..
-         const targetDiv = document.getElementById(`${type}-dv`); // divider 
+         const targetDiv = document.getElementById(`${type}-dv`); // divider
          const reg_pwd = /^.*(?=.{6,10})(?=.*[0-9])(?=.*[a-zA-Z]).*$/; // 영문,숫자 포함 6 - 10자
-         const reg_name = /[~!@#$%^&*()_+|<>?:;{}]/ // 별명 특수문자 포함되어있는지
+         const reg_name = /[~!@#$%^&*()_+|<>?:;{}]/; // 별명 특수문자 포함되어있는지
          targetDiv.classList.remove('focused');
          targetDiv.classList.remove('divder'); // 기존에 적용된 css제거
          if (type === 'email') {
@@ -301,13 +333,13 @@ export default {
             }
          } else if (type === 'name') {
             if (!this.name || reg_name.test(this.name)) {
-               targetDiv.classList.add('unval')
-               this.nameVal = false
+               targetDiv.classList.add('unval');
+               this.nameVal = false;
             } else {
-               this.nameVal = true
+               this.nameVal = true;
             }
          } else {
-            this.telFocused = false
+            this.telFocused = false;
          }
       },
 
@@ -315,25 +347,25 @@ export default {
       doRegister: function() {
          // 회원가입 요청 보내기
          if (this.emailVali(this.suEmail) && this.pwdVali(this.suPwd) && this.pwdConfVali(this.suPwdConf) && this.nameVali(this.name))
-         registerFounder(
-            {
-               email: this.suEmail,
-               password: this.suPwd,
-               name: this.name,
-               phonenumber: this.tel
-            },
-            () => {
-               // 회원가입에 성공한 경우
-               alert('성공적으로 회원가입되었습니다.')
-               this.controlModal(2, 'close');
-               this.controlModal(1, 'open');
-            },
-            (error) => {
-               if(error.response.status == 409) {
-                  alert('이미 가입되어 있는 이메일입니다');
+            registerFounder(
+               {
+                  email: this.suEmail,
+                  password: this.suPwd,
+                  name: this.name,
+                  phonenumber: this.tel,
+               },
+               () => {
+                  // 회원가입에 성공한 경우
+                  alert('성공적으로 회원가입되었습니다.');
+                  this.controlModal(2, 'close');
+                  this.controlModal(1, 'open');
+               },
+               (error) => {
+                  if (error.response.status == 409) {
+                     alert('이미 가입되어 있는 이메일입니다');
+                  }
                }
-            }
-         )       
+            );
       },
 
       // 로그인 요청처리 메서드
@@ -345,32 +377,32 @@ export default {
                   email: this.liEmail,
                   password: this.liPwd,
                },
-               (res) => {               
+               (res) => {
                   if (res.status == 200) {
                      let token = res.data['accessToken'];
                      localStorage.setItem('accessToken', token); // 토큰 로컬스토리지에 저장
                      this.$store.dispatch('getUserInfo'); // 토큰을 이용한 유저정보 가져오기
                      this.controlModal(1, 'close');
-                     alert('로그인이 완료되었습니다.')
-                  }        
+                     alert('로그인이 완료되었습니다.');
+                  }
                },
                (err) => {
-                  if(err.response.status == 401) {
+                  if (err.response.status == 401) {
                      alert('아이디 또는 비밀번호가 일치하지 않습니다.');
                      this.isLoginError = true;
-                  }               
+                  }
                }
-            ) 
+            );
          }
       },
-      ...mapActions(["doLogout"])      
+      ...mapActions(['doLogout']),
    },
    filters: {
-      extractId: function (value) {
-         const targetIdx = value.indexOf('@')
-         return value.slice(0, targetIdx)
-      }
-   }
+      extractId: function(value) {
+         const targetIdx = value.indexOf('@');
+         return value.slice(0, targetIdx);
+      },
+   },
 };
 </script>
 <style scoped lang="scss">
@@ -474,8 +506,10 @@ export default {
       padding-left: 150px;
       height: 100%;
       width: 40%;
-      .l-top-wrapper {
-         .name-wrapper {
+      /* background-color: green; */
+
+      .header {
+         .service-name {
             display: flex;
             align-items: center;
             .about-logo {
@@ -489,20 +523,23 @@ export default {
             .sub-name {
                font-size: 12pt;
                margin-left: 5px;
-               color: rgba(255, 255, 255, 0.753)
-            };
+               color: rgba(255, 255, 255, 0.753);
+            }
          }
          .description {
             font-size: 10pt;
             font-weight: 600;
             line-height: 24px;
          }
-      }
-      .l-bottom-wrapper {
-         span {
+         .team {
+            margin-top: 4px;
             font-size: 9pt;
-            font-weight: 100;
-            color: rgba(255, 255, 255, 0.753)
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.753);
+            .member {
+               color: rgb(255, 225, 0);
+               line-height: 20px;
+            }
          }
       }
    }
@@ -512,6 +549,7 @@ export default {
       width: 40%;
       height: 80px;
       justify-content: center;
+      /* background-color: rgb(156, 255, 156); */
       .r-left-wrapper {
          font-size: 13pt;
          font-weight: 600;
