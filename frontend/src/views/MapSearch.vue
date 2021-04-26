@@ -1,50 +1,14 @@
 <template lang="">
-   <div class="container">
-      <transition name="slide-down">
-         <toast
-            v-show="toastShow"
-            :isExplore="isExplore"
-            :toastDist="toastDist"
-            class="toast-pop-up floating"
-            @emit-initRecommend="initRecommend"
-            @emit-closeRecommend="closeRecommend"
-            @emit-closeExplore="closeExplore"
-         ></toast>
-      </transition>
-      <transition name="slide-up">
-         <div v-show="isRecommend" class="caution-msg floating">
-            <p>추천 결과는 <span class="bold">FUZZY-CMEANS 클러스터링</span>을 기반으로 추천된 지수입니다.</p>
-            <p>높은 매출을 기록하는 상권과 몇 퍼센트 유사한지 보여줍니다.</p>
-            <p class="danger">⚠️ 단, 이 결과는 어디까지나 참고용이며 본 추천으로 인해 발생한 결과에 대한 책임은 본인에게 있습니다.</p>
-         </div>
-      </transition>
-      <transition name="collapse-right">
-         <div v-show="detailCompo" class="detail-compo floating">
-            <map-detail v-show="detailCompo" :isBookmark="isBookmark" :detailData="detailData" :loadStatus="loadStatus" @close-expended="onClickCloseDetail"></map-detail>
-         </div>
-      </transition>
-      <transition name="collapse">
-         <div v-show="optionCompo || bookMarkCompo" class="menu-expand-compo floating">
-            <option-input v-show="optionCompo" @close-expended="onClickClose" @input-complete="onInputComplete"></option-input>
-            <bookmark-list v-if="bookMarkCompo" @close-expended="onClickClose" @goDetail="goDetail"></bookmark-list>
-         </div>
-      </transition>
-      <div class="sidemenu-compo floating">
-         <side-menu @open-input-form="onClickInputBt" @open-bookmark="onClickBookmarkBt" @dialog-change="onDialogChange"></side-menu>
-      </div>
-      <vue-daum-map
-         id="map"
-         :appKey="appKey"
-         :center.sync="center"
-         :level.sync="level"
-         :mapTypeId="mapTypeId"
-         :libraries="libraries"
-         @load="onLoad"
-         @tilesloaded="onMapEvent('titlesloaded', $event)"
-         @zoom_changed="onMapEvent('zoom_changed', $event)"
-      >
-      </vue-daum-map>
-   </div>
+   <div class="container"> <transition name="slide-down"> <toast v-show="toastShow" :isExplore="isExplore" :toastDist="toastDist" class="toast-pop-up floating" @emit-initRecommend="initRecommend"
+   @emit-closeRecommend="closeRecommend" @emit-closeExplore="closeExplore" ></toast> </transition> <transition name="slide-up"> <div v-show="isRecommend" class="caution-msg floating"> <p>추천 결과는
+   <span class="bold">FUZZY-CMEANS 클러스터링</span>을 기반으로 추천된 지수입니다.</p> <p>높은 매출을 기록하는 상권과 몇 퍼센트 유사한지 보여줍니다.</p> <p class="danger">⚠️ 단, 이 결과는 어디까지나
+   참고용이며 본 추천으로 인해 발생한 결과에 대한 책임은 본인에게 있습니다.</p> </div> </transition> <transition name="collapse-right"> <div v-show="detailCompo" class="detail-compo floating">
+   <map-detail v-show="detailCompo" :isBookmark="isBookmark" :detailData="detailData" :loadStatus="loadStatus" @close-expended="onClickCloseDetail"></map-detail> </div> </transition> <transition
+   name="collapse"> <div v-show="optionCompo || bookMarkCompo" class="menu-expand-compo floating"> <option-input v-show="optionCompo" @close-expended="onClickClose"
+   @input-complete="onInputComplete"></option-input> <bookmark-list v-if="bookMarkCompo" @close-expended="onClickClose" @goDetail="goDetail"></bookmark-list> </div> </transition> <div
+   class="sidemenu-compo floating"> <side-menu @open-input-form="onClickInputBt" @open-bookmark="onClickBookmarkBt" @dialog-change="onDialogChange"></side-menu> </div> <vue-daum-map id="map"
+   :appKey="appKey" :center.sync="center" :level.sync="level" :mapTypeId="mapTypeId" :libraries="libraries" @load="onLoad" @tilesloaded="onMapEvent('titlesloaded', $event)"
+   @zoom_changed="onMapEvent('zoom_changed', $event)" > </vue-daum-map> </div>
 </template>
 
 <script type="text/javascript" src="http://dapi.kakao.com/v2/maps/sdk.js?appkey=b20bb90eb97f8724820808bd2047982e&libraries=services,clusterer"></script>
@@ -125,7 +89,7 @@ export default {
    },
 
    watch: {
-      level: function() {
+      level: function () {
          // 조건 만족 시 1회만 생성 -> 성능..
          if (this.mapObject != null && this.recommendResult == null) {
             if (this.level >= 6 && this.gu_Overlays.length == 0) {
@@ -146,7 +110,7 @@ export default {
 
    methods: {
       // 모달 생성시 블러 적용
-      onDialogChange: function(dialog) {
+      onDialogChange: function (dialog) {
          if (dialog === true) {
             document.querySelector('.container').classList.add('blur-display');
          } else {
@@ -155,20 +119,20 @@ export default {
       },
 
       // sidemenu의 옵션입력 버튼 눌렀을 때
-      onClickInputBt: function() {
+      onClickInputBt: function () {
          this.optionCompo = !this.optionCompo;
          this.bookMarkCompo = false;
       },
-      onClickBookmarkBt: function() {
+      onClickBookmarkBt: function () {
          this.bookMarkCompo = !this.bookMarkCompo;
          this.optionCompo = false;
       },
       //expended compo 닫기 버튼 눌렀을 때
-      onClickClose: function() {
+      onClickClose: function () {
          this.optionCompo = false;
          this.bookMarkCompo = false;
       },
-      onClickCloseDetail: function() {
+      onClickCloseDetail: function () {
          this.closeExplore();
          this.detailCompo = false;
 
@@ -177,7 +141,7 @@ export default {
       },
 
       //추천조건 입력 완료되어 버튼 클릭시 (상권추천)
-      onInputComplete: function(options) {
+      onInputComplete: function (options) {
          // console.log(options);
 
          this.inputOption = options;
@@ -394,16 +358,16 @@ export default {
          });
 
          // 다각형에 mouseover 이벤트를 등록하고 이벤트가 발생하면 폴리곤의 채움색을 변경합니다
-         kakao.maps.event.addListener(polygon, 'mouseover', function(mouseEvent) {
+         kakao.maps.event.addListener(polygon, 'mouseover', function (mouseEvent) {
             polygon.setOptions({ fillColor: '#09f' });
          });
 
          // 다각형에 mouseout 이벤트를 등록하고 이벤트가 발생하면 폴리곤의 채움색을 원래색으로 변경합니다
-         kakao.maps.event.addListener(polygon, 'mouseout', function() {
+         kakao.maps.event.addListener(polygon, 'mouseout', function () {
             polygon.setOptions({ fillColor: '#fff' });
          });
 
-         kakao.maps.event.addListener(polygon, 'click', function(mouseEvent) {
+         kakao.maps.event.addListener(polygon, 'click', function (mouseEvent) {
             // console.log(name, ' -> ', mouseEvent.latLng);
             polygon.f.setCenter(center);
             polygon.f.setLevel(5, { anchor: center, animate: true });
@@ -528,7 +492,7 @@ export default {
          clusterer.addMarkers(this.dong_Markers);
 
          // 클러스터 클릭시 확대
-         kakao.maps.event.addListener(clusterer, 'clusterclick', function(cluster) {
+         kakao.maps.event.addListener(clusterer, 'clusterclick', function (cluster) {
             var level = cluster._map.getLevel() - 1;
             cluster._map.setLevel(level, { anchor: cluster.getCenter(), animate: true });
          });
@@ -1081,7 +1045,7 @@ export default {
    .toast-pop-up {
       background-color: rgb(255, 255, 255);
 
-      width: 380px;
+      width: 400px;
       height: 40px;
 
       top: 40px;
