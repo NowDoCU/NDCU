@@ -4,7 +4,7 @@
 
 Fuzzy c-means 클러스터링 알고리즘을 기반으로 후보 상권지를 추천하는, 상권 추천 및 분석 서비스 🖥
 
-🚧 [LIVE SERVICE](!http://j4a106.p.ssafy.io/)
+🚧 [LIVE SERVICE](http://j4a106.p.ssafy.io/)
 
 <br>
 
@@ -12,7 +12,7 @@ Fuzzy c-means 클러스터링 알고리즘을 기반으로 후보 상권지를 �
 
 |                   팀장                   |                 팀원                  |                팀원                 |                  팀원                  |                 팀원                  |
 | :--------------------------------------: | :-----------------------------------: | :---------------------------------: | :------------------------------------: | :-----------------------------------: |
-| [이주상](!https://github.com/stateaward) | [김수연](!https://github.com/xsw7563) | [김수진](!https://github.com/5ujin) | [김한솔](!https://github.com/pinest94) | [장재용](!https://github.com/kaslock) |
+| [이주상](https://github.com/stateaward) | [김수연](https://github.com/xsw7563) | [김수진](https://github.com/5ujin) | [김한솔](https://github.com/pinest94) | [장재용](https://github.com/kaslock) |
 |                   👨‍🎨 Front-End                   |                 👨‍🎨 Front-End                  |                👨‍🎨 Front-End                 |                  🧑‍💻 Back-End                  |                 🧑‍💻 Back-End                  |
 
 <br>
@@ -42,8 +42,8 @@ Fuzzy c-means 클러스터링 알고리즘을 기반으로 후보 상권지를 �
       -  예비 창업자가 정말 필요로 하는, 실용적인 기능이 필요 ➡️ `Fuzzy c-means Clustering`을 기반으로 추천 기능 제공
 
 - 🗄 산출물
-  - [🔖 기획 발표 자료](!docs/presentation/특화PRJ_A106_기획발표.pdf) : `PMI 기법` 을 통한 아이디어 도출 과정, 와이어프레임 등
-  - [🔖 최종 발표 자료](!docs/presentation/특화PRJ_A106_최종발표.pdf) : 기획 배경부터 서비스 소개까지
+  - [🔖 기획 발표 자료](docs/presentation/특화PRJ_A106_기획발표.pdf) : `PMI 기법` 을 통한 아이디어 도출 과정, 와이어프레임 등
+  - [🔖 최종 발표 자료](docs/presentation/특화PRJ_A106_최종발표.pdf) : 기획 배경부터 서비스 소개까지
   - [📽 시연 영상 (01:52)](https://youtu.be/XoMm4SuEsns)
 
 -  🥇 성과
